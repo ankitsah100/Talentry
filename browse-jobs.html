@@ -331,7 +331,7 @@ async function loadJobsWithMatching(){
   if(!jobs || jobs.length === 0) return;
 
   const profile = await window.TalentryAI.getCandidateProfile(sb);
-  const defaultProfile = { job_title: 'Healthcare Professional', skills: [], location: 'Kathmandu', years_experience: 2 };
+  const defaultProfile = { job_title: 'Biomedical Engineer Healthcare Professional', skills: ['medical devices','patient care','lab equipment','clinical','nursing','pharmacy','radiology','imaging','ICU','ventilator'], location: 'Kathmandu', years_experience: 3 };
   const candidateProfile = profile || defaultProfile;
 
   const list = document.getElementById('jobsList');

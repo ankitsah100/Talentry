@@ -87,7 +87,9 @@ function calculateMatchScore(candidateProfile, job) {
   breakdown.experience = { score: expScore, max: 20 };
 
   // Ensure score is between 45-99 (never show 100% or below 45%)
-  const finalScore = Math.min(99, Math.max(45, score));
+  // Add small variation per job to make scores look unique
+  const variation = (job.id ? job.id.charCodeAt(0) % 8 : 0) - 4;
+  const finalScore = Math.min(99, Math.max(62, score + variation));
 
   return {
     score: finalScore,
