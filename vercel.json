@@ -43,6 +43,10 @@
     {
       "source": "/salary",
       "destination": "/salary-insights.html"
+    },
+    {
+      "source": "/video-interview",
+      "destination": "/video-interview.html"
     }
   ]
 }
