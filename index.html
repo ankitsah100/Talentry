@@ -278,6 +278,7 @@ footer{padding:56px 6% 30px;background:var(--bg);border-top:1.5px solid var(--bo
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
 .reveal.in{opacity:1;transform:translateY(0);}
 </style>
+<link rel="stylesheet" href="mobile.css"/>
 </head>
 <body>
 
@@ -291,7 +292,8 @@ footer{padding:56px 6% 30px;background:var(--bg);border-top:1.5px solid var(--bo
     <a href="post-job.html">For employers</a>
     <a href="browse-jobs.html">Salary insights</a>
   </div>
-  <div class="nav-r">
+  <button class="hamburger" onclick="toggleMenu()" id="hamburger"><span></span><span></span><span></span></button>
+  <div class="nav-r" id="navR">
     <button class="btn-ghost" onclick="location.href='auth.html'">Log in</button>
     <button class="btn-solid" onclick="location.href='auth.html'">Get started free</button>
   </div>
@@ -761,6 +763,29 @@ document.getElementById('applyBtn')?.addEventListener('click', function(){
 // Template switcher
 document.querySelectorAll('.tmpl').forEach(t => {
   t.addEventListener('click', () => { document.querySelectorAll('.tmpl').forEach(x => x.classList.remove('on')); t.classList.add('on'); });
+});
+</script>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="browse-jobs.html">🔍 Find jobs</a>
+  <a href="interview-prep.html">🎙 AI Interview prep</a>
+  <a href="post-job.html">📝 Post a job</a>
+  <a href="employer-dashboard.html">📊 Employer dashboard</a>
+  <a href="profile.html">👤 My profile</a>
+  <a href="auth.html">🔐 Log in</a>
+  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
+</div>
+<script>
+function toggleMenu(){
+  document.getElementById("mobileMenu").classList.toggle("open");
+  const h=document.getElementById("hamburger");
+  h.classList.toggle("open");
+}
+document.addEventListener("click",function(e){
+  const menu=document.getElementById("mobileMenu");
+  const btn=document.getElementById("hamburger");
+  if(menu && !menu.contains(e.target) && !btn.contains(e.target)){
+    menu.classList.remove("open");
+  }
 });
 </script>
 </body>

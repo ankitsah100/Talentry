@@ -85,6 +85,7 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;pa
 .success-btn{display:inline-block;background:var(--g);color:#fff;border:none;padding:13px 32px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-decoration:none;}
 .hidden{display:none;}
 </style>
+<link rel="stylesheet" href="mobile.css"/>
 </head>
 <body>
 <nav>
@@ -302,6 +303,29 @@ async function handleForgot(){
   document.getElementById('errorMsg').style.background='#d6f5eb';
   document.getElementById('errorMsg').style.color='#064e38';
 }
+</script>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="browse-jobs.html">🔍 Find jobs</a>
+  <a href="interview-prep.html">🎙 AI Interview prep</a>
+  <a href="post-job.html">📝 Post a job</a>
+  <a href="employer-dashboard.html">📊 Employer dashboard</a>
+  <a href="profile.html">👤 My profile</a>
+  <a href="auth.html">🔐 Log in</a>
+  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
+</div>
+<script>
+function toggleMenu(){
+  document.getElementById("mobileMenu").classList.toggle("open");
+  const h=document.getElementById("hamburger");
+  h.classList.toggle("open");
+}
+document.addEventListener("click",function(e){
+  const menu=document.getElementById("mobileMenu");
+  const btn=document.getElementById("hamburger");
+  if(menu && !menu.contains(e.target) && !btn.contains(e.target)){
+    menu.classList.remove("open");
+  }
+});
 </script>
 </body>
 </html>

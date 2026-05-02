@@ -1,0 +1,236 @@
+/* ============================================
+   TALENTRY MOBILE RESPONSIVE CSS
+   Include this in all pages
+   ============================================ */
+
+/* HAMBURGER MENU */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  padding: 4px;
+  background: none;
+  border: none;
+}
+.hamburger span {
+  width: 24px;
+  height: 2px;
+  background: var(--text, #0a1a12);
+  border-radius: 2px;
+  transition: all 0.3s;
+  display: block;
+}
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-bottom: 1.5px solid rgba(14,162,113,0.14);
+  padding: 16px 6%;
+  z-index: 99;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a, .mobile-menu button {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #0a1a12;
+  text-decoration: none;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s;
+}
+.mobile-menu a:hover, .mobile-menu button:hover { background: #f4faf7; }
+.mobile-menu .m-btn-solid {
+  background: #0ea271;
+  color: #fff;
+  border-radius: 100px;
+  text-align: center;
+  margin-top: 8px;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  /* NAV */
+  .nav-links { display: none !important; }
+  .hamburger { display: flex !important; }
+
+  /* HERO */
+  .hero {
+    padding: 88px 5% 48px !important;
+    text-align: center !important;
+  }
+  .hero h1 { font-size: clamp(32px, 8vw, 52px) !important; letter-spacing: -1px !important; }
+  .hero-sub { font-size: 15px !important; }
+  .hero-search {
+    flex-direction: column !important;
+    border-radius: 16px !important;
+    padding: 12px !important;
+    gap: 10px !important;
+  }
+  .hero-search input { width: 100% !important; }
+  .hero-search select { border-left: none !important; border-top: 1.5px solid rgba(14,162,113,0.28) !important; width: 100% !important; }
+  .hero-search button { width: 100% !important; border-radius: 12px !important; }
+  .hero-chips { justify-content: center !important; }
+  .hero-stats {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    border-radius: 16px !important;
+  }
+  .hstat {
+    padding: 14px 20px !important;
+    border-right: 1.5px solid rgba(14,162,113,0.14) !important;
+    border-bottom: 1.5px solid rgba(14,162,113,0.14) !important;
+    width: 50% !important;
+  }
+
+  /* SPLIT LAYOUTS */
+  .split, .swipe-layout, .ai-layout, .resume-layout,
+  .salary-layout, .wa-layout, .split.rev {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+  }
+  .split.rev .split-text { order: 1 !important; }
+  .split.rev .split-vis { order: 2 !important; }
+
+  /* TOOLS GRID */
+  .tools-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+
+  /* JOBS */
+  .jobs-hdr { flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
+  .jcard { flex-wrap: wrap !important; }
+  .j-right { width: 100% !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; margin-top: 10px !important; }
+  .ring { width: 44px !important; height: 44px !important; }
+
+  /* KANBAN */
+  .kanban { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
+
+  /* TESTIMONIALS */
+  .testi-grid { grid-template-columns: 1fr !important; }
+
+  /* SECTIONS */
+  .sec { padding: 52px 5% !important; }
+  .sec-title { font-size: clamp(24px, 6vw, 36px) !important; }
+
+  /* CTA */
+  .cta { padding: 60px 5% !important; }
+  .cta-btns { flex-direction: column !important; align-items: center !important; }
+  .cta-w, .cta-o { width: 100% !important; max-width: 320px !important; }
+
+  /* FOOTER */
+  .foot-grid { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
+  .foot-bot { flex-direction: column !important; gap: 14px !important; text-align: center !important; }
+
+  /* AUTH PAGE */
+  .main { grid-template-columns: 1fr !important; }
+  .left { display: none !important; }
+  .right { padding: 24px 5% !important; }
+
+  /* BROWSE JOBS */
+  .page-body { grid-template-columns: 1fr !important; }
+  .filters-sidebar { position: static !important; display: none; }
+  .filters-sidebar.open { display: block !important; }
+  .filter-toggle { display: flex !important; }
+
+  /* POST JOB */
+  .form-layout { grid-template-columns: 1fr !important; }
+  .preview-card { position: static !important; }
+  .form-row { grid-template-columns: 1fr !important; }
+  .form-row.triple { grid-template-columns: 1fr !important; }
+  .benefits-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* PROFILE */
+  .profile-grid { grid-template-columns: 1fr !important; }
+  .profile-header { flex-direction: column !important; }
+  .profile-actions { width: 100% !important; justify-content: flex-start !important; }
+
+  /* EMPLOYER DASHBOARD */
+  .sidebar { width: 100% !important; min-height: auto !important; position: fixed !important; bottom: 0 !important; top: auto !important; flex-direction: row !important; z-index: 100 !important; border-top: 1px solid rgba(255,255,255,0.1) !important; }
+  .sb-logo, .sb-org, .sb-section, .sb-post-btn { display: none !important; }
+  .sb-nav { display: flex !important; flex-direction: row !important; padding: 0 !important; overflow-x: auto !important; }
+  .sb-nav a { flex-direction: column !important; padding: 8px 14px !important; font-size: 10px !important; gap: 3px !important; white-space: nowrap !important; border-right: none !important; }
+  .sb-nav-icon { font-size: 18px !important; width: auto !important; }
+  .main { margin-left: 0 !important; padding: 20px 4% 80px !important; }
+  .stats-row { grid-template-columns: 1fr 1fr !important; }
+  .dash-grid { grid-template-columns: 1fr !important; }
+  .kanban { grid-template-columns: 1fr 1fr !important; }
+  .emp-grid { grid-template-columns: 1fr 1fr !important; }
+
+  /* INTERVIEW PREP */
+  .page { grid-template-columns: 1fr !important; padding: 20px 4% 40px !important; }
+  .setup-panel { position: static !important; }
+
+  /* SWIPE DECK */
+  .swipe-deck { height: 260px !important; }
+  .sc { width: 240px !important; }
+  .sc.s1 { width: 240px !important; }
+
+  /* TICKER */
+  .trust { padding: 12px 0 !important; }
+
+  /* SALARY */
+  .salary-card { padding: 14px !important; }
+  .sal-bar { width: 70px !important; }
+
+  /* EMPLOYER GRID */
+  .employer-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  .tools-grid { grid-template-columns: 1fr !important; }
+  .kanban { grid-template-columns: 1fr !important; }
+  .stats-row { grid-template-columns: 1fr 1fr !important; }
+  .foot-grid { grid-template-columns: 1fr !important; }
+  .hstat { width: 50% !important; }
+  .employer-grid { grid-template-columns: 1fr !important; }
+  .emp-grid { grid-template-columns: 1fr !important; }
+  .benefits-grid { grid-template-columns: 1fr !important; }
+  .field-row { grid-template-columns: 1fr !important; }
+  .role-select { grid-template-columns: 1fr !important; }
+}
+
+/* HAMBURGER ANIMATION */
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+/* HIDE NAV-R BUTTONS ON MOBILE */
+@media (max-width: 768px) {
+  #navR { display: none !important; }
+  .hamburger { display: flex !important; }
+
+  /* BETTER CARD PADDING ON MOBILE */
+  .jcard { padding: 14px 16px !important; }
+  .card { padding: 16px !important; }
+  .form-card { padding: 20px !important; }
+
+  /* BIGGER TOUCH TARGETS */
+  .apply-btn, .btn-solid, .btn-ghost, .submit-btn {
+    min-height: 44px !important;
+  }
+  .filter { padding: 8px 16px !important; }
+
+  /* BETTER HERO SEARCH ON MOBILE */
+  .hero-search { margin: 0 auto 20px !important; }
+
+  /* FIX SWIPE CARD ON MOBILE */
+  .sc-btns button { min-height: 44px !important; }
+
+  /* PROFILE HEADER MOBILE */
+  .profile-header { margin-top: -40px !important; }
+
+  /* CHAT PANEL MOBILE */
+  .chat-panel { min-height: 400px !important; }
+  .chat-messages { max-height: 300px !important; overflow-y: auto !important; }
+}

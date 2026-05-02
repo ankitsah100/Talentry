@@ -96,11 +96,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 .q-card-text{font-size:13.5px;color:var(--text);font-weight:500;line-height:1.5;}
 .q-card-tag{font-size:11px;color:var(--g);margin-top:6px;}
 </style>
+<link rel="stylesheet" href="mobile.css"/>
 </head>
 <body>
 <nav>
   <a class="logo" href="index.html">Tal<em>entry</em></a>
-  <div class="nav-r">
+  <button class="hamburger" onclick="toggleMenu()" id="hamburger"><span></span><span></span><span></span></button>
+  <div class="nav-r" id="navR">
     <button class="btn-ghost" onclick="location.href='auth.html'">Log in</button>
     <button class="btn-solid" onclick="location.href='auth.html'">Sign up free</button>
   </div>
@@ -312,6 +314,29 @@ function updateProgress(){
 
 function handleKey(e){ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendAnswer(); } }
 function insertHint(text){ document.getElementById('userInput').value = text; document.getElementById('userInput').focus(); }
+</script>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="browse-jobs.html">🔍 Find jobs</a>
+  <a href="interview-prep.html">🎙 AI Interview prep</a>
+  <a href="post-job.html">📝 Post a job</a>
+  <a href="employer-dashboard.html">📊 Employer dashboard</a>
+  <a href="profile.html">👤 My profile</a>
+  <a href="auth.html">🔐 Log in</a>
+  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
+</div>
+<script>
+function toggleMenu(){
+  document.getElementById("mobileMenu").classList.toggle("open");
+  const h=document.getElementById("hamburger");
+  h.classList.toggle("open");
+}
+document.addEventListener("click",function(e){
+  const menu=document.getElementById("mobileMenu");
+  const btn=document.getElementById("hamburger");
+  if(menu && !menu.contains(e.target) && !btn.contains(e.target)){
+    menu.classList.remove("open");
+  }
+});
 </script>
 </body>
 </html>

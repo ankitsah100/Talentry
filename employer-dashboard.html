@@ -107,6 +107,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var
 .anl-num{font-family:'Fraunces',serif;font-size:22px;color:var(--g);}
 .anl-lbl{font-size:11px;color:var(--muted);margin-top:3px;}
 </style>
+<link rel="stylesheet" href="mobile.css"/>
 </head>
 <body>
 
@@ -330,5 +331,28 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var
   </div>
 </div>
 
+<div class="mobile-menu" id="mobileMenu">
+  <a href="browse-jobs.html">🔍 Find jobs</a>
+  <a href="interview-prep.html">🎙 AI Interview prep</a>
+  <a href="post-job.html">📝 Post a job</a>
+  <a href="employer-dashboard.html">📊 Employer dashboard</a>
+  <a href="profile.html">👤 My profile</a>
+  <a href="auth.html">🔐 Log in</a>
+  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
+</div>
+<script>
+function toggleMenu(){
+  document.getElementById("mobileMenu").classList.toggle("open");
+  const h=document.getElementById("hamburger");
+  h.classList.toggle("open");
+}
+document.addEventListener("click",function(e){
+  const menu=document.getElementById("mobileMenu");
+  const btn=document.getElementById("hamburger");
+  if(menu && !menu.contains(e.target) && !btn.contains(e.target)){
+    menu.classList.remove("open");
+  }
+});
+</script>
 </body>
 </html>

@@ -76,6 +76,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 .wa-card p{font-size:12.5px;color:rgba(255,255,255,0.65);margin-bottom:14px;line-height:1.6;}
 .wa-btn{background:#25D366;color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;width:100%;}
 </style>
+<link rel="stylesheet" href="mobile.css"/>
 </head>
 <body>
 <nav>
@@ -85,7 +86,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
     <a href="interview-prep.html">Interview prep</a>
     <a href="employer-dashboard.html">Dashboard</a>
   </div>
-  <div class="nav-r">
+  <button class="hamburger" onclick="toggleMenu()" id="hamburger"><span></span><span></span><span></span></button>
+  <div class="nav-r" id="navR">
     <button class="btn-ghost">Log out</button>
     <button class="btn-solid" onclick="location.href='profile.html'">My profile</button>
   </div>
@@ -217,5 +219,28 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
     </div>
   </div>
 </div>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="browse-jobs.html">🔍 Find jobs</a>
+  <a href="interview-prep.html">🎙 AI Interview prep</a>
+  <a href="post-job.html">📝 Post a job</a>
+  <a href="employer-dashboard.html">📊 Employer dashboard</a>
+  <a href="profile.html">👤 My profile</a>
+  <a href="auth.html">🔐 Log in</a>
+  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
+</div>
+<script>
+function toggleMenu(){
+  document.getElementById("mobileMenu").classList.toggle("open");
+  const h=document.getElementById("hamburger");
+  h.classList.toggle("open");
+}
+document.addEventListener("click",function(e){
+  const menu=document.getElementById("mobileMenu");
+  const btn=document.getElementById("hamburger");
+  if(menu && !menu.contains(e.target) && !btn.contains(e.target)){
+    menu.classList.remove("open");
+  }
+});
+</script>
 </body>
 </html>
