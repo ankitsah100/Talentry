@@ -299,12 +299,10 @@ Always respond in this exact JSON format:
 Keep questions relevant to ${sessionRole} roles in Nepal healthcare sector.
 Be encouraging but honest. Use STAR method tips when relevant.`;
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 600,
         system: systemPrompt,
         messages: conversationHistory
       })
@@ -344,8 +342,8 @@ Be encouraging but honest. Use STAR method tips when relevant.`;
 
   } catch(err) {
     removeTyping();
-    // Fallback with helpful message
-    addAIMessage(`Thanks for your answer! <br><br>⚠️ AI feedback is temporarily unavailable. Please try again in a moment, or continue practicing with the next question.`);
+    console.error('AI Error:', err);
+    addAIMessage(`Thanks for your answer! <br><br>⚠️ Error: ${err.message}. Make sure the API key is set in Vercel Environment Variables and redeploy.`);
     if(questionCount < 10){
       setTimeout(()=>{
         questionCount++;
