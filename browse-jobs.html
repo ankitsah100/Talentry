@@ -255,6 +255,7 @@ function filterJobs(){ }
 function clearFilters(){ document.querySelectorAll('.filters-sidebar input[type=checkbox]').forEach(c=>c.checked=false); }
 function updateSalaryLabel(v){ document.getElementById('salaryLabel').textContent = 'Up to Rs. '+Number(v).toLocaleString(); }
 </script>
+<script type="module" src="navbar.js"></script>
 <div class="mobile-menu" id="mobileMenu">
   <a href="browse-jobs.html">🔍 Find jobs</a>
   <a href="interview-prep.html">🎙 AI Interview prep</a>
