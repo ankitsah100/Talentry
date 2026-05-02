@@ -329,3 +329,18 @@ document.addEventListener("click",function(e){
 </script>
 </body>
 </html>
+<script>
+async function signInWithGoogle(){
+  const { error } = await window._sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin + '/browse-jobs.html'
+    }
+  });
+  if(error){
+    const err = document.getElementById('errorMsg');
+    err.textContent = '❌ Google sign in failed: ' + error.message;
+    err.classList.add('show');
+  }
+}
+</script>
