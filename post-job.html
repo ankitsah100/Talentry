@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Post a Job — Talentry</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);min-height:100vh;}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Fraunces',serif;font-size:24px;color:var(--text);text-decoration:none;}
+.logo em{color:var(--g);font-style:italic;}
+.nav-r{display:flex;gap:10px;align-items:center;}
+.btn-ghost{background:none;border:1.5px solid var(--border2);color:var(--text);padding:8px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;}
+.btn-solid{background:var(--g);color:#fff;border:none;padding:9px 22px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
+
+.page{padding:100px 6% 60px;max-width:1100px;margin:0 auto;}
+.page-header{text-align:center;margin-bottom:52px;}
+.page-label{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--g);margin-bottom:10px;}
+.page-title{font-family:'Fraunces',serif;font-size:clamp(32px,4vw,48px);color:var(--text);letter-spacing:-1px;line-height:1.1;margin-bottom:12px;}
+.page-title em{color:var(--g);font-style:italic;}
+.page-sub{font-size:16px;color:var(--muted);font-weight:300;line-height:1.7;}
+
+.form-layout{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start;}
+
+/* FORM CARD */
+.form-card{background:#fff;border:1.5px solid var(--border);border-radius:22px;padding:36px;}
+.form-section{margin-bottom:32px;padding-bottom:32px;border-bottom:1.5px solid var(--border);}
+.form-section:last-child{border:none;margin:0;padding:0;}
+.fsec-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.fsec-icon{width:30px;height:30px;background:var(--gl);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-row.single{grid-template-columns:1fr;}
+.form-row.triple{grid-template-columns:1fr 1fr 1fr;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{font-size:13px;font-weight:600;color:var(--text);}
+.field label span{color:#e24b4a;margin-left:2px;}
+.field input,.field select,.field textarea{padding:11px 16px;border:1.5px solid var(--border2);border-radius:12px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;transition:border-color .2s,box-shadow .2s;outline:none;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(14,162,113,0.1);}
+.field textarea{resize:vertical;min-height:110px;line-height:1.6;}
+.field select{cursor:pointer;}
+.field .hint{font-size:11.5px;color:var(--muted);}
+
+/* SALARY RANGE */
+.salary-row{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;}
+.salary-sep{font-size:14px;color:var(--muted);text-align:center;padding-top:20px;}
+
+/* SKILLS TAGS */
+.skills-wrap{border:1.5px solid var(--border2);border-radius:12px;padding:10px 12px;background:#fff;min-height:52px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;cursor:text;transition:border-color .2s;}
+.skills-wrap:focus-within{border-color:var(--g);box-shadow:0 0 0 3px rgba(14,162,113,0.1);}
+.skill-tag{display:flex;align-items:center;gap:5px;background:var(--gl);color:var(--gd);font-size:12px;font-weight:500;padding:4px 12px;border-radius:100px;}
+.skill-tag button{background:none;border:none;cursor:pointer;color:var(--gd);font-size:14px;line-height:1;padding:0;}
+.skill-input{border:none;outline:none;font-size:13px;font-family:inherit;color:var(--text);background:transparent;min-width:120px;flex:1;}
+.skill-hint{font-size:11.5px;color:var(--muted);margin-top:6px;}
+
+/* BENEFITS */
+.benefits-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.benefit-cb{display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;transition:all .2s;font-size:13px;color:var(--muted);}
+.benefit-cb:hover{border-color:var(--gm);color:var(--text);}
+.benefit-cb input{accent-color:var(--g);width:15px;height:15px;cursor:pointer;}
+.benefit-cb.checked{background:var(--gl);border-color:var(--gm);color:var(--gd);}
+
+/* SOCIAL PREVIEW */
+.preview-card{background:#fff;border:1.5px solid var(--border);border-radius:22px;padding:24px;position:sticky;top:84px;}
+.preview-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:#0ea271;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.preview-sub{font-size:12px;color:var(--muted);margin-bottom:18px;}
+.preview-tabs{display:flex;gap:6px;margin-bottom:16px;}
+.ptab{font-size:11.5px;padding:5px 14px;border-radius:100px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s;}
+.ptab.on{background:var(--gl);color:var(--gd);border-color:var(--gm);}
+
+/* FB POST PREVIEW */
+.fb-post{background:#f0f2f5;border-radius:12px;padding:14px;font-size:13px;}
+.fb-hdr{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.fb-logo{width:36px;height:36px;border-radius:9px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:15px;color:var(--gd);}
+.fb-name{font-size:13px;font-weight:600;color:#050505;}
+.fb-time{font-size:11px;color:#65676b;}
+.fb-body{font-size:13px;color:#050505;line-height:1.7;margin-bottom:10px;}
+.fb-ht{font-size:12px;color:#216fdb;margin-bottom:10px;}
+.fb-img{height:80px;background:linear-gradient(135deg,var(--gl),var(--gm));border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.fb-img-text{font-family:'Fraunces',serif;font-size:16px;color:var(--gd);font-style:italic;}
+.fb-stats{display:flex;gap:14px;padding-top:8px;border-top:1px solid #ddd;}
+.fb-stat{font-size:12px;color:#65676b;}
+
+/* JOB CARD PREVIEW */
+.jcard-prev{border:1.5px solid var(--border);border-radius:14px;padding:16px;}
+.jcp-top{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+.jcp-ico{width:40px;height:40px;border-radius:11px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.jcp-title{font-size:14px;font-weight:600;color:var(--text);}
+.jcp-org{font-size:12px;color:var(--muted);margin-top:2px;}
+.jcp-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.jct{font-size:11px;padding:3px 10px;border-radius:100px;}
+.jctg{background:var(--gl);color:var(--gd);}
+.jctb{background:#dbeeff;color:#1a5fa8;}
+
+/* SUBMIT SECTION */
+.submit-wrap{display:flex;flex-direction:column;gap:12px;margin-top:8px;}
+.submit-btn{background:var(--g);color:#fff;border:none;padding:15px;border-radius:14px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.submit-btn:hover{background:var(--gd);transform:translateY(-1px);}
+.submit-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.6;}
+
+/* SUCCESS */
+.success-overlay{position:fixed;inset:0;background:rgba(6,78,56,0.95);z-index:1000;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:40px;}
+.success-overlay.show{display:flex;}
+.success-ico{font-size:64px;margin-bottom:20px;}
+.success-title{font-family:'Fraunces',serif;font-size:42px;color:#fff;margin-bottom:12px;letter-spacing:-1px;}
+.success-title em{color:var(--gm);font-style:italic;}
+.success-sub{font-size:17px;color:rgba(255,255,255,0.7);margin-bottom:32px;font-weight:300;max-width:440px;line-height:1.7;}
+.success-pills{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.success-pill{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.1);color:#fff;font-size:13px;padding:10px 20px;border-radius:100px;border:1px solid rgba(255,255,255,0.2);}
+.success-pill-dot{width:8px;height:8px;border-radius:50%;}
+.success-btns{display:flex;gap:12px;}
+.sbw{background:#fff;color:var(--gd);border:none;padding:13px 28px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;}
+.sbo{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.3);padding:13px 28px;border-radius:100px;font-size:14px;font-family:inherit;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">Tal<em>entry</em></a>
+  <div class="nav-r">
+    <button class="btn-ghost">Log in</button>
+    <button class="btn-solid">Get started free</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-label">For employers</div>
+    <h1 class="page-title">Post a job on <em>Talentry</em></h1>
+    <p class="page-sub">Reach 10,000+ healthcare professionals across Nepal — auto-posted to Facebook, LinkedIn & Instagram.</p>
+  </div>
+
+  <div class="form-layout">
+    <!-- MAIN FORM -->
+    <div class="form-card">
+
+      <!-- SECTION 1: BASIC INFO -->
+      <div class="form-section">
+        <div class="fsec-title"><div class="fsec-icon">🏥</div>Job & company details</div>
+        <div class="form-row">
+          <div class="field">
+            <label>Job title <span>*</span></label>
+            <input type="text" id="jobTitle" placeholder="e.g. Biomedical Engineer" oninput="updatePreview()"/>
+          </div>
+          <div class="field">
+            <label>Company / Hospital name <span>*</span></label>
+            <input type="text" id="company" placeholder="e.g. Bir Hospital" oninput="updatePreview()"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Department</label>
+            <input type="text" id="dept" placeholder="e.g. Biomedical Engineering" oninput="updatePreview()"/>
+          </div>
+          <div class="field">
+            <label>Location <span>*</span></label>
+            <select id="location" onchange="updatePreview()">
+              <option value="">Select city</option>
+              <option>Kathmandu</option>
+              <option>Lalitpur</option>
+              <option>Bhaktapur</option>
+              <option>Pokhara</option>
+              <option>Bharatpur</option>
+              <option>Biratnagar</option>
+              <option>Birgunj</option>
+              <option>Remote</option>
+              <option>All Nepal</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row triple">
+          <div class="field">
+            <label>Job type <span>*</span></label>
+            <select id="jobType" onchange="updatePreview()">
+              <option value="">Select type</option>
+              <option>Full time</option>
+              <option>Part time</option>
+              <option>Contract</option>
+              <option>Internship</option>
+              <option>Volunteer</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Experience level</label>
+            <select id="expLevel" onchange="updatePreview()">
+              <option value="">Select level</option>
+              <option>Entry level (0–1 yr)</option>
+              <option>Junior (1–3 yrs)</option>
+              <option>Mid level (3–5 yrs)</option>
+              <option>Senior (5+ yrs)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Category <span>*</span></label>
+            <select id="category" onchange="updatePreview()">
+              <option value="">Select category</option>
+              <option>Biomedical Engineering</option>
+              <option>Nursing</option>
+              <option>Laboratory</option>
+              <option>Pharmacy</option>
+              <option>Imaging / Radiology</option>
+              <option>Public Health</option>
+              <option>Physiotherapy</option>
+              <option>Medical Officer</option>
+              <option>Administration</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 2: SALARY -->
+      <div class="form-section">
+        <div class="fsec-title"><div class="fsec-icon">💰</div>Salary & compensation</div>
+        <div class="form-row">
+          <div class="field">
+            <label>Salary range (Rs. per month)</label>
+            <div class="salary-row">
+              <input type="number" id="salMin" placeholder="Min e.g. 35000" oninput="updatePreview()"/>
+              <div class="salary-sep">—</div>
+              <input type="number" id="salMax" placeholder="Max e.g. 55000" oninput="updatePreview()"/>
+            </div>
+            <span class="hint">Leave blank if you prefer not to disclose</span>
+          </div>
+          <div class="field">
+            <label>Application deadline</label>
+            <input type="date" id="deadline"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 3: DESCRIPTION -->
+      <div class="form-section">
+        <div class="fsec-title"><div class="fsec-icon">📝</div>Job description</div>
+        <div class="form-row single">
+          <div class="field">
+            <label>Job description <span>*</span></label>
+            <textarea id="jobDesc" placeholder="Describe the role, responsibilities, and what a typical day looks like..." rows="5" oninput="updatePreview()"></textarea>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="field">
+            <label>Requirements</label>
+            <textarea id="requirements" placeholder="List qualifications, education, certifications required..." rows="4"></textarea>
+          </div>
+        </div>
+        <div class="form-row single">
+          <div class="field">
+            <label>Required skills</label>
+            <div class="skills-wrap" id="skillsWrap" onclick="document.getElementById('skillInput').focus()">
+              <input type="text" id="skillInput" class="skill-input" placeholder="Type a skill and press Enter..."/>
+            </div>
+            <span class="skill-hint">e.g. Medical devices, ICU equipment, Ventilator servicing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: BENEFITS -->
+      <div class="form-section">
+        <div class="fsec-title"><div class="fsec-icon">🎁</div>Benefits & perks</div>
+        <div class="benefits-grid" id="benefitsGrid">
+          <label class="benefit-cb"><input type="checkbox" value="Health insurance" onchange="toggleBenefit(this)"/> Health insurance</label>
+          <label class="benefit-cb"><input type="checkbox" value="Provident fund" onchange="toggleBenefit(this)"/> Provident fund</label>
+          <label class="benefit-cb"><input type="checkbox" value="Paid leave" onchange="toggleBenefit(this)"/> Paid leave</label>
+          <label class="benefit-cb"><input type="checkbox" value="Training & development" onchange="toggleBenefit(this)"/> Training & development</label>
+          <label class="benefit-cb"><input type="checkbox" value="Transportation" onchange="toggleBenefit(this)"/> Transportation</label>
+          <label class="benefit-cb"><input type="checkbox" value="Accommodation" onchange="toggleBenefit(this)"/> Accommodation</label>
+          <label class="benefit-cb"><input type="checkbox" value="Festival bonus" onchange="toggleBenefit(this)"/> Festival bonus</label>
+          <label class="benefit-cb"><input type="checkbox" value="Flexible hours" onchange="toggleBenefit(this)"/> Flexible hours</label>
+          <label class="benefit-cb"><input type="checkbox" value="Remote work" onchange="toggleBenefit(this)"/> Remote work</label>
+        </div>
+      </div>
+
+      <!-- SECTION 5: CONTACT -->
+      <div class="form-section">
+        <div class="fsec-title"><div class="fsec-icon">📬</div>Contact & application</div>
+        <div class="form-row">
+          <div class="field">
+            <label>Contact email <span>*</span></label>
+            <input type="email" id="contactEmail" placeholder="hr@hospital.com.np"/>
+          </div>
+          <div class="field">
+            <label>Contact phone</label>
+            <input type="tel" id="contactPhone" placeholder="+977 98XXXXXXXX"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label>Application link (optional)</label>
+            <input type="url" id="appLink" placeholder="https://yourhospital.com/careers"/>
+            <span class="hint">If candidates should apply on your website instead</span>
+          </div>
+          <div class="field">
+            <label>Company website</label>
+            <input type="url" id="website" placeholder="https://yourhospital.com.np"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBMIT -->
+      <div class="form-section">
+        <div class="fsec-title"><div class="fsec-icon">🚀</div>Auto social media posting</div>
+        <div class="benefits-grid" style="margin-bottom:20px;">
+          <label class="benefit-cb checked"><input type="checkbox" checked onchange="toggleBenefit(this)"/> 📘 Facebook</label>
+          <label class="benefit-cb checked"><input type="checkbox" checked onchange="toggleBenefit(this)"/> 💼 LinkedIn</label>
+          <label class="benefit-cb checked"><input type="checkbox" checked onchange="toggleBenefit(this)"/> 📸 Instagram</label>
+          <label class="benefit-cb checked"><input type="checkbox" checked onchange="toggleBenefit(this)"/> 💬 WhatsApp alerts</label>
+        </div>
+        <div class="submit-wrap">
+          <button class="submit-btn" onclick="submitJob()">🚀 Post job & auto-share to social media</button>
+          <p class="submit-note">Your job will be posted instantly and automatically shared to Facebook, LinkedIn, and Instagram. Matching candidates will receive WhatsApp alerts.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR PREVIEW -->
+    <div>
+      <div class="preview-card">
+        <div class="preview-title"><div class="live-dot"></div>Live preview</div>
+        <p class="preview-sub">Updates as you type</p>
+        <div class="preview-tabs">
+          <button class="ptab on" onclick="switchTab('jobcard',this)">Job card</button>
+          <button class="ptab" onclick="switchTab('fbpost',this)">Facebook post</button>
+        </div>
+
+        <!-- JOB CARD PREVIEW -->
+        <div id="prev-jobcard">
+          <div class="jcard-prev">
+            <div class="jcp-top">
+              <div class="jcp-ico">🏥</div>
+              <div>
+                <div class="jcp-title" id="prev-title">Job title</div>
+                <div class="jcp-org" id="prev-org">Company · Location</div>
+              </div>
+            </div>
+            <div class="jcp-tags" id="prev-tags">
+              <span class="jct jctg">Job type</span>
+              <span class="jct jctb">Rs. —</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- FB POST PREVIEW -->
+        <div id="prev-fbpost" style="display:none;">
+          <div class="fb-post">
+            <div class="fb-hdr">
+              <div class="fb-logo">T</div>
+              <div><div class="fb-name">Talentry Nepal</div><div class="fb-time">Just now · 🌐</div></div>
+            </div>
+            <div class="fb-body" id="prev-fb-body">Fill in the form to see your auto-generated social media post preview here.</div>
+            <div class="fb-ht" id="prev-fb-ht">#TalentryNepal #HealthJobs</div>
+            <div class="fb-img"><div class="fb-img-text" id="prev-fb-img">Talentry</div></div>
+            <div class="fb-stats"><span class="fb-stat">👍 Like</span><span class="fb-stat">💬 Comment</span><span class="fb-stat">↗ Share</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-ico">🎉</div>
+  <h2 class="success-title">Job posted<br><em>successfully!</em></h2>
+  <p class="success-sub">Your job has been posted on Talentry and automatically shared to social media. Matching candidates are being notified via WhatsApp.</p>
+  <div class="success-pills">
+    <div class="success-pill"><div class="success-pill-dot" style="background:#1877F2"></div>Posted to Facebook</div>
+    <div class="success-pill"><div class="success-pill-dot" style="background:#0A66C2"></div>Posted to LinkedIn</div>
+    <div class="success-pill"><div class="success-pill-dot" style="background:#E1306C"></div>Posted to Instagram</div>
+    <div class="success-pill"><div class="success-pill-dot" style="background:#25D366"></div>WhatsApp alerts sent</div>
+  </div>
+  <div class="success-btns">
+    <button class="sbw" onclick="document.getElementById('successOverlay').classList.remove('show')">View job listing</button>
+    <button class="sbo" onclick="document.getElementById('successOverlay').classList.remove('show')">Post another job</button>
+  </div>
+</div>
+
+<script>
+let skills = [];
+
+// Skill tags
+document.getElementById('skillInput').addEventListener('keydown', function(e){
+  if((e.key === 'Enter' || e.key === ',') && this.value.trim()){
+    e.preventDefault();
+    addSkill(this.value.trim());
+    this.value = '';
+  }
+  if(e.key === 'Backspace' && this.value === '' && skills.length){
+    removeSkill(skills[skills.length-1]);
+  }
+});
+
+function addSkill(skill){
+  if(skills.includes(skill)) return;
+  skills.push(skill);
+  renderSkills();
+}
+
+function removeSkill(skill){
+  skills = skills.filter(s => s !== skill);
+  renderSkills();
+}
+
+function renderSkills(){
+  const wrap = document.getElementById('skillsWrap');
+  const input = document.getElementById('skillInput');
+  wrap.innerHTML = '';
+  skills.forEach(s => {
+    const tag = document.createElement('div');
+    tag.className = 'skill-tag';
+    tag.innerHTML = `${s}<button onclick="removeSkill('${s}')">×</button>`;
+    wrap.appendChild(tag);
+  });
+  wrap.appendChild(input);
+}
+
+// Benefits toggle
+function toggleBenefit(cb){
+  cb.parentElement.classList.toggle('checked', cb.checked);
+}
+
+// Live preview
+function updatePreview(){
+  const title = document.getElementById('jobTitle').value || 'Job title';
+  const company = document.getElementById('company').value || 'Company';
+  const location = document.getElementById('location').value || 'Location';
+  const jobType = document.getElementById('jobType').value || '';
+  const salMin = document.getElementById('salMin').value;
+  const salMax = document.getElementById('salMax').value;
+  const desc = document.getElementById('jobDesc').value;
+
+  // Job card
+  document.getElementById('prev-title').textContent = title;
+  document.getElementById('prev-org').textContent = `${company} · ${location}`;
+
+  const tagsEl = document.getElementById('prev-tags');
+  tagsEl.innerHTML = '';
+  if(jobType){ tagsEl.innerHTML += `<span class="jct jctg">${jobType}</span>`; }
+  if(salMin && salMax){ tagsEl.innerHTML += `<span class="jct jctb">Rs. ${Number(salMin).toLocaleString()}–${Number(salMax).toLocaleString()}</span>`; }
+  else if(salMin){ tagsEl.innerHTML += `<span class="jct jctb">Rs. ${Number(salMin).toLocaleString()}+</span>`; }
+
+  // Facebook post
+  let fbBody = '';
+  if(title !== 'Job title'){
+    fbBody = `🏥 Now hiring: ${title}\n\n`;
+    if(company !== 'Company') fbBody += `🏢 ${company}`;
+    if(location !== 'Location') fbBody += ` · 📍 ${location}`;
+    fbBody += '\n';
+    if(salMin && salMax) fbBody += `💰 Rs. ${Number(salMin).toLocaleString()}–${Number(salMax).toLocaleString()}/mo\n`;
+    if(jobType) fbBody += `⏰ ${jobType}\n`;
+    if(desc) fbBody += `\n${desc.substring(0, 120)}${desc.length > 120 ? '...' : ''}\n`;
+    fbBody += '\n👉 Apply now at talentry.com';
+  } else {
+    fbBody = 'Fill in the form to see your auto-generated social media post preview here.';
+  }
+  document.getElementById('prev-fb-body').style.whiteSpace = 'pre-line';
+  document.getElementById('prev-fb-body').textContent = fbBody;
+  document.getElementById('prev-fb-img').textContent = title !== 'Job title' ? title : 'Talentry';
+
+  const cat = document.getElementById('category').value;
+  let ht = '#TalentryNepal #HealthJobs #NepaliJobs';
+  if(location && location !== 'Location') ht += ` #${location.replace(' ','')}Jobs`;
+  if(cat) ht += ` #${cat.replace(/[^a-zA-Z]/g,'')}`;
+  document.getElementById('prev-fb-ht').textContent = ht;
+}
+
+// Tab switch
+function switchTab(tab, btn){
+  document.querySelectorAll('.ptab').forEach(t => t.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('prev-jobcard').style.display = tab === 'jobcard' ? 'block' : 'none';
+  document.getElementById('prev-fbpost').style.display = tab === 'fbpost' ? 'block' : 'none';
+}
+
+// Submit
+function submitJob_old(){
+  const title = document.getElementById('jobTitle').value;
+  const company = document.getElementById('company').value;
+  const email = document.getElementById('contactEmail').value;
+  if(!title || !company || !email){
+    alert('Please fill in Job title, Company name, and Contact email at minimum.');
+    return;
+  }
+  document.getElementById('successOverlay').classList.add('show');
+}
+</script>
+</body>
+</html>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
+window._sb = sb;
+
+window.submitJob = async function(){
+  const title = document.getElementById('jobTitle').value.trim();
+  const company = document.getElementById('company').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  if(!title || !company || !email){ alert('Please fill in Job title, Company name, and Contact email.'); return; }
+
+  const btn = document.querySelector('.submit-btn');
+  btn.textContent = '🚀 Posting your job...'; btn.disabled = true;
+
+  const { data: { session } } = await sb.auth.getSession();
+
+  const jobData = {
+    title,
+    company,
+    location: document.getElementById('location').value,
+    job_type: document.getElementById('jobType').value,
+    category: document.getElementById('category').value,
+    department: document.getElementById('dept').value,
+    description: document.getElementById('jobDesc').value,
+    requirements: document.getElementById('requirements').value,
+    salary_min: parseInt(document.getElementById('salMin').value) || null,
+    salary_max: parseInt(document.getElementById('salMax').value) || null,
+    contact_email: email,
+    contact_phone: document.getElementById('contactPhone').value,
+    skills: window._skills || [],
+    status: 'active',
+    employer_id: session?.user?.id || null
+  };
+
+  const { error } = await sb.from('jobs').insert([jobData]);
+
+  if(error){
+    alert('Error posting job: ' + error.message);
+    btn.textContent = '🚀 Post job & auto-share to social media';
+    btn.disabled = false;
+    return;
+  }
+
+  document.getElementById('successOverlay').classList.add('show');
+};
+</script>

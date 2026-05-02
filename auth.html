@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login / Sign Up — Talentry</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);min-height:100vh;display:flex;flex-direction:column;}
+nav{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Fraunces',serif;font-size:24px;color:var(--text);text-decoration:none;}.logo em{color:var(--g);font-style:italic;}
+.nav-back{font-size:13px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}.nav-back:hover{color:var(--g);}
+.main{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 64px);}
+.left{background:var(--gd);padding:60px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;}
+.left-glow{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(78,205,164,0.2),transparent 65%);bottom:-100px;right:-100px;pointer-events:none;}
+.left-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+.left-top{position:relative;}
+.left-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.85);font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;margin-bottom:28px;border:1px solid rgba(255,255,255,0.15);}
+.left-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gm);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.left h2{font-family:'Fraunces',serif;font-size:clamp(28px,3.5vw,42px);color:#fff;line-height:1.15;letter-spacing:-1px;margin-bottom:16px;}
+.left h2 em{color:var(--gm);font-style:italic;}
+.left p{font-size:15px;color:rgba(255,255,255,0.6);line-height:1.75;font-weight:300;max-width:360px;}
+.left-features{display:flex;flex-direction:column;gap:14px;position:relative;}
+.lf{display:flex;align-items:center;gap:14px;}
+.lf-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);}
+.lf-text{font-size:13.5px;color:rgba(255,255,255,0.75);line-height:1.5;}
+.lf-text strong{color:#fff;font-weight:600;}
+.left-stats{display:flex;gap:28px;position:relative;}
+.lst strong{font-family:'Fraunces',serif;font-size:24px;color:#fff;display:block;}
+.lst span{font-size:12px;color:rgba(255,255,255,0.5);}
+.right{display:flex;align-items:center;justify-content:center;padding:40px;}
+.auth-box{width:100%;max-width:440px;}
+.auth-tabs{display:flex;background:var(--bg2);border-radius:14px;padding:4px;margin-bottom:32px;border:1.5px solid var(--border);}
+.atab{flex:1;padding:11px;border-radius:10px;border:none;background:transparent;font-size:14px;font-weight:500;font-family:inherit;color:var(--muted);cursor:pointer;transition:all .2s;}
+.atab.on{background:#fff;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.role-select{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.role-card{border:1.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;text-align:center;}
+.role-card:hover{border-color:var(--gm);}
+.role-card.on{border-color:var(--g);background:var(--gl);}
+.role-ico{font-size:24px;margin-bottom:8px;}
+.role-name{font-size:13.5px;font-weight:600;color:var(--text);}
+.role-desc{font-size:11.5px;color:var(--muted);margin-top:3px;}
+.form-title{font-family:'Fraunces',serif;font-size:26px;color:var(--text);letter-spacing:-0.5px;margin-bottom:6px;}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:28px;font-weight:300;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.field input{width:100%;padding:12px 16px;border:1.5px solid var(--border2);border-radius:12px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:all .2s;}
+.field input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(14,162,113,0.1);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.pass-wrap{position:relative;}
+.pass-wrap input{padding-right:46px;}
+.pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+.divider-line{flex:1;height:1px;background:var(--border2);}
+.divider-text{font-size:12px;color:var(--muted);}
+.social-btns{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.social-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border:1.5px solid var(--border2);border-radius:12px;background:#fff;font-size:14px;font-weight:500;font-family:inherit;color:var(--text);cursor:pointer;transition:all .2s;}
+.social-btn:hover{border-color:var(--gm);background:var(--bg2);}
+.social-icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.submit-btn{width:100%;padding:14px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:4px;}
+.submit-btn:hover{background:var(--gd);}
+.submit-btn:disabled{background:var(--muted);cursor:not-allowed;}
+.form-note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6;}
+.form-note a{color:var(--g);text-decoration:none;cursor:pointer;}
+.forgot{font-size:12.5px;color:var(--g);text-decoration:none;float:right;margin-top:-10px;margin-bottom:14px;display:block;cursor:pointer;}
+.strength-wrap{margin-top:6px;}
+.strength-bars{display:flex;gap:4px;margin-bottom:4px;}
+.sbar{height:3px;flex:1;border-radius:2px;background:var(--border2);transition:background .3s;}
+.strength-text{font-size:11px;color:var(--muted);}
+.terms-cb{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;}
+.terms-cb input{margin-top:2px;accent-color:var(--g);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
+.terms-cb span{font-size:12.5px;color:var(--muted);line-height:1.6;}
+.terms-cb a{color:var(--g);text-decoration:none;}
+.error-msg{background:#ffe8e8;color:#9b1c1c;border:1px solid #f5c1c1;border-radius:10px;padding:12px 16px;font-size:13px;margin-bottom:16px;display:none;}
+.error-msg.show{display:block;}
+.success-screen{display:none;text-align:center;padding:20px 0;}
+.success-screen.show{display:block;}
+.success-ico{font-size:56px;margin-bottom:16px;}
+.success-title{font-family:'Fraunces',serif;font-size:28px;color:var(--text);letter-spacing:-0.5px;margin-bottom:8px;}
+.success-title em{color:var(--g);font-style:italic;}
+.success-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px;font-weight:300;}
+.success-btn{display:inline-block;background:var(--g);color:#fff;border:none;padding:13px 32px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-decoration:none;}
+.hidden{display:none;}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="index.html">Tal<em>entry</em></a>
+  <a class="nav-back" href="index.html">← Back to home</a>
+</nav>
+<div class="main">
+  <div class="left">
+    <div class="left-grid"></div>
+    <div class="left-glow"></div>
+    <div class="left-top">
+      <div class="left-badge"><div class="left-badge-dot"></div>Nepal's #1 healthcare job portal</div>
+      <h2>Your healthcare<br>career starts <em>here</em></h2>
+      <p>Join 10,000+ healthcare professionals and 200+ hospitals already on Talentry.</p>
+    </div>
+    <div class="left-features">
+      <div class="lf"><div class="lf-icon">🤖</div><div class="lf-text"><strong>AI job matching</strong> — Jobs matched to your real skills</div></div>
+      <div class="lf"><div class="lf-icon">🎙</div><div class="lf-text"><strong>AI interview prep</strong> — Practice and get scored</div></div>
+      <div class="lf"><div class="lf-icon">💬</div><div class="lf-text"><strong>WhatsApp alerts</strong> — Never miss an opportunity</div></div>
+      <div class="lf"><div class="lf-icon">📄</div><div class="lf-text"><strong>Resume builder</strong> — 32 ATS-ready templates</div></div>
+      <div class="lf"><div class="lf-icon">💰</div><div class="lf-text"><strong>Salary insights</strong> — Know your market value</div></div>
+    </div>
+    <div class="left-stats">
+      <div class="lst"><strong>500+</strong><span>Active jobs</span></div>
+      <div class="lst"><strong>200+</strong><span>Hospitals</span></div>
+      <div class="lst"><strong>Free</strong><span>Forever</span></div>
+    </div>
+  </div>
+  <div class="right">
+    <div class="auth-box">
+      <div class="auth-tabs">
+        <button class="atab on" onclick="switchTab('login')">Log in</button>
+        <button class="atab" onclick="switchTab('signup')">Sign up free</button>
+      </div>
+
+      <!-- ERROR -->
+      <div class="error-msg" id="errorMsg"></div>
+
+      <!-- LOGIN -->
+      <div id="loginForm">
+        <h2 class="form-title">Welcome back</h2>
+        <p class="form-sub">Log in to your Talentry account</p>
+        <div class="field">
+          <label>Email address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com"/>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="loginPass" placeholder="Enter your password"/>
+            <button class="pass-toggle" onclick="togglePass('loginPass',this)">👁</button>
+          </div>
+          <span class="forgot" onclick="handleForgot()">Forgot password?</span>
+        </div>
+        <button class="submit-btn" id="loginBtn" onclick="handleLogin()">Log in to Talentry</button>
+        <p class="form-note">Don't have an account? <a onclick="switchTab('signup')">Sign up free</a></p>
+      </div>
+
+      <!-- SIGNUP -->
+      <div id="signupForm" class="hidden">
+        <h2 class="form-title">Create your account</h2>
+        <p class="form-sub">Join Talentry free — no credit card needed</p>
+        <div class="role-select">
+          <div class="role-card on" id="roleJobseeker" onclick="selectRole('jobseeker')">
+            <div class="role-ico">👤</div>
+            <div class="role-name">Job seeker</div>
+            <div class="role-desc">Find healthcare jobs</div>
+          </div>
+          <div class="role-card" id="roleEmployer" onclick="selectRole('employer')">
+            <div class="role-ico">🏥</div>
+            <div class="role-name">Employer</div>
+            <div class="role-desc">Post jobs & hire</div>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>First name</label><input type="text" id="firstName" placeholder="Ram"/></div>
+          <div class="field"><label>Last name</label><input type="text" id="lastName" placeholder="Shrestha"/></div>
+        </div>
+        <div class="field"><label>Email address</label><input type="email" id="signupEmail" placeholder="you@example.com"/></div>
+        <div class="field"><label>Phone (for WhatsApp alerts)</label><input type="tel" id="signupPhone" placeholder="+977 98XXXXXXXX"/></div>
+        <div id="jobseekerFields">
+          <div class="field"><label>Job title / Role</label><input type="text" id="jobTitle" placeholder="e.g. Biomedical Engineer"/></div>
+        </div>
+        <div id="employerFields" class="hidden">
+          <div class="field"><label>Hospital / Company name</label><input type="text" id="companyName" placeholder="e.g. Bir Hospital"/></div>
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <div class="pass-wrap">
+            <input type="password" id="signupPass" placeholder="Create a strong password" oninput="checkStrength(this.value)"/>
+            <button class="pass-toggle" onclick="togglePass('signupPass',this)">👁</button>
+          </div>
+          <div class="strength-wrap">
+            <div class="strength-bars">
+              <div class="sbar" id="sb1"></div><div class="sbar" id="sb2"></div>
+              <div class="sbar" id="sb3"></div><div class="sbar" id="sb4"></div>
+            </div>
+            <div class="strength-text" id="strengthText"></div>
+          </div>
+        </div>
+        <div class="terms-cb">
+          <input type="checkbox" id="termsCheck"/>
+          <span>I agree to Talentry's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
+        </div>
+        <button class="submit-btn" id="signupBtn" onclick="handleSignup()">Create free account</button>
+        <p class="form-note">Already have an account? <a onclick="switchTab('login')">Log in</a></p>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="success-screen" id="successScreen">
+        <div class="success-ico">🎉</div>
+        <h2 class="success-title">Welcome to <em>Talentry!</em></h2>
+        <p class="success-sub" id="successMsg">Your account is ready. Start exploring healthcare jobs across Nepal.</p>
+        <button class="success-btn" onclick="location.href='browse-jobs.html'">Browse jobs →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const supabase = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
+window._sb = supabase;
+
+// Check if already logged in
+const { data: { session } } = await supabase.auth.getSession();
+if (session) { window.location.href = 'browse-jobs.html'; }
+</script>
+
+<script>
+let currentRole = 'jobseeker';
+
+function switchTab(tab){
+  document.querySelectorAll('.atab').forEach((t,i)=>t.classList.toggle('on',(tab==='login'&&i===0)||(tab==='signup'&&i===1)));
+  document.getElementById('loginForm').classList.toggle('hidden',tab!=='login');
+  document.getElementById('signupForm').classList.toggle('hidden',tab!=='signup');
+  document.getElementById('errorMsg').classList.remove('show');
+}
+
+function selectRole(role){
+  currentRole = role;
+  document.getElementById('roleJobseeker').classList.toggle('on',role==='jobseeker');
+  document.getElementById('roleEmployer').classList.toggle('on',role==='employer');
+  document.getElementById('jobseekerFields').classList.toggle('hidden',role!=='jobseeker');
+  document.getElementById('employerFields').classList.toggle('hidden',role!=='employer');
+}
+
+function togglePass(id,btn){
+  const inp=document.getElementById(id);
+  inp.type=inp.type==='password'?'text':'password';
+  btn.textContent=inp.type==='password'?'👁':'🙈';
+}
+
+function checkStrength(val){
+  let score=0;
+  if(val.length>=8)score++;
+  if(/[A-Z]/.test(val))score++;
+  if(/[0-9]/.test(val))score++;
+  if(/[^A-Za-z0-9]/.test(val))score++;
+  const colors=['','#e24b4a','#f0a500','#0ea271','#064e38'];
+  const labels=['','Weak','Fair','Good','Strong'];
+  for(let i=1;i<=4;i++) document.getElementById('sb'+i).style.background=i<=score?colors[score]:'';
+  document.getElementById('strengthText').textContent=val.length?labels[score]:'';
+  document.getElementById('strengthText').style.color=colors[score];
+}
+
+function showError(msg){
+  const el=document.getElementById('errorMsg');
+  el.textContent=msg;
+  el.classList.add('show');
+}
+
+async function handleLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const password=document.getElementById('loginPass').value;
+  if(!email||!password){showError('Please enter your email and password.');return;}
+  const btn=document.getElementById('loginBtn');
+  btn.textContent='Logging in...';btn.disabled=true;
+  document.getElementById('errorMsg').classList.remove('show');
+  const {error}=await window._sb.auth.signInWithPassword({email,password});
+  if(error){showError(error.message);btn.textContent='Log in to Talentry';btn.disabled=false;return;}
+  document.getElementById('loginForm').classList.add('hidden');
+  document.getElementById('successScreen').classList.add('show');
+  document.getElementById('successMsg').textContent='Welcome back! Redirecting you to jobs...';
+  setTimeout(()=>location.href='browse-jobs.html',1500);
+}
+
+async function handleSignup(){
+  if(!document.getElementById('termsCheck').checked){showError('Please agree to the Terms of Service.');return;}
+  const email=document.getElementById('signupEmail').value.trim();
+  const password=document.getElementById('signupPass').value;
+  const firstName=document.getElementById('firstName').value.trim();
+  const lastName=document.getElementById('lastName').value.trim();
+  const phone=document.getElementById('signupPhone').value.trim();
+  if(!email||!password||!firstName){showError('Please fill in all required fields.');return;}
+  if(password.length<6){showError('Password must be at least 6 characters.');return;}
+  const btn=document.getElementById('signupBtn');
+  btn.textContent='Creating account...';btn.disabled=true;
+  document.getElementById('errorMsg').classList.remove('show');
+  const fullName=firstName+' '+lastName;
+  const extraData={full_name:fullName,phone,role:currentRole};
+  if(currentRole==='jobseeker') extraData.job_title=document.getElementById('jobTitle').value.trim();
+  if(currentRole==='employer') extraData.company_name=document.getElementById('companyName').value.trim();
+  const {error}=await window._sb.auth.signUp({email,password,options:{data:extraData}});
+  if(error){showError(error.message);btn.textContent='Create free account';btn.disabled=false;return;}
+  document.getElementById('signupForm').classList.add('hidden');
+  document.getElementById('successScreen').classList.add('show');
+}
+
+async function handleForgot(){
+  const email=document.getElementById('loginEmail').value.trim();
+  if(!email){showError('Enter your email address first, then click Forgot password.');return;}
+  await window._sb.auth.resetPasswordForEmail(email);
+  showError('✅ Password reset email sent! Check your inbox.');
+  document.getElementById('errorMsg').style.background='#d6f5eb';
+  document.getElementById('errorMsg').style.color='#064e38';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Talentry — Nepal's AI-Powered Healthcare Job Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,300;1,9..144,500;1,9..144,700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --g: #0ea271;
+  --gd: #064e38;
+  --gl: #d6f5eb;
+  --gm: #4ecda4;
+  --text: #0a1a12;
+  --muted: #4a6b58;
+  --bg: #ffffff;
+  --bg2: #f4faf7;
+  --border: rgba(14,162,113,0.14);
+  --border2: rgba(14,162,113,0.28);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg);overflow-x:hidden;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:66px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(255,255,255,0.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Fraunces',serif;font-size:26px;color:var(--text);text-decoration:none;letter-spacing:-0.5px;}
+.logo em{color:var(--g);font-style:italic;}
+.nav-links{display:flex;gap:28px;}
+.nav-links a{font-size:13.5px;color:var(--muted);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--g);}
+.nav-r{display:flex;gap:10px;align-items:center;}
+.btn-ghost{background:none;border:1.5px solid var(--border2);color:var(--text);padding:8px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{border-color:var(--g);color:var(--g);}
+.btn-solid{background:var(--g);color:#fff;border:none;padding:9px 22px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;transition:all .2s;}
+.btn-solid:hover{background:var(--gd);transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 6% 60px;position:relative;overflow:hidden;background:var(--bg);}
+.hero-glow{position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(14,162,113,0.13) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;opacity:0.5;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--gl);color:var(--gd);font-size:12px;font-weight:600;padding:6px 16px;border-radius:100px;margin-bottom:32px;position:relative;letter-spacing:0.02em;}
+.hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--g);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(48px,7vw,88px);line-height:1.02;color:var(--text);letter-spacing:-2px;margin-bottom:24px;position:relative;max-width:900px;}
+.hero h1 em{color:var(--g);font-style:italic;}
+.hero-sub{font-size:clamp(16px,2vw,19px);color:var(--muted);line-height:1.75;max-width:560px;font-weight:300;margin-bottom:44px;position:relative;}
+.hero-search{display:flex;align-items:center;gap:0;background:#fff;border:2px solid var(--border2);border-radius:100px;padding:7px 7px 7px 24px;max-width:620px;width:100%;box-shadow:0 8px 40px rgba(14,162,113,0.12);position:relative;margin-bottom:24px;}
+.hero-search input{flex:1;border:none;outline:none;font-size:15px;font-family:inherit;color:var(--text);background:transparent;}
+.hero-search input::placeholder{color:var(--muted);}
+.hero-search select{border:none;outline:none;font-size:13px;font-family:inherit;color:var(--muted);background:transparent;padding:0 12px;border-left:1.5px solid var(--border2);cursor:pointer;}
+.hero-search button{background:var(--g);color:#fff;border:none;padding:12px 28px;border-radius:100px;font-size:14px;font-family:inherit;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .2s;}
+.hero-search button:hover{background:var(--gd);}
+.hero-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:52px;position:relative;}
+.chip{font-size:12.5px;color:var(--muted);border:1.5px solid var(--border);padding:6px 16px;border-radius:100px;cursor:pointer;transition:all .2s;background:var(--bg);}
+.chip:hover{border-color:var(--g);color:var(--g);background:var(--gl);}
+.hero-stats{display:flex;gap:0;position:relative;border:1.5px solid var(--border);border-radius:20px;overflow:hidden;background:var(--bg);}
+.hstat{padding:18px 36px;text-align:center;border-right:1.5px solid var(--border);}
+.hstat:last-child{border:none;}
+.hstat strong{font-size:26px;font-weight:600;color:var(--text);display:block;font-family:'Fraunces',serif;}
+.hstat span{font-size:12px;color:var(--muted);}
+
+/* ── TICKER ── */
+.ticker{padding:16px 0;background:var(--gd);overflow:hidden;display:flex;align-items:center;gap:0;}
+.ticker-track{display:flex;gap:0;animation:tick 22s linear infinite;white-space:nowrap;}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);padding:0 28px;display:flex;align-items:center;gap:10px;}
+.ticker-sep{color:var(--gm);font-size:16px;}
+
+/* ── SECTION SHELL ── */
+.sec{padding:90px 6%;}
+.sec-alt{background:var(--bg2);}
+.sec-center{text-align:center;}
+.sec-label{font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--g);margin-bottom:12px;}
+.sec-title{font-family:'Fraunces',serif;font-size:clamp(30px,4.5vw,50px);line-height:1.1;color:var(--text);letter-spacing:-1px;margin-bottom:14px;}
+.sec-title em{color:var(--g);font-style:italic;}
+.sec-body{font-size:16px;color:var(--muted);line-height:1.8;font-weight:300;max-width:560px;}
+.sec-center .sec-body{margin:0 auto 52px;}
+.mb52{margin-bottom:52px;}
+
+/* ── SPLIT LAYOUT ── */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.split.rev .split-text{order:2;}
+.split.rev .split-vis{order:1;}
+
+/* ── SWIPE FEATURE ── */
+.swipe-deck{position:relative;height:300px;display:flex;align-items:center;justify-content:center;}
+.sc{position:absolute;width:280px;background:#fff;border:1.5px solid var(--border2);border-radius:24px;padding:24px;transition:all .3s;}
+.sc.s3{transform:rotate(5deg) translateY(18px);opacity:0.35;z-index:0;}
+.sc.s2{transform:rotate(-3deg) translateY(10px);opacity:0.55;z-index:1;}
+.sc.s1{z-index:3;box-shadow:0 20px 60px rgba(14,162,113,0.18);}
+.sc-badge{position:absolute;top:16px;right:16px;background:var(--g);color:#fff;font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;}
+.sc-hosp{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:10px;}
+.sc-ico{width:22px;height:22px;border-radius:6px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:11px;}
+.sc-role{font-family:'Fraunces',serif;font-size:22px;color:var(--text);margin-bottom:4px;letter-spacing:-0.5px;}
+.sc-sal{font-size:13px;color:var(--g);font-weight:600;margin-bottom:14px;}
+.sc-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.sct{font-size:11px;padding:3px 11px;border-radius:100px;}
+.sctg{background:var(--gl);color:var(--gd);}
+.sctb{background:#dbeeff;color:#1a5fa8;}
+.sc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.sc-skip{padding:10px;border-radius:100px;border:1.5px solid var(--border2);background:#fff;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s;}
+.sc-skip:hover{border-color:#ccc;}
+.sc-go{padding:10px;border-radius:100px;border:none;background:var(--g);color:#fff;font-size:13px;cursor:pointer;font-weight:500;font-family:inherit;transition:all .2s;}
+.sc-go:hover{background:var(--gd);}
+.feat-list{display:flex;flex-direction:column;gap:14px;margin-bottom:32px;}
+.feat-item{display:flex;align-items:center;gap:14px;font-size:14.5px;color:var(--muted);}
+.feat-dot{width:32px;height:32px;border-radius:10px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+
+/* ── TOOLS ── */
+.tools-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+.tool{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px 18px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+.tool::after{content:'';position:absolute;inset:0;background:var(--gl);opacity:0;transition:.25s;}
+.tool:hover{border-color:var(--gm);transform:translateY(-3px);box-shadow:0 10px 36px rgba(14,162,113,0.14);}
+.tool:hover::after{opacity:0.25;}
+.tool-ico{font-size:26px;margin-bottom:14px;position:relative;z-index:1;}
+.tool h3{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:5px;position:relative;z-index:1;}
+.tool p{font-size:12px;color:var(--muted);line-height:1.6;position:relative;z-index:1;}
+.tool-tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;display:inline-block;margin-top:10px;position:relative;z-index:1;}
+.ttg{background:var(--gl);color:var(--gd);}
+.ttb{background:#dbeeff;color:#1a5fa8;}
+.tta{background:#fff3d6;color:#7a4e00;}
+
+/* ── JOBS ── */
+.jobs-hdr{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px;}
+.jobs-hdr a{font-size:13px;color:var(--g);text-decoration:none;cursor:pointer;}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.f{font-size:12.5px;padding:6px 18px;border-radius:100px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:all .2s;font-family:inherit;}
+.f.on,.f:hover{background:var(--gl);color:var(--gd);border-color:var(--gm);}
+.jcard{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:20px 24px;margin-bottom:10px;display:flex;gap:16px;align-items:flex-start;cursor:pointer;transition:all .2s;}
+.jcard:hover{border-color:var(--gm);box-shadow:0 6px 24px rgba(14,162,113,0.1);}
+.j-ico{width:46px;height:46px;border-radius:13px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.j-body{flex:1;}
+.j-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.j-org{font-size:13px;color:var(--muted);margin-bottom:10px;}
+.j-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.jt{font-size:11.5px;padding:3px 11px;border-radius:100px;}
+.jtg{background:var(--gl);color:var(--gd);}
+.jtb{background:#dbeeff;color:#1a5fa8;}
+.jta{background:#fff3d6;color:#7a4e00;}
+.jtp{background:#ede9ff;color:#4a30b0;}
+.jtr{background:#ffe8e8;color:#9b1c1c;}
+.j-right{flex-shrink:0;text-align:center;}
+.ring{width:50px;height:50px;border-radius:50%;background:var(--gl);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-n{font-size:14px;font-weight:600;color:var(--g);line-height:1;}
+.ring-t{font-size:9px;color:var(--gd);}
+.jnew{font-size:10px;background:#ffe8e8;color:#9b1c1c;padding:2px 8px;border-radius:100px;margin-left:8px;vertical-align:middle;}
+
+/* ── KANBAN ── */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.kcol{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:16px;}
+.khead{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.kdot{width:9px;height:9px;border-radius:50%;}
+.kitem{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:13px;margin-bottom:8px;}
+.ki-role{font-size:13px;font-weight:600;color:var(--text);}
+.ki-org{font-size:11px;color:var(--muted);margin-top:2px;}
+.ki-date{font-size:10px;color:var(--muted);margin-top:6px;}
+
+/* ── AI INTERVIEW ── */
+.ai-box{background:var(--bg2);border:1.5px solid var(--border);border-radius:22px;padding:28px;}
+.chat-msg{margin-bottom:14px;}
+.chat-who{font-size:11px;color:var(--muted);margin-bottom:5px;font-weight:500;}
+.bubble{padding:13px 16px;border-radius:18px;font-size:13.5px;line-height:1.65;}
+.bai{background:var(--gl);color:var(--gd);border-radius:4px 18px 18px 18px;}
+.bme{background:#fff;border:1.5px solid var(--border);color:var(--text);border-radius:18px 4px 18px 18px;}
+.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px;padding-top:14px;border-top:1.5px solid var(--border);}
+.sc-item{text-align:center;}
+.sc-val{font-size:20px;font-weight:600;color:var(--g);font-family:'Fraunces',serif;}
+.sc-lbl{font-size:11px;color:var(--muted);}
+.live-pill{display:inline-flex;align-items:center;gap:5px;background:#ffe8e8;color:#9b1c1c;font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;margin-bottom:14px;}
+.live-d{width:6px;height:6px;border-radius:50%;background:#e24b4a;animation:blink 1.5s infinite;}
+.steps{display:flex;flex-direction:column;gap:14px;margin-bottom:28px;}
+.step{display:flex;gap:14px;align-items:flex-start;}
+.step-n{width:28px;height:28px;border-radius:50%;background:var(--g);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-t{font-size:14px;color:var(--muted);line-height:1.5;padding-top:5px;}
+
+/* ── ATS ── */
+.ats-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;}
+.ats-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:18px;}
+.ats-row{margin-bottom:13px;}
+.ats-lbl{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;}
+.ats-track{height:7px;background:var(--bg2);border-radius:4px;overflow:hidden;}
+.ats-fill{height:100%;border-radius:4px;background:var(--g);}
+.ats-warn{background:#f0a500;}
+.tmpls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px;}
+.tmpl{border:1.5px solid var(--border);border-radius:13px;padding:10px;cursor:pointer;transition:all .2s;}
+.tmpl:hover,.tmpl.on{border-color:var(--g);}
+.tmpl-prev{height:66px;border-radius:7px;padding:9px;display:flex;flex-direction:column;gap:4px;margin-bottom:7px;}
+.tl{height:4px;border-radius:2px;background:rgba(0,0,0,0.09);}
+.tmpl-name{font-size:11px;color:var(--muted);text-align:center;}
+
+/* ── SALARY ── */
+.salary-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;}
+.sal-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1.5px solid var(--border);}
+.sal-row:last-child{border:none;}
+.sal-role{font-size:13.5px;color:var(--text);font-weight:500;}
+.sal-bar{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:5px;width:120px;}
+.sal-fill{height:100%;border-radius:3px;background:var(--gm);}
+.sal-amt{font-size:13px;font-weight:600;color:var(--g);white-space:nowrap;}
+
+/* ── SOCIAL POST ── */
+.social-pills{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-bottom:36px;}
+.spill{display:flex;align-items:center;gap:8px;padding:10px 24px;border-radius:100px;font-size:13px;font-weight:500;border:1.5px solid var(--border);background:#fff;color:var(--text);}
+.sdot{width:9px;height:9px;border-radius:50%;}
+.post{max-width:400px;margin:0 auto;background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:20px;text-align:left;}
+.post-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.post-logo{width:38px;height:38px;border-radius:11px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:16px;color:var(--gd);}
+.post-nm{font-size:13.5px;font-weight:600;color:var(--text);}
+.post-tm{font-size:11px;color:var(--muted);}
+.post-body{font-size:13.5px;color:var(--text);line-height:1.7;margin-bottom:8px;}
+.post-ht{font-size:12.5px;color:var(--g);margin-bottom:10px;}
+.post-stats{display:flex;gap:14px;padding-top:10px;border-top:1.5px solid var(--border);}
+.pstat{font-size:12px;color:var(--muted);}
+
+/* ── WHATSAPP ── */
+.wa-card{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:20px;}
+.wa-hd{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:12px;border-bottom:1.5px solid var(--border);font-size:13.5px;font-weight:600;color:var(--text);}
+.wa-online{width:8px;height:8px;border-radius:50%;background:#25D366;}
+.wa-msg{background:var(--gl);border-radius:4px 16px 16px 16px;padding:13px 15px;font-size:13px;color:var(--gd);line-height:1.65;margin-bottom:10px;}
+.wa-time{font-size:10px;color:var(--gd);text-align:right;margin-top:4px;opacity:.7;}
+
+/* ── EMPLOYER ── */
+.emp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.emp-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:26px;text-align:center;transition:all .25s;}
+.emp-card:hover{border-color:var(--gm);transform:translateY(-3px);box-shadow:0 10px 36px rgba(14,162,113,0.1);}
+.emp-ico{font-size:28px;margin-bottom:13px;}
+.emp-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:7px;}
+.emp-desc{font-size:13px;color:var(--muted);line-height:1.65;}
+
+/* ── PROFILE ── */
+.profile-wrap{max-width:620px;margin:0 auto;}
+.profile-card{background:#fff;border:1.5px solid var(--border);border-radius:22px;padding:30px;display:flex;gap:22px;}
+.pav{width:72px;height:72px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:24px;color:var(--gd);flex-shrink:0;}
+.p-name{font-size:19px;font-weight:600;color:var(--text);}
+.p-url{font-size:13px;color:var(--g);margin-bottom:9px;}
+.p-bio{font-size:13.5px;color:var(--muted);line-height:1.7;margin-bottom:14px;}
+.p-badges{display:flex;gap:8px;flex-wrap:wrap;}
+.pb{font-size:11.5px;padding:4px 13px;border-radius:100px;}
+.pbg{background:var(--gl);color:var(--gd);border:1px solid var(--gm);}
+.pbb{background:#dbeeff;color:#1a5fa8;}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.tcard{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:24px;}
+.tstars{color:#f0a500;font-size:14px;margin-bottom:11px;}
+.ttext{font-size:13.5px;color:var(--muted);line-height:1.75;margin-bottom:16px;font-style:italic;}
+.tauthor{display:flex;align-items:center;gap:11px;}
+.tav{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.tname{font-size:13.5px;font-weight:600;color:var(--text);}
+.trole{font-size:11.5px;color:var(--muted);}
+
+/* ── CTA ── */
+.cta{padding:110px 6%;background:var(--gd);text-align:center;position:relative;overflow:hidden;}
+.cta-glow{position:absolute;inset:0;background:radial-gradient(ellipse 70% 90% at 50% 110%,rgba(78,205,164,0.25),transparent 60%);pointer-events:none;}
+.cta h2{font-family:'Fraunces',serif;font-size:clamp(34px,5.5vw,60px);color:#fff;letter-spacing:-1.5px;line-height:1.1;margin-bottom:14px;position:relative;}
+.cta h2 em{color:var(--gm);font-style:italic;}
+.cta p{font-size:17px;color:rgba(255,255,255,0.6);margin-bottom:40px;font-weight:300;position:relative;}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;}
+.cta-w{background:#fff;color:var(--gd);border:none;padding:15px 36px;border-radius:100px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;}
+.cta-w:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,0,0,0.18);}
+.cta-o{background:transparent;color:#fff;border:2px solid rgba(255,255,255,0.3);padding:15px 36px;border-radius:100px;font-size:15px;font-family:inherit;cursor:pointer;transition:all .2s;}
+.cta-o:hover{border-color:#fff;}
+
+/* ── FOOTER ── */
+footer{padding:56px 6% 30px;background:var(--bg);border-top:1.5px solid var(--border);}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:44px;margin-bottom:44px;}
+.foot-brand p{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.8;max-width:260px;font-weight:300;}
+.foot-col h4{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.foot-col a{display:block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:9px;transition:color .2s;}
+.foot-col a:hover{color:var(--g);}
+.foot-bot{display:flex;justify-content:space-between;align-items:center;border-top:1.5px solid var(--border);padding-top:24px;}
+.foot-copy{font-size:12px;color:var(--muted);}
+.foot-soc{display:flex;gap:8px;}
+.fsoc{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);cursor:pointer;transition:all .2s;}
+.fsoc:hover{border-color:var(--g);color:var(--g);}
+
+/* ── ANIMATIONS ── */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">Tal<em>entry</em></a>
+  <div class="nav-links">
+    <a href="#jobs">Find jobs</a>
+    <a href="#tools">AI tools</a>
+    <a href="#interview">Interview prep</a>
+    <a href="#employers">For employers</a>
+    <a href="#salary">Salary insights</a>
+  </div>
+  <div class="nav-r">
+    <button class="btn-ghost">Log in</button>
+    <button class="btn-solid">Get started free</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><div class="hero-badge-dot"></div>Nepal's first AI-powered healthcare job portal</div>
+  <h1>Find the right job.<br><em>Land it with AI.</em></h1>
+  <p class="hero-sub">Smart matching, AI interview coaching, resume builder & WhatsApp alerts — everything to get hired in Nepal's healthcare sector, 100% free.</p>
+  <div class="hero-search">
+    <input type="text" placeholder="Job title, skill, or hospital name..."/>
+    <select>
+      <option>All Nepal</option>
+      <option>Kathmandu</option>
+      <option>Pokhara</option>
+      <option>Lalitpur</option>
+      <option>Bharatpur</option>
+    </select>
+    <button>Search jobs</button>
+  </div>
+  <div class="hero-chips">
+    <span class="chip">Biomedical Engineer</span>
+    <span class="chip">Nurse</span>
+    <span class="chip">Lab Technician</span>
+    <span class="chip">Radiographer</span>
+    <span class="chip">Pharmacist</span>
+    <span class="chip">Doctor</span>
+    <span class="chip">Physiotherapist</span>
+    <span class="chip">INGO / NGO</span>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><strong>500+</strong><span>Active jobs</span></div>
+    <div class="hstat"><strong>200+</strong><span>Hospitals & clinics</span></div>
+    <div class="hstat"><strong>10k+</strong><span>Professionals</span></div>
+    <div class="hstat"><strong>Free</strong><span>Forever</span></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">Bir Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Grande Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Norvic Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Patan Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Nepal Medical College<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">KIST Medical<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">WHO Nepal<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Alka Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Tribhuvan University Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">B&B Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Bir Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Grande Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Norvic Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Patan Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Nepal Medical College<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">KIST Medical<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">WHO Nepal<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Alka Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">Tribhuvan University Hospital<span class="ticker-sep">✦</span></span>
+    <span class="ticker-item">B&B Hospital<span class="ticker-sep">✦</span></span>
+  </div>
+</div>
+
+<!-- SWIPE -->
+<section class="sec reveal">
+  <div class="split">
+    <div class="split-text">
+      <div class="sec-label">Smart discovery</div>
+      <h2 class="sec-title">Swipe to apply —<br><em>like Tinder for jobs</em></h2>
+      <p class="sec-body" style="margin-bottom:28px;">AI pre-filters jobs that match your profile. No more scrolling through irrelevant listings — just swipe right to apply, left to skip.</p>
+      <div class="feat-list">
+        <div class="feat-item"><div class="feat-dot">✦</div>40 free swipes every day</div>
+        <div class="feat-item"><div class="feat-dot">🤖</div>AI pre-matches to your profile</div>
+        <div class="feat-item"><div class="feat-dot">⚡</div>One-tap apply with your Talentry profile</div>
+        <div class="feat-item"><div class="feat-dot">🔖</div>Save jobs to apply later</div>
+      </div>
+      <button class="btn-solid">Try swipe mode</button>
+    </div>
+    <div class="split-vis">
+      <div class="swipe-deck">
+        <div class="sc s3"><div class="sc-role">Pharmacist</div><div class="sc-hosp"><div class="sc-ico">💊</div>Patan Hospital</div></div>
+        <div class="sc s2"><div class="sc-role">Lab Technician</div><div class="sc-hosp"><div class="sc-ico">🧬</div>Grande Hospital</div></div>
+        <div class="sc s1">
+          <div class="sc-badge">94% match</div>
+          <div class="sc-hosp"><div class="sc-ico">🏥</div>Bir Hospital · Kathmandu</div>
+          <div class="sc-role">Biomedical Engineer</div>
+          <div class="sc-sal">Rs. 45,000 / month</div>
+          <div class="sc-tags">
+            <span class="sct sctg">Full time</span>
+            <span class="sct sctb">Medical devices</span>
+          </div>
+          <div class="sc-btns">
+            <button class="sc-skip">✕ Skip</button>
+            <button class="sc-go" id="applyBtn">✓ Apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="sec sec-alt reveal" id="tools">
+  <div class="sec-center mb52">
+    <div class="sec-label">All-in-one platform</div>
+    <h2 class="sec-title">15 AI career tools —<br><em>completely free</em></h2>
+    <p class="sec-body">Everything from job search to getting hired, built specifically for Nepal's healthcare sector.</p>
+  </div>
+  <div class="tools-grid">
+    <div class="tool"><div class="tool-ico">🤖</div><h3>AI job matching</h3><p>Jobs matched to your real skills, not just keywords.</p><span class="tool-tag ttg">Smart</span></div>
+    <div class="tool"><div class="tool-ico">🎥</div><h3>Video resume</h3><p>Record a 60-second intro to stand out instantly.</p><span class="tool-tag ttg">Unique</span></div>
+    <div class="tool"><div class="tool-ico">🎙</div><h3>AI interview prep</h3><p>Practice, get scored, go confident on interview day.</p><span class="tool-tag ttg">Popular</span></div>
+    <div class="tool"><div class="tool-ico">📄</div><h3>Resume builder</h3><p>32 ATS-friendly templates for Nepal's recruiters.</p><span class="tool-tag ttb">32 templates</span></div>
+    <div class="tool"><div class="tool-ico">🔍</div><h3>ATS scanner</h3><p>Check if your resume passes automated screening.</p><span class="tool-tag ttg">Free</span></div>
+    <div class="tool"><div class="tool-ico">✅</div><h3>Skill badges</h3><p>Earn verified badges that employers trust.</p><span class="tool-tag ttg">Verified</span></div>
+    <div class="tool"><div class="tool-ico">📊</div><h3>App tracker</h3><p>Track all applications in a visual kanban board.</p><span class="tool-tag tta">New</span></div>
+    <div class="tool"><div class="tool-ico">💰</div><h3>Salary insights</h3><p>Know your market value before you negotiate.</p><span class="tool-tag tta">New</span></div>
+    <div class="tool"><div class="tool-ico">💬</div><h3>WhatsApp alerts</h3><p>Job alerts straight to your WhatsApp.</p><span class="tool-tag ttg">Nepal-first</span></div>
+    <div class="tool"><div class="tool-ico">🌐</div><h3>Nepali language</h3><p>Full support in Nepali and English.</p><span class="tool-tag ttg">नेपाली</span></div>
+  </div>
+</section>
+
+<!-- JOBS -->
+<section class="sec reveal" id="jobs">
+  <div class="jobs-hdr">
+    <div>
+      <div class="sec-label">Latest openings</div>
+      <h2 class="sec-title">Healthcare jobs in <em>Nepal</em></h2>
+    </div>
+    <a href="#">View all jobs →</a>
+  </div>
+  <div class="filters">
+    <button class="f on">All</button>
+    <button class="f">Biomedical</button>
+    <button class="f">Nursing</button>
+    <button class="f">Laboratory</button>
+    <button class="f">Pharmacy</button>
+    <button class="f">Imaging</button>
+    <button class="f">INGO / NGO</button>
+    <button class="f">Remote</button>
+  </div>
+  <div class="jcard">
+    <div class="j-ico">🏥</div>
+    <div class="j-body">
+      <div class="j-title">Biomedical Engineer <span class="jnew">New</span></div>
+      <div class="j-org">Bir Hospital · Kathmandu · Posted 2 hours ago</div>
+      <div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 45,000/mo</span><span class="jt jta">Medical devices</span><span class="jt jtp">Urgent</span></div>
+    </div>
+    <div class="j-right"><div class="ring"><span class="ring-n">94%</span><span class="ring-t">match</span></div></div>
+  </div>
+  <div class="jcard">
+    <div class="j-ico">🧬</div>
+    <div class="j-body">
+      <div class="j-title">Clinical Lab Technician</div>
+      <div class="j-org">Grande Hospital · Kathmandu · Posted 5 hours ago</div>
+      <div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 38,000/mo</span><span class="jt jta">Laboratory</span></div>
+    </div>
+    <div class="j-right"><div class="ring"><span class="ring-n">88%</span><span class="ring-t">match</span></div></div>
+  </div>
+  <div class="jcard">
+    <div class="j-ico">🔬</div>
+    <div class="j-body">
+      <div class="j-title">Radiographer</div>
+      <div class="j-org">Norvic Hospital · Kathmandu · Posted 1 day ago</div>
+      <div class="j-tags"><span class="jt jtg">Part time</span><span class="jt jtb">Rs. 30,000/mo</span><span class="jt jta">Imaging</span></div>
+    </div>
+    <div class="j-right"><div class="ring"><span class="ring-n">81%</span><span class="ring-t">match</span></div></div>
+  </div>
+  <div class="jcard">
+    <div class="j-ico">🌍</div>
+    <div class="j-body">
+      <div class="j-title">Health Program Officer <span class="jnew">INGO</span></div>
+      <div class="j-org">WHO Nepal · Kathmandu · Posted 3 days ago</div>
+      <div class="j-tags"><span class="jt jtg">Contract</span><span class="jt jtb">Rs. 80,000/mo</span><span class="jt jtp">Public health</span></div>
+    </div>
+    <div class="j-right"><div class="ring"><span class="ring-n">77%</span><span class="ring-t">match</span></div></div>
+  </div>
+</section>
+
+<!-- KANBAN -->
+<section class="sec sec-alt reveal">
+  <div class="sec-center mb52">
+    <div class="sec-label">Stay organized</div>
+    <h2 class="sec-title">Track every application<br><em>in one kanban board</em></h2>
+    <p class="sec-body">Always know where you stand — from applied to offer received.</p>
+  </div>
+  <div class="kanban">
+    <div class="kcol">
+      <div class="khead"><div class="kdot" style="background:#888"></div>Applied (3)</div>
+      <div class="kitem"><div class="ki-role">Biomedical Engineer</div><div class="ki-org">Bir Hospital</div><div class="ki-date">Applied Apr 28</div></div>
+      <div class="kitem"><div class="ki-role">Lab Technician</div><div class="ki-org">Grande Hospital</div><div class="ki-date">Applied Apr 25</div></div>
+    </div>
+    <div class="kcol">
+      <div class="khead"><div class="kdot" style="background:#378ADD"></div>Screening (1)</div>
+      <div class="kitem"><div class="ki-role">Radiographer</div><div class="ki-org">Norvic Hospital</div><div class="ki-date">Shortlisted Apr 27</div></div>
+    </div>
+    <div class="kcol">
+      <div class="khead"><div class="kdot" style="background:#f0a500"></div>Interview (1)</div>
+      <div class="kitem"><div class="ki-role">Pharmacist</div><div class="ki-org">Patan Hospital</div><div class="ki-date">Interview May 2</div></div>
+    </div>
+    <div class="kcol">
+      <div class="khead"><div class="kdot" style="background:#0ea271"></div>Offered 🎉</div>
+      <div class="kitem"><div class="ki-role">Health Officer</div><div class="ki-org">WHO Nepal</div><div class="ki-date">Offer received!</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- AI INTERVIEW -->
+<section class="sec reveal" id="interview">
+  <div class="split rev">
+    <div class="split-text">
+      <div class="sec-label">Interview prep</div>
+      <div class="live-pill"><div class="live-d"></div>Live AI coaching</div>
+      <h2 class="sec-title">Your personal<br><em>AI interview coach</em></h2>
+      <p class="sec-body" style="margin-bottom:24px;">Practice real questions for healthcare roles in Nepal. Get instant scored feedback in Nepali or English.</p>
+      <div class="steps">
+        <div class="step"><div class="step-n">1</div><div class="step-t">Choose your role and difficulty level</div></div>
+        <div class="step"><div class="step-n">2</div><div class="step-t">Answer via text or video recording</div></div>
+        <div class="step"><div class="step-n">3</div><div class="step-t">Get instant AI feedback on clarity, depth, and relevance</div></div>
+        <div class="step"><div class="step-n">4</div><div class="step-t">Repeat until your confidence score hits 90%+</div></div>
+      </div>
+      <button class="btn-solid">Start practicing free</button>
+    </div>
+    <div class="split-vis">
+      <div class="ai-box">
+        <div class="chat-msg"><div class="chat-who">AI coach</div><div class="bubble bai">Tell me about your experience maintaining biomedical equipment in a hospital setting.</div></div>
+        <div class="chat-msg"><div class="chat-who">You</div><div class="bubble bme">I have 2 years of experience servicing ICU ventilators and imaging equipment at Bir Hospital...</div></div>
+        <div class="chat-msg"><div class="chat-who">AI feedback</div><div class="bubble bai">Good start! Add specific equipment models and quantify your impact — try: "Reduced downtime by 30%." Want to retry?</div></div>
+        <div class="scores">
+          <div class="sc-item"><div class="sc-val">82%</div><div class="sc-lbl">Confidence</div></div>
+          <div class="sc-item"><div class="sc-val">74%</div><div class="sc-lbl">Clarity</div></div>
+          <div class="sc-item"><div class="sc-val">90%</div><div class="sc-lbl">Relevance</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESUME -->
+<section class="sec sec-alt reveal">
+  <div class="split">
+    <div class="split-text">
+      <div class="sec-label">Resume builder</div>
+      <h2 class="sec-title">Know your resume score<br><em>before you apply</em></h2>
+      <p class="sec-body" style="margin-bottom:28px;">AI scans for ATS compatibility, keywords, and formatting — and tells you exactly what to improve to land more interviews.</p>
+      <button class="btn-solid">Build my resume free</button>
+    </div>
+    <div class="split-vis">
+      <div class="ats-card">
+        <div class="ats-title">Resume ATS score</div>
+        <div class="ats-row"><div class="ats-lbl"><span>Keywords</span><span>88%</span></div><div class="ats-track"><div class="ats-fill" style="width:88%"></div></div></div>
+        <div class="ats-row"><div class="ats-lbl"><span>Formatting</span><span>95%</span></div><div class="ats-track"><div class="ats-fill" style="width:95%"></div></div></div>
+        <div class="ats-row"><div class="ats-lbl"><span>Readability</span><span>72%</span></div><div class="ats-track"><div class="ats-fill ats-warn" style="width:72%"></div></div></div>
+      </div>
+      <div class="tmpls">
+        <div class="tmpl on"><div class="tmpl-prev" style="background:#d6f5eb"><div class="tl" style="background:#0ea271;width:70%"></div><div class="tl" style="width:50%"></div><div class="tl"></div><div class="tl"></div></div><div class="tmpl-name">Classic</div></div>
+        <div class="tmpl"><div class="tmpl-prev" style="background:#dbeeff"><div class="tl" style="background:#378ADD;width:55%"></div><div class="tl" style="width:40%"></div><div class="tl"></div><div class="tl"></div></div><div class="tmpl-name">Modern</div></div>
+        <div class="tmpl"><div class="tmpl-prev" style="background:#ede9ff"><div class="tl" style="background:#4a30b0;width:80%"></div><div class="tl" style="width:60%"></div><div class="tl"></div><div class="tl"></div></div><div class="tmpl-name">Bold</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SALARY -->
+<section class="sec reveal" id="salary">
+  <div class="split rev">
+    <div class="split-text">
+      <div class="sec-label">Salary insights</div>
+      <h2 class="sec-title">Never undersell<br><em>yourself again</em></h2>
+      <p class="sec-body" style="margin-bottom:28px;">Compare salaries by role, experience, city, and hospital across Nepal. Updated monthly from real job postings.</p>
+      <button class="btn-solid">Check my salary worth</button>
+    </div>
+    <div class="split-vis">
+      <div class="salary-card">
+        <div class="sal-row"><div><div class="sal-role">Biomedical Engineer</div><div class="sal-bar"><div class="sal-fill" style="width:75%"></div></div></div><div class="sal-amt">Rs. 35k–55k</div></div>
+        <div class="sal-row"><div><div class="sal-role">Lab Technician</div><div class="sal-bar"><div class="sal-fill" style="width:55%"></div></div></div><div class="sal-amt">Rs. 25k–40k</div></div>
+        <div class="sal-row"><div><div class="sal-role">Radiographer</div><div class="sal-bar"><div class="sal-fill" style="width:60%"></div></div></div><div class="sal-amt">Rs. 28k–45k</div></div>
+        <div class="sal-row"><div><div class="sal-role">Pharmacist</div><div class="sal-bar"><div class="sal-fill" style="width:65%"></div></div></div><div class="sal-amt">Rs. 30k–50k</div></div>
+        <div class="sal-row"><div><div class="sal-role">INGO Health Officer</div><div class="sal-bar"><div class="sal-fill" style="width:90%"></div></div></div><div class="sal-amt">Rs. 60k–120k</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL -->
+<section class="sec sec-alt reveal">
+  <div class="sec-center mb52">
+    <div class="sec-label">Auto social posting</div>
+    <h2 class="sec-title">Every job posted to social media<br><em>automatically — free</em></h2>
+    <p class="sec-body">Post once on Talentry and reach thousands across Facebook, LinkedIn, and Instagram instantly.</p>
+  </div>
+  <div class="social-pills">
+    <div class="spill"><div class="sdot" style="background:#1877F2"></div>Facebook</div>
+    <div class="spill"><div class="sdot" style="background:#0A66C2"></div>LinkedIn</div>
+    <div class="spill"><div class="sdot" style="background:#E1306C"></div>Instagram</div>
+    <div class="spill"><div class="sdot" style="background:#25D366"></div>WhatsApp</div>
+  </div>
+  <div class="post">
+    <div class="post-hdr"><div class="post-logo">T</div><div><div class="post-nm">Talentry Nepal</div><div class="post-tm">Just now · Auto-posted</div></div></div>
+    <div class="post-body">New job alert! Bir Hospital is hiring a Biomedical Engineer in Kathmandu. Rs. 45,000/mo. Apply now at talentry.com</div>
+    <div class="post-ht">#TalentryNepal #BiomedicaNepal #HealthJobs #KathmanduJobs</div>
+    <div class="post-stats"><span class="pstat">142 likes</span><span class="pstat">38 shares</span><span class="pstat">12 comments</span></div>
+  </div>
+</section>
+
+<!-- WHATSAPP -->
+<section class="sec reveal">
+  <div class="split">
+    <div class="split-text">
+      <div class="sec-label">WhatsApp-first</div>
+      <h2 class="sec-title">Job alerts on<br><em>WhatsApp</em></h2>
+      <p class="sec-body" style="margin-bottom:28px;">Nepalis use WhatsApp more than email. Job alerts, interview reminders, and updates sent directly to your phone.</p>
+      <button class="btn-solid">Enable WhatsApp alerts</button>
+    </div>
+    <div class="split-vis">
+      <div class="wa-card">
+        <div class="wa-hd"><div class="wa-online"></div>Talentry WhatsApp bot · Online</div>
+        <div class="wa-msg">Hi Ram! New job match:<br><br><strong>Biomedical Engineer</strong><br>Bir Hospital, Kathmandu<br>Rs. 45,000/mo · 94% AI match<br><br>Reply <strong>1</strong> to apply instantly<div class="wa-time">10:32 AM ✓✓</div></div>
+        <div class="wa-msg">Reminder: Interview at Grande Hospital tomorrow at 10 AM. Reply <strong>PREP</strong> to practice with AI now.<div class="wa-time">9:00 AM ✓✓</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EMPLOYERS -->
+<section class="sec sec-alt reveal" id="employers">
+  <div class="sec-center mb52">
+    <div class="sec-label">For employers</div>
+    <h2 class="sec-title">Hire smarter, <em>faster</em></h2>
+    <p class="sec-body">Everything you need to find and hire the best healthcare talent in Nepal — from AI job descriptions to analytics.</p>
+  </div>
+  <div class="emp-grid">
+    <div class="emp-card"><div class="emp-ico">📝</div><div class="emp-title">AI job descriptions</div><div class="emp-desc">Generate compelling job posts in seconds with AI.</div></div>
+    <div class="emp-card"><div class="emp-ico">🤖</div><div class="emp-title">AI candidate screening</div><div class="emp-desc">Every applicant gets an instant AI match score.</div></div>
+    <div class="emp-card"><div class="emp-ico">📊</div><div class="emp-title">Hiring pipeline</div><div class="emp-desc">Visual kanban to manage your full recruitment flow.</div></div>
+    <div class="emp-card"><div class="emp-ico">📣</div><div class="emp-title">Auto social posting</div><div class="emp-desc">Jobs auto-posted to Facebook, LinkedIn & Instagram.</div></div>
+    <div class="emp-card"><div class="emp-ico">📅</div><div class="emp-title">Interview scheduler</div><div class="emp-desc">One-click scheduling with WhatsApp reminders.</div></div>
+    <div class="emp-card"><div class="emp-ico">📈</div><div class="emp-title">Hiring analytics</div><div class="emp-desc">Track time-to-hire, cost-per-hire, and pipeline health.</div></div>
+  </div>
+</section>
+
+<!-- PROFILE -->
+<section class="sec reveal">
+  <div class="sec-center mb52">
+    <div class="sec-label">Your career identity</div>
+    <h2 class="sec-title">Your own profile at<br><em>talentry.com/yourname</em></h2>
+    <p class="sec-body">One link to share everywhere — WhatsApp, email, LinkedIn, business card.</p>
+  </div>
+  <div class="profile-wrap">
+    <div class="profile-card">
+      <div class="pav">RB</div>
+      <div>
+        <div class="p-name">Ram Bahadur Shrestha</div>
+        <div class="p-url">talentry.com/rambahadur</div>
+        <div class="p-bio">Biomedical Engineer with 4 years of experience in medical device maintenance. Specialized in ICU equipment, ventilators, and imaging systems across Kathmandu hospitals.</div>
+        <div class="p-badges">
+          <span class="pb pbg">Medical devices</span>
+          <span class="pb pbg">Ventilator servicing</span>
+          <span class="pb pbg">ICU equipment</span>
+          <span class="pb pbb">Identity verified</span>
+          <span class="pb pbb">Degree verified</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="sec sec-alt reveal">
+  <div class="sec-center mb52">
+    <div class="sec-label">Testimonials</div>
+    <h2 class="sec-title">What people say about <em>Talentry</em></h2>
+  </div>
+  <div class="testi-grid">
+    <div class="tcard">
+      <div class="tstars">★★★★★</div>
+      <div class="ttext">Got matched with Bir Hospital within 2 days. The AI interview prep gave me the confidence I needed. Best job platform in Nepal!</div>
+      <div class="tauthor"><div class="tav" style="background:#d6f5eb;color:#064e38">RS</div><div><div class="tname">Rajesh Shrestha</div><div class="trole">Biomedical Engineer, Kathmandu</div></div></div>
+    </div>
+    <div class="tcard">
+      <div class="tstars">★★★★★</div>
+      <div class="ttext">We reduced our time-to-hire by 60%. AI screening saves hours every week. Auto social posting gives us amazing organic reach too.</div>
+      <div class="tauthor"><div class="tav" style="background:#dbeeff;color:#1a5fa8">SP</div><div><div class="tname">Sushma Pandey</div><div class="trole">HR Manager, Grande Hospital</div></div></div>
+    </div>
+    <div class="tcard">
+      <div class="tstars">★★★★★</div>
+      <div class="ttext">WhatsApp alerts are a game changer. Applied to 3 jobs from my phone in under 5 minutes. Got 2 interviews that same week!</div>
+      <div class="tauthor"><div class="tav" style="background:#fff3d6;color:#7a4e00">BT</div><div><div class="tname">Binita Tamang</div><div class="trole">Lab Technician, Pokhara</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta reveal">
+  <div class="cta-glow"></div>
+  <h2>Ready to build<br><em>Nepal's best job portal?</em></h2>
+  <p>Start free. Scale when it grows. Built for Nepal's healthcare future.</p>
+  <div class="cta-btns">
+    <button class="cta-w">Get started free</button>
+    <button class="cta-o">Post a job</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-grid">
+    <div class="foot-brand">
+      <a class="logo" href="#">Tal<em>entry</em></a>
+      <p>Nepal's first AI-powered healthcare job portal. Built for biomedical engineers, nurses, lab technicians, and all healthcare professionals across Nepal.</p>
+    </div>
+    <div class="foot-col">
+      <h4>Job seekers</h4>
+      <a href="#">Find jobs</a>
+      <a href="#">Resume builder</a>
+      <a href="#">AI interview prep</a>
+      <a href="#">Salary insights</a>
+      <a href="#">Skill badges</a>
+    </div>
+    <div class="foot-col">
+      <h4>Employers</h4>
+      <a href="#">Post a job</a>
+      <a href="#">AI screening</a>
+      <a href="#">Hiring pipeline</a>
+      <a href="#">Analytics</a>
+      <a href="#">Pricing</a>
+    </div>
+    <div class="foot-col">
+      <h4>Company</h4>
+      <a href="#">About</a>
+      <a href="#">Blog</a>
+      <a href="#">Careers</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+  </div>
+  <div class="foot-bot">
+    <div class="foot-copy">© 2026 Talentry · Kathmandu, Nepal · Built for Nepal's healthcare sector</div>
+    <div class="foot-soc">
+      <div class="fsoc">f</div>
+      <div class="fsoc">in</div>
+      <div class="fsoc">ig</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Reveal on scroll
+const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); }), {threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Filter buttons
+document.querySelectorAll('.f').forEach(btn => {
+  btn.addEventListener('click', () => { document.querySelectorAll('.f').forEach(b => b.classList.remove('on')); btn.classList.add('on'); });
+});
+
+// Apply button feedback
+document.getElementById('applyBtn')?.addEventListener('click', function(){
+  this.textContent = '✓ Applied!';
+  this.style.background = '#064e38';
+  setTimeout(() => { this.textContent = '✓ Apply'; this.style.background = ''; }, 2000);
+});
+
+// Template switcher
+document.querySelectorAll('.tmpl').forEach(t => {
+  t.addEventListener('click', () => { document.querySelectorAll('.tmpl').forEach(x => x.classList.remove('on')); t.classList.add('on'); });
+});
+</script>
+</body>
+</html>

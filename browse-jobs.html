@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Browse Jobs — Talentry</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Fraunces',serif;font-size:24px;color:var(--text);text-decoration:none;}.logo em{color:var(--g);font-style:italic;}
+.nav-links{display:flex;gap:24px;}.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;}
+.nav-links a:hover,.nav-links a.active{color:var(--g);}
+.nav-r{display:flex;gap:10px;}
+.btn-ghost{background:none;border:1.5px solid var(--border2);color:var(--text);padding:8px 18px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;}
+.btn-solid{background:var(--g);color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
+
+.hero-bar{padding:88px 6% 32px;background:var(--gd);position:relative;overflow:hidden;}
+.hero-bar-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+.hero-bar h1{font-family:'Fraunces',serif;font-size:clamp(28px,4vw,42px);color:#fff;letter-spacing:-1px;margin-bottom:8px;position:relative;}
+.hero-bar h1 em{color:var(--gm);font-style:italic;}
+.hero-bar p{font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:20px;position:relative;font-weight:300;}
+.search-row{display:flex;gap:10px;max-width:700px;position:relative;}
+.search-row input{flex:1;padding:12px 18px;border:none;border-radius:12px;font-size:14px;font-family:inherit;outline:none;color:var(--text);}
+.search-row select{padding:12px 16px;border:none;border-radius:12px;font-size:13px;font-family:inherit;color:var(--text);cursor:pointer;background:#fff;}
+.search-row button{background:var(--g);color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;font-family:inherit;cursor:pointer;font-weight:500;white-space:nowrap;}
+
+.page-body{display:grid;grid-template-columns:280px 1fr;gap:24px;padding:28px 6%;max-width:1300px;margin:0 auto;}
+
+/* FILTERS SIDEBAR */
+.filters-sidebar{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;height:fit-content;position:sticky;top:84px;}
+.fs-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;}
+.fs-clear{font-size:12px;color:var(--g);cursor:pointer;font-weight:400;}
+.filter-group{margin-bottom:22px;padding-bottom:22px;border-bottom:1.5px solid var(--border);}
+.filter-group:last-child{border:none;margin:0;padding:0;}
+.fg-title{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.filter-option{display:flex;align-items:center;gap:9px;padding:7px 0;cursor:pointer;font-size:13.5px;color:var(--muted);transition:color .2s;}
+.filter-option:hover{color:var(--text);}
+.filter-option input{accent-color:var(--g);width:15px;height:15px;cursor:pointer;}
+.filter-option.checked{color:var(--gd);font-weight:500;}
+.filter-count{font-size:11px;color:var(--muted);margin-left:auto;}
+.salary-range{display:flex;flex-direction:column;gap:8px;}
+.salary-range input[type=range]{accent-color:var(--g);width:100%;cursor:pointer;}
+.salary-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);}
+
+/* JOBS LIST */
+.jobs-main{}
+.jobs-toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.jobs-count{font-size:14px;color:var(--muted);}
+.jobs-count strong{color:var(--text);}
+.sort-wrap{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);}
+.sort-wrap select{border:1.5px solid var(--border2);border-radius:8px;padding:6px 12px;font-size:13px;font-family:inherit;color:var(--text);background:#fff;cursor:pointer;outline:none;}
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.fchip{display:flex;align-items:center;gap:5px;background:var(--gl);color:var(--gd);font-size:12px;padding:4px 12px;border-radius:100px;border:1px solid var(--gm);}
+.fchip-x{background:none;border:none;cursor:pointer;color:var(--gd);font-size:14px;padding:0;}
+
+.jcard{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:20px 24px;margin-bottom:12px;display:flex;gap:16px;align-items:flex-start;cursor:pointer;transition:all .2s;position:relative;}
+.jcard:hover{border-color:var(--gm);box-shadow:0 6px 24px rgba(14,162,113,0.1);transform:translateY(-1px);}
+.jcard.featured{border-color:var(--gm);background:linear-gradient(135deg,#fff,var(--bg2));}
+.featured-badge{position:absolute;top:14px;right:14px;background:var(--g);color:#fff;font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;}
+.j-ico{width:48px;height:48px;border-radius:13px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.j-body{flex:1;}
+.j-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.j-org{font-size:13px;color:var(--muted);margin-bottom:10px;}
+.j-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.j-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.jt{font-size:11.5px;padding:3px 11px;border-radius:100px;}
+.jtg{background:var(--gl);color:var(--gd);}
+.jtb{background:#dbeeff;color:#1a5fa8;}
+.jta{background:#fff3d6;color:#7a4e00;}
+.jtp{background:#ede9ff;color:#4a30b0;}
+.jtr{background:#ffe8e8;color:#9b1c1c;}
+.j-right{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.ring{width:52px;height:52px;border-radius:50%;background:var(--gl);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-n{font-size:14px;font-weight:600;color:var(--g);line-height:1;}
+.ring-t{font-size:9px;color:var(--gd);}
+.save-btn{background:none;border:1.5px solid var(--border2);border-radius:100px;padding:5px 12px;font-size:11px;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s;}
+.save-btn:hover{border-color:var(--g);color:var(--g);}
+.j-footer{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1.5px solid var(--border);}
+.j-time{font-size:12px;color:var(--muted);}
+.apply-btn{background:var(--g);color:#fff;border:none;padding:8px 20px;border-radius:100px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s;}
+.apply-btn:hover{background:var(--gd);}
+
+.load-more{display:block;width:100%;padding:14px;background:#fff;border:1.5px solid var(--border2);border-radius:14px;font-size:14px;font-weight:500;font-family:inherit;color:var(--text);cursor:pointer;transition:all .2s;margin-top:8px;}
+.load-more:hover{border-color:var(--g);color:var(--g);}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="index.html">Tal<em>entry</em></a>
+  <div class="nav-links">
+    <a href="browse-jobs.html" class="active">Find jobs</a>
+    <a href="post-job.html">Post a job</a>
+    <a href="#">AI tools</a>
+    <a href="interview-prep.html">Interview prep</a>
+  </div>
+  <div class="nav-r">
+    <button class="btn-ghost" onclick="location.href='auth.html'">Log in</button>
+    <button class="btn-solid" onclick="location.href='auth.html'">Sign up free</button>
+  </div>
+</nav>
+
+<div class="hero-bar">
+  <div class="hero-bar-grid"></div>
+  <h1>Healthcare jobs in <em>Nepal</em></h1>
+  <p>500+ open positions across hospitals, clinics, and NGOs — AI-matched to your skills</p>
+  <div class="search-row">
+    <input type="text" placeholder="Job title, skill, or keyword..." id="searchInput"/>
+    <select id="locationFilter">
+      <option value="">All Nepal</option>
+      <option>Kathmandu</option>
+      <option>Pokhara</option>
+      <option>Lalitpur</option>
+      <option>Bharatpur</option>
+      <option>Biratnagar</option>
+    </select>
+    <button onclick="filterJobs()">Search</button>
+  </div>
+</div>
+
+<div class="page-body">
+  <!-- SIDEBAR -->
+  <div class="filters-sidebar">
+    <div class="fs-title">Filters <span class="fs-clear" onclick="clearFilters()">Clear all</span></div>
+    <div class="filter-group">
+      <div class="fg-title">Job type</div>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Full time <span class="filter-count">142</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Part time <span class="filter-count">38</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Contract <span class="filter-count">67</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Internship <span class="filter-count">24</span></label>
+    </div>
+    <div class="filter-group">
+      <div class="fg-title">Category</div>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Biomedical Engineering <span class="filter-count">45</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Nursing <span class="filter-count">89</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Laboratory <span class="filter-count">52</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Pharmacy <span class="filter-count">34</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Imaging / Radiology <span class="filter-count">28</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Public Health <span class="filter-count">41</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> INGO / NGO <span class="filter-count">19</span></label>
+    </div>
+    <div class="filter-group">
+      <div class="fg-title">Experience level</div>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Entry level (0–1 yr) <span class="filter-count">56</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Junior (1–3 yrs) <span class="filter-count">98</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Mid level (3–5 yrs) <span class="filter-count">72</span></label>
+      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Senior (5+ yrs) <span class="filter-count">44</span></label>
+    </div>
+    <div class="filter-group">
+      <div class="fg-title">Salary range (Rs./mo)</div>
+      <div class="salary-range">
+        <input type="range" min="10000" max="150000" value="150000" step="5000" id="salaryRange" oninput="updateSalaryLabel(this.value)"/>
+        <div class="salary-labels"><span>Rs. 10k</span><span id="salaryLabel">Up to Rs. 150k</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOBS LIST -->
+  <div class="jobs-main">
+    <div class="jobs-toolbar">
+      <div class="jobs-count">Showing <strong>247</strong> jobs</div>
+      <div class="sort-wrap">Sort by: <select><option>Best match</option><option>Newest first</option><option>Salary: High to low</option><option>Salary: Low to high</option></select></div>
+    </div>
+    <div class="filter-chips" id="filterChips"></div>
+    <div id="jobsList">
+      <div class="jcard featured">
+        <div class="featured-badge">Featured</div>
+        <div class="j-ico">🏥</div>
+        <div class="j-body">
+          <div class="j-title">Biomedical Engineer</div>
+          <div class="j-org">Bir Hospital · Kathmandu</div>
+          <div class="j-desc">Responsible for maintaining, repairing, and calibrating biomedical equipment including ICU ventilators, imaging systems, and patient monitoring devices.</div>
+          <div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 45,000/mo</span><span class="jt jta">Medical devices</span><span class="jt jtp">Urgent</span></div>
+          <div class="j-footer"><span class="j-time">Posted 2 hours ago</span><button class="apply-btn" onclick="location.href='auth.html'">Apply now</button></div>
+        </div>
+        <div class="j-right"><div class="ring"><span class="ring-n">94%</span><span class="ring-t">match</span></div><button class="save-btn">Save</button></div>
+      </div>
+      <div class="jcard">
+        <div class="j-ico">🧬</div>
+        <div class="j-body">
+          <div class="j-title">Clinical Lab Technician</div>
+          <div class="j-org">Grande Hospital · Kathmandu</div>
+          <div class="j-desc">Perform laboratory tests, analyze samples, and maintain lab equipment. Work closely with clinical staff to support accurate diagnosis.</div>
+          <div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 38,000/mo</span><span class="jt jta">Laboratory</span></div>
+          <div class="j-footer"><span class="j-time">Posted 5 hours ago</span><button class="apply-btn" onclick="location.href='auth.html'">Apply now</button></div>
+        </div>
+        <div class="j-right"><div class="ring"><span class="ring-n">88%</span><span class="ring-t">match</span></div><button class="save-btn">Save</button></div>
+      </div>
+      <div class="jcard">
+        <div class="j-ico">🔬</div>
+        <div class="j-body">
+          <div class="j-title">Radiographer</div>
+          <div class="j-org">Norvic Hospital · Kathmandu</div>
+          <div class="j-desc">Operate radiographic equipment and produce high-quality diagnostic images. Ensure patient safety and comfort during procedures.</div>
+          <div class="j-tags"><span class="jt jtg">Part time</span><span class="jt jtb">Rs. 30,000/mo</span><span class="jt jta">Imaging</span></div>
+          <div class="j-footer"><span class="j-time">Posted 1 day ago</span><button class="apply-btn" onclick="location.href='auth.html'">Apply now</button></div>
+        </div>
+        <div class="j-right"><div class="ring"><span class="ring-n">81%</span><span class="ring-t">match</span></div><button class="save-btn">Save</button></div>
+      </div>
+      <div class="jcard">
+        <div class="j-ico">🌍</div>
+        <div class="j-body">
+          <div class="j-title">Health Program Officer</div>
+          <div class="j-org">WHO Nepal · Kathmandu</div>
+          <div class="j-desc">Support implementation of national health programs, coordinate with government stakeholders, and monitor program outcomes.</div>
+          <div class="j-tags"><span class="jt jtg">Contract</span><span class="jt jtb">Rs. 80,000/mo</span><span class="jt jtp">Public health</span><span class="jt jtr">INGO</span></div>
+          <div class="j-footer"><span class="j-time">Posted 3 days ago</span><button class="apply-btn" onclick="location.href='auth.html'">Apply now</button></div>
+        </div>
+        <div class="j-right"><div class="ring"><span class="ring-n">77%</span><span class="ring-t">match</span></div><button class="save-btn">Save</button></div>
+      </div>
+      <div class="jcard">
+        <div class="j-ico">💊</div>
+        <div class="j-body">
+          <div class="j-title">Pharmacist</div>
+          <div class="j-org">Patan Hospital · Lalitpur</div>
+          <div class="j-desc">Dispense medications, counsel patients on proper drug use, and collaborate with medical teams to optimize patient therapy outcomes.</div>
+          <div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 42,000/mo</span><span class="jt jta">Pharmacy</span></div>
+          <div class="j-footer"><span class="j-time">Posted 4 days ago</span><button class="apply-btn" onclick="location.href='auth.html'">Apply now</button></div>
+        </div>
+        <div class="j-right"><div class="ring"><span class="ring-n">73%</span><span class="ring-t">match</span></div><button class="save-btn">Save</button></div>
+      </div>
+      <div class="jcard">
+        <div class="j-ico">🩺</div>
+        <div class="j-body">
+          <div class="j-title">Medical Officer</div>
+          <div class="j-org">KIST Medical College · Lalitpur</div>
+          <div class="j-desc">Provide clinical care, perform examinations, and manage patient records. Support junior staff and medical students in training.</div>
+          <div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 95,000/mo</span><span class="jt jta">Medical</span></div>
+          <div class="j-footer"><span class="j-time">Posted 5 days ago</span><button class="apply-btn" onclick="location.href='auth.html'">Apply now</button></div>
+        </div>
+        <div class="j-right"><div class="ring"><span class="ring-n">69%</span><span class="ring-t">match</span></div><button class="save-btn">Save</button></div>
+      </div>
+      <div class="jcard">
+        <div class="j-ico">🦾</div>
+        <div class="j-body">
+          <div class="j-title">Physiotherapist</div>
+          <div class="j-org">Nepal Orthopedic Hospital · Kathmandu</div>
+          <div class="j-desc">Assess and treat patients with physical disabilities, injuries, and chronic conditions using evidence-based physiotherapy techniques.</div>
+          <div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 35,000/mo</span><span class="jt jta">Physiotherapy</span></div>
+          <div class="j-footer"><span class="j-time">Posted 1 week ago</span><button class="apply-btn" onclick="location.href='auth.html'">Apply now</button></div>
+        </div>
+        <div class="j-right"><div class="ring"><span class="ring-n">65%</span><span class="ring-t">match</span></div><button class="save-btn">Save</button></div>
+      </div>
+    </div>
+    <button class="load-more">Load more jobs</button>
+  </div>
+</div>
+
+<script>
+function filterJobs(){ }
+function clearFilters(){ document.querySelectorAll('.filters-sidebar input[type=checkbox]').forEach(c=>c.checked=false); }
+function updateSalaryLabel(v){ document.getElementById('salaryLabel').textContent = 'Up to Rs. '+Number(v).toLocaleString(); }
+</script>
+</body>
+</html>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
+
+async function loadJobs(){
+  const { data: jobs, error } = await sb.from('jobs').select('*').eq('status','active').order('created_at',{ascending:false});
+  if(error || !jobs || jobs.length === 0) return;
+  const list = document.getElementById('jobsList');
+  list.innerHTML = '';
+  jobs.forEach(job => {
+    const sal = job.salary_min && job.salary_max
+      ? 'Rs. '+Number(job.salary_min).toLocaleString()+'/mo'
+      : job.salary_min ? 'Rs. '+Number(job.salary_min).toLocaleString()+'+' : 'Salary not disclosed';
+    list.innerHTML += `
+    <div class="jcard">
+      <div class="j-ico">🏥</div>
+      <div class="j-body">
+        <div class="j-title">${job.title}</div>
+        <div class="j-org">${job.company} · ${job.location || ''}</div>
+        <div class="j-desc">${(job.description||'').substring(0,120)}...</div>
+        <div class="j-tags">
+          ${job.job_type ? '<span class="jt jtg">'+job.job_type+'</span>' : ''}
+          ${sal ? '<span class="jt jtb">'+sal+'</span>' : ''}
+          ${job.category ? '<span class="jt jta">'+job.category+'</span>' : ''}
+        </div>
+        <div class="j-footer">
+          <span class="j-time">Just posted</span>
+          <button class="apply-btn" onclick="location.href='auth.html'">Apply now</button>
+        </div>
+      </div>
+      <div class="j-right">
+        <div class="ring"><span class="ring-n">${Math.floor(70+Math.random()*25)}%</span><span class="ring-t">match</span></div>
+        <button class="save-btn">Save</button>
+      </div>
+    </div>`; 
+  });
+}
+loadJobs();
+</script>

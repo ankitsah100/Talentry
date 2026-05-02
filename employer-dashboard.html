@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Employer Dashboard — Talentry</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-height:100vh;background:var(--gd);padding:0;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;}
+.sb-logo{padding:22px 24px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sb-logo a{font-family:'Fraunces',serif;font-size:22px;color:#fff;text-decoration:none;}
+.sb-logo a em{color:var(--gm);font-style:italic;}
+.sb-org{padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.sb-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;margin-bottom:8px;}
+.sb-name{font-size:13px;font-weight:600;color:#fff;}
+.sb-role{font-size:11.5px;color:rgba(255,255,255,0.5);}
+.sb-nav{flex:1;padding:16px 0;}
+.sb-nav a{display:flex;align-items:center;gap:11px;padding:11px 24px;font-size:13.5px;color:rgba(255,255,255,0.65);text-decoration:none;transition:all .2s;cursor:pointer;}
+.sb-nav a:hover,.sb-nav a.active{background:rgba(255,255,255,0.08);color:#fff;}
+.sb-nav a.active{border-right:3px solid var(--gm);}
+.sb-nav-icon{font-size:16px;width:20px;text-align:center;}
+.sb-section{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:12px 24px 6px;}
+.sb-post-btn{margin:16px;background:var(--g);color:#fff;border:none;padding:12px;border-radius:12px;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;width:calc(100% - 32px);transition:all .2s;}
+.sb-post-btn:hover{background:#0cb87f;}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;padding:28px 32px;min-height:100vh;}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+.top-greeting{font-family:'Fraunces',serif;font-size:26px;color:var(--text);letter-spacing:-0.5px;}
+.top-greeting span{color:var(--g);font-style:italic;}
+.top-actions{display:flex;gap:10px;}
+.btn-outline{background:none;border:1.5px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;}
+.btn-solid{background:var(--g);color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;}
+.stat-label{font-size:12px;color:var(--muted);margin-bottom:6px;}
+.stat-num{font-family:'Fraunces',serif;font-size:30px;color:var(--text);font-weight:500;line-height:1;}
+.stat-change{font-size:12px;margin-top:6px;}
+.up{color:var(--g);}
+.down{color:#e24b4a;}
+
+/* GRID */
+.dash-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;}
+
+.card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px;}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.card-title{font-size:15px;font-weight:600;color:var(--text);}
+.card-action{font-size:12.5px;color:var(--g);cursor:pointer;text-decoration:none;}
+
+/* JOB LISTINGS */
+.job-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1.5px solid var(--border);}
+.job-row:last-child{border:none;padding-bottom:0;}
+.jr-ico{width:40px;height:40px;border-radius:11px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.jr-info{flex:1;}
+.jr-title{font-size:14px;font-weight:600;color:var(--text);}
+.jr-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.jr-stats{display:flex;gap:14px;align-items:center;}
+.jr-stat{text-align:center;}
+.jr-stat-num{font-size:15px;font-weight:600;color:var(--text);}
+.jr-stat-lbl{font-size:10px;color:var(--muted);}
+.status-pill{font-size:11px;padding:3px 11px;border-radius:100px;font-weight:500;}
+.active-pill{background:var(--gl);color:var(--gd);}
+.paused-pill{background:#f0f0f0;color:#666;}
+
+/* KANBAN */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.kcol{background:var(--bg2);border-radius:12px;padding:12px;}
+.khead{font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.kdot{width:8px;height:8px;border-radius:50%;}
+.kitem{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:11px;margin-bottom:7px;cursor:pointer;transition:all .2s;}
+.kitem:hover{border-color:var(--gm);}
+.ki-name{font-size:12.5px;font-weight:600;color:var(--text);}
+.ki-role{font-size:11px;color:var(--muted);margin-top:1px;}
+.ki-score{font-size:11px;color:var(--g);margin-top:4px;font-weight:500;}
+
+/* APPLICANTS */
+.applicant-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1.5px solid var(--border);}
+.applicant-row:last-child{border:none;}
+.app-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.app-name{font-size:13.5px;font-weight:600;color:var(--text);}
+.app-role{font-size:12px;color:var(--muted);}
+.app-match{font-size:12px;font-weight:600;color:var(--g);margin-left:auto;white-space:nowrap;}
+.app-actions{display:flex;gap:6px;margin-left:8px;}
+.app-btn{padding:5px 12px;border-radius:100px;font-size:11.5px;font-family:inherit;cursor:pointer;}
+.app-view{background:var(--gl);color:var(--gd);border:none;}
+.app-reject{background:#ffe8e8;color:#9b1c1c;border:none;}
+
+/* SOCIAL POSTS */
+.post-item{padding:12px 0;border-bottom:1.5px solid var(--border);display:flex;gap:12px;align-items:flex-start;}
+.post-item:last-child{border:none;}
+.post-platform{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.post-info{flex:1;}
+.post-text{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:4px;}
+.post-stats{font-size:11.5px;color:var(--muted);}
+.post-time{font-size:11px;color:var(--muted);white-space:nowrap;}
+
+/* ANALYTICS MINI -->
+.analytics-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.anl-card{background:var(--bg2);border-radius:12px;padding:14px;text-align:center;}
+.anl-num{font-family:'Fraunces',serif;font-size:22px;color:var(--g);}
+.anl-lbl{font-size:11px;color:var(--muted);margin-top:3px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-logo"><a href="index.html">Tal<em>entry</em></a></div>
+  <div class="sb-org">
+    <div class="sb-av">BH</div>
+    <div class="sb-name">Bir Hospital</div>
+    <div class="sb-role">Employer account</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Main</div>
+    <a class="active"><span class="sb-nav-icon">📊</span>Dashboard</a>
+    <a href="post-job.html"><span class="sb-nav-icon">➕</span>Post a job</a>
+    <a><span class="sb-nav-icon">💼</span>Active jobs</a>
+    <a><span class="sb-nav-icon">👥</span>Applicants</a>
+    <div class="sb-section">Tools</div>
+    <a><span class="sb-nav-icon">🤖</span>AI screening</a>
+    <a><span class="sb-nav-icon">📅</span>Interviews</a>
+    <a><span class="sb-nav-icon">📣</span>Social posts</a>
+    <a><span class="sb-nav-icon">📈</span>Analytics</a>
+    <div class="sb-section">Account</div>
+    <a><span class="sb-nav-icon">⚙</span>Settings</a>
+    <a href="auth.html"><span class="sb-nav-icon">🚪</span>Log out</a>
+  </nav>
+  <button class="sb-post-btn" onclick="location.href='post-job.html'">+ Post a new job</button>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="top-bar">
+    <div class="top-greeting">Good morning, <span>Bir Hospital</span> 👋</div>
+    <div class="top-actions">
+      <button class="btn-outline">📥 Download report</button>
+      <button class="btn-solid" onclick="location.href='post-job.html'">+ Post a job</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Active jobs</div>
+      <div class="stat-num">4</div>
+      <div class="stat-change up">↑ 1 this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total applicants</div>
+      <div class="stat-num">87</div>
+      <div class="stat-change up">↑ 12 today</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Interviews scheduled</div>
+      <div class="stat-num">6</div>
+      <div class="stat-change up">↑ 2 this week</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg. time to hire</div>
+      <div class="stat-num">8d</div>
+      <div class="stat-change down">↓ 3 days faster</div>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <div>
+      <!-- ACTIVE JOBS -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Active job listings</div>
+          <a class="card-action" href="post-job.html">+ Post new job</a>
+        </div>
+        <div class="job-row">
+          <div class="jr-ico">🏥</div>
+          <div class="jr-info">
+            <div class="jr-title">Biomedical Engineer</div>
+            <div class="jr-meta">Posted 2 days ago · Kathmandu</div>
+          </div>
+          <div class="jr-stats">
+            <div class="jr-stat"><div class="jr-stat-num">34</div><div class="jr-stat-lbl">Applicants</div></div>
+            <div class="jr-stat"><div class="jr-stat-num">1.2k</div><div class="jr-stat-lbl">Views</div></div>
+          </div>
+          <span class="status-pill active-pill">Active</span>
+        </div>
+        <div class="job-row">
+          <div class="jr-ico">🧬</div>
+          <div class="jr-info">
+            <div class="jr-title">Lab Technician</div>
+            <div class="jr-meta">Posted 5 days ago · Kathmandu</div>
+          </div>
+          <div class="jr-stats">
+            <div class="jr-stat"><div class="jr-stat-num">28</div><div class="jr-stat-lbl">Applicants</div></div>
+            <div class="jr-stat"><div class="jr-stat-num">890</div><div class="jr-stat-lbl">Views</div></div>
+          </div>
+          <span class="status-pill active-pill">Active</span>
+        </div>
+        <div class="job-row">
+          <div class="jr-ico">🔬</div>
+          <div class="jr-info">
+            <div class="jr-title">Radiographer</div>
+            <div class="jr-meta">Posted 1 week ago · Kathmandu</div>
+          </div>
+          <div class="jr-stats">
+            <div class="jr-stat"><div class="jr-stat-num">18</div><div class="jr-stat-lbl">Applicants</div></div>
+            <div class="jr-stat"><div class="jr-stat-num">540</div><div class="jr-stat-lbl">Views</div></div>
+          </div>
+          <span class="status-pill paused-pill">Paused</span>
+        </div>
+      </div>
+
+      <!-- HIRING PIPELINE -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Hiring pipeline</div>
+          <a class="card-action">View all</a>
+        </div>
+        <div class="kanban">
+          <div class="kcol">
+            <div class="khead"><div class="kdot" style="background:#888"></div>Applied (34)</div>
+            <div class="kitem"><div class="ki-name">Ram Shrestha</div><div class="ki-role">Biomedical Eng.</div><div class="ki-score">94% match</div></div>
+            <div class="kitem"><div class="ki-name">Sita Gurung</div><div class="ki-role">Biomedical Eng.</div><div class="ki-score">88% match</div></div>
+            <div class="kitem"><div class="ki-name">Bikash Rai</div><div class="ki-role">Lab Tech.</div><div class="ki-score">82% match</div></div>
+          </div>
+          <div class="kcol">
+            <div class="khead"><div class="kdot" style="background:#378ADD"></div>Screening (8)</div>
+            <div class="kitem"><div class="ki-name">Priya Thapa</div><div class="ki-role">Biomedical Eng.</div><div class="ki-score">91% match</div></div>
+            <div class="kitem"><div class="ki-name">Anish Karki</div><div class="ki-role">Lab Tech.</div><div class="ki-score">79% match</div></div>
+          </div>
+          <div class="kcol">
+            <div class="khead"><div class="kdot" style="background:#f0a500"></div>Interview (3)</div>
+            <div class="kitem"><div class="ki-name">Maya Tamang</div><div class="ki-role">Radiographer</div><div class="ki-score">May 2 · 10AM</div></div>
+          </div>
+          <div class="kcol">
+            <div class="khead"><div class="kdot" style="background:#0ea271"></div>Offered (1)</div>
+            <div class="kitem"><div class="ki-name">Rohan Pandey</div><div class="ki-role">Biomedical Eng.</div><div class="ki-score">Offer sent 🎉</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP APPLICANTS -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Top AI-matched applicants</div>
+          <a class="card-action">View all 87</a>
+        </div>
+        <div class="applicant-row">
+          <div class="app-av" style="background:#d6f5eb;color:#064e38">RS</div>
+          <div><div class="app-name">Ram Shrestha</div><div class="app-role">Biomedical Engineer · 4 yrs exp</div></div>
+          <div class="app-match">94% match</div>
+          <div class="app-actions"><button class="app-btn app-view">View</button><button class="app-btn app-reject">Skip</button></div>
+        </div>
+        <div class="applicant-row">
+          <div class="app-av" style="background:#dbeeff;color:#1a5fa8">PT</div>
+          <div><div class="app-name">Priya Thapa</div><div class="app-role">Biomedical Engineer · 3 yrs exp</div></div>
+          <div class="app-match">91% match</div>
+          <div class="app-actions"><button class="app-btn app-view">View</button><button class="app-btn app-reject">Skip</button></div>
+        </div>
+        <div class="applicant-row">
+          <div class="app-av" style="background:#ede9ff;color:#4a30b0">SG</div>
+          <div><div class="app-name">Sita Gurung</div><div class="app-role">Biomedical Engineer · 2 yrs exp</div></div>
+          <div class="app-match">88% match</div>
+          <div class="app-actions"><button class="app-btn app-view">View</button><button class="app-btn app-reject">Skip</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDEBAR -->
+    <div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">Analytics overview</div></div>
+        <div class="analytics-row">
+          <div class="anl-card"><div class="anl-num">3.2k</div><div class="anl-lbl">Total views</div></div>
+          <div class="anl-card"><div class="anl-num">87</div><div class="anl-lbl">Total applies</div></div>
+          <div class="anl-card"><div class="anl-num">2.7%</div><div class="anl-lbl">Apply rate</div></div>
+          <div class="anl-card"><div class="anl-num">8d</div><div class="anl-lbl">Time to hire</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">Auto social posts</div><a class="card-action">View all</a></div>
+        <div class="post-item">
+          <div class="post-platform" style="background:#dbeeff">f</div>
+          <div class="post-info">
+            <div class="post-text">Hiring: Biomedical Engineer at Bir Hospital...</div>
+            <div class="post-stats">👍 142 likes · 38 shares</div>
+          </div>
+          <div class="post-time">2h ago</div>
+        </div>
+        <div class="post-item">
+          <div class="post-platform" style="background:#dbeeff">in</div>
+          <div class="post-info">
+            <div class="post-text">We're looking for a Lab Technician to join...</div>
+            <div class="post-stats">👍 89 likes · 22 shares</div>
+          </div>
+          <div class="post-time">5h ago</div>
+        </div>
+        <div class="post-item">
+          <div class="post-platform" style="background:#ffe8e8">ig</div>
+          <div class="post-info">
+            <div class="post-text">New opening at Bir Hospital! Apply now...</div>
+            <div class="post-stats">❤ 67 likes · 14 shares</div>
+          </div>
+          <div class="post-time">1d ago</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">Upcoming interviews</div></div>
+        <div class="applicant-row">
+          <div class="app-av" style="background:#fff3d6;color:#7a4e00">MT</div>
+          <div><div class="app-name">Maya Tamang</div><div class="app-role">Tomorrow · 10:00 AM</div></div>
+        </div>
+        <div class="applicant-row">
+          <div class="app-av" style="background:#d6f5eb;color:#064e38">AK</div>
+          <div><div class="app-name">Anish Karki</div><div class="app-role">May 3 · 2:00 PM</div></div>
+        </div>
+        <div style="margin-top:12px;">
+          <button style="width:100%;padding:10px;background:var(--gl);color:var(--gd);border:none;border-radius:10px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;">📅 Schedule interview</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
