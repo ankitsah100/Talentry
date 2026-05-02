@@ -320,3 +320,54 @@ async function loadJobs(){
 }
 loadJobs();
 </script>
+
+<script src="ai-match.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
+
+async function loadJobsWithMatching(){
+  const { data: jobs } = await sb.from('jobs').select('*').eq('status','active').order('created_at',{ascending:false});
+  if(!jobs || jobs.length === 0) return;
+
+  const profile = await window.TalentryAI.getCandidateProfile(sb);
+  const defaultProfile = { job_title: 'Healthcare Professional', skills: [], location: 'Kathmandu', years_experience: 2 };
+  const candidateProfile = profile || defaultProfile;
+
+  const list = document.getElementById('jobsList');
+  list.innerHTML = '';
+
+  jobs.forEach(job => {
+    const match = window.TalentryAI.calculateMatchScore(candidateProfile, job);
+    const sal = job.salary_min && job.salary_max
+      ? 'Rs. '+Number(job.salary_min).toLocaleString()+'–'+Number(job.salary_max).toLocaleString()+'/mo'
+      : job.salary_min ? 'Rs. '+Number(job.salary_min).toLocaleString()+'+' : '';
+
+    list.innerHTML += `
+    <div class="jcard" style="cursor:pointer">
+      <div class="j-ico">🏥</div>
+      <div class="j-body">
+        <div class="j-title">${job.title}</div>
+        <div class="j-org">${job.company} · ${job.location || ''}</div>
+        <div class="j-desc">${(job.description||'').substring(0,120)}...</div>
+        <div class="j-tags">
+          ${job.job_type?'<span class="jt jtg">'+job.job_type+'</span>':''}
+          ${sal?'<span class="jt jtb">'+sal+'</span>':''}
+          ${job.category?'<span class="jt jta">'+job.category+'</span>':''}
+          ${match.score>=85?'<span class="jt" style="background:#d6f5eb;color:#064e38">'+match.label+'</span>':''}
+        </div>
+        <div class="j-footer">
+          <span class="j-time">Recently posted</span>
+          <button class="apply-btn" onclick="location.href='auth.html'">Apply now</button>
+        </div>
+      </div>
+      <div class="j-right">
+        ${window.TalentryAI.renderMatchBadge(match)}
+        <button class="save-btn" style="margin-top:6px">Save</button>
+      </div>
+    </div>`;
+  });
+}
+
+loadJobsWithMatching();
+</script>

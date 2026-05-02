@@ -244,3 +244,37 @@ document.addEventListener("click",function(e){
 </script>
 </body>
 </html>
+
+<script src="ai-match.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
+
+async function loadProfile(){
+  const { data: { session } } = await sb.auth.getSession();
+  if(!session){ return; }
+
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if(!profile) return;
+
+  // Update profile display
+  if(profile.full_name){
+    document.querySelector('.profile-name').textContent = profile.full_name;
+    document.querySelector('.avatar').textContent = profile.full_name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+  }
+  if(profile.job_title) document.querySelector('.profile-role').textContent = profile.job_title + ' · ' + (profile.location || 'Nepal');
+  if(profile.profile_url) document.querySelector('.profile-url').textContent = 'talentry.com/' + profile.profile_url;
+
+  // Show skills
+  if(profile.skills && profile.skills.length > 0){
+    const wrap = document.querySelector('.skills-wrap');
+    if(wrap){
+      wrap.innerHTML = profile.skills.map(s =>
+        '<span class="skill-tag">'+s+'</span>'
+      ).join('');
+    }
+  }
+}
+
+loadProfile();
+</script>
