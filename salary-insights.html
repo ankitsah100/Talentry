@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Salary Insights — Talentry Nepal Healthcare</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="mobile.css"/>
+<style>
+:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Fraunces',serif;font-size:24px;color:var(--text);text-decoration:none;}.logo em{color:var(--g);font-style:italic;}
+.nav-r{display:flex;gap:10px;align-items:center;}
+.btn-ghost{background:none;border:1.5px solid var(--border2);color:var(--text);padding:8px 18px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;}
+.btn-solid{background:var(--g);color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
+
+/* HERO */
+.hero{padding:90px 6% 52px;background:var(--gd);position:relative;overflow:hidden;text-align:center;}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(30px,5vw,52px);color:#fff;letter-spacing:-1px;line-height:1.1;margin-bottom:12px;position:relative;}
+.hero h1 em{color:var(--gm);font-style:italic;}
+.hero p{font-size:16px;color:rgba(255,255,255,.55);font-weight:300;max-width:520px;margin:0 auto 32px;position:relative;}
+.sources{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;}
+.src-pill{font-size:11.5px;color:rgba(255,255,255,.5);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);padding:5px 14px;border-radius:100px;}
+
+/* ESTIMATOR */
+.estimator-wrap{max-width:800px;margin:-32px auto 0;padding:0 6%;position:relative;z-index:10;}
+.estimator{background:#fff;border:1.5px solid var(--border);border-radius:22px;padding:28px;box-shadow:0 8px 40px rgba(0,0,0,.1);}
+.est-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.est-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
+.field select,.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border2);border-radius:12px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:all .2s;}
+.field select:focus,.field input:focus{border-color:var(--g);}
+.est-btn{background:var(--g);color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;height:46px;}
+.est-btn:hover{background:var(--gd);}
+.est-result{margin-top:20px;display:none;}
+.est-result.show{display:block;}
+.est-range{background:linear-gradient(135deg,var(--gl),#e8f8f2);border:1.5px solid var(--gm);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.est-range-num{font-family:'Fraunces',serif;font-size:32px;color:var(--gd);font-weight:500;}
+.est-range-lbl{font-size:13px;color:var(--muted);}
+.est-tips{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;}
+.est-tip{font-size:12px;background:#fff;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:100px;}
+.ai-analyzing{display:none;text-align:center;padding:16px;}
+.ai-analyzing.show{display:flex;align-items:center;justify-content:center;gap:10px;}
+.spin{width:18px;height:18px;border:2.5px solid var(--border2);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:40px 6% 60px;}
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--g);margin-bottom:10px;}
+.sec-title{font-family:'Fraunces',serif;font-size:clamp(26px,3.5vw,38px);color:var(--text);letter-spacing:-1px;line-height:1.15;margin-bottom:8px;}
+.sec-title em{color:var(--g);font-style:italic;}
+.sec-sub{font-size:15px;color:var(--muted);font-weight:300;line-height:1.7;margin-bottom:32px;}
+
+/* ROLE TABS */
+.role-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+.rtab{padding:8px 18px;border-radius:100px;border:1.5px solid var(--border);background:#fff;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s;}
+.rtab.on,.rtab:hover{background:var(--gl);color:var(--gd);border-color:var(--gm);}
+
+/* SALARY CARD */
+.salary-hero-card{background:#fff;border:1.5px solid var(--border);border-radius:22px;padding:28px;margin-bottom:24px;}
+.shc-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:24px;}
+.shc-title{font-family:'Fraunces',serif;font-size:26px;color:var(--text);letter-spacing:-0.5px;}
+.shc-avg{text-align:right;}
+.shc-avg-num{font-family:'Fraunces',serif;font-size:36px;color:var(--g);}
+.shc-avg-lbl{font-size:12px;color:var(--muted);}
+.shc-range-bar{height:12px;background:var(--bg2);border-radius:6px;position:relative;margin-bottom:8px;}
+.shc-bar-fill{position:absolute;height:100%;border-radius:6px;background:linear-gradient(90deg,#4ecda4,var(--g));}
+.shc-bar-avg{position:absolute;top:-4px;width:3px;height:20px;background:var(--gd);border-radius:2px;}
+.shc-range-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);}
+.shc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px;}
+.shc-stat{background:var(--bg2);border-radius:12px;padding:14px;text-align:center;}
+.shc-stat-num{font-family:'Fraunces',serif;font-size:20px;color:var(--text);font-weight:500;}
+.shc-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px;}
+
+/* EXPERIENCE TABLE */
+.exp-table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.exp-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:10px 16px;text-align:left;border-bottom:2px solid var(--border);}
+.exp-table td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:14px;}
+.exp-table tr:last-child td{border:none;}
+.exp-table tr:hover td{background:var(--bg2);}
+.exp-level{font-weight:600;color:var(--text);}
+.exp-years{color:var(--muted);font-size:13px;}
+.salary-range-cell{font-weight:600;color:var(--g);}
+.growth-badge{font-size:11px;background:var(--gl);color:var(--gd);padding:3px 10px;border-radius:100px;}
+.bar-mini{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:4px;width:120px;}
+.bar-mini-fill{height:100%;border-radius:3px;background:var(--gm);}
+
+/* SECTOR COMPARISON */
+.sector-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+.sector-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;}
+.sector-icon{font-size:24px;margin-bottom:10px;}
+.sector-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.sector-sal{font-family:'Fraunces',serif;font-size:22px;color:var(--g);margin-bottom:8px;}
+.sector-pros{font-size:12px;color:var(--muted);line-height:1.6;}
+.sector-badge{display:inline-block;font-size:10px;padding:2px 9px;border-radius:100px;margin-bottom:8px;}
+
+/* CITY COMPARISON */
+.city-table{width:100%;border-collapse:collapse;}
+.city-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:10px 16px;text-align:left;border-bottom:2px solid var(--border);}
+.city-table td{padding:13px 16px;border-bottom:1px solid var(--border);font-size:13.5px;}
+.city-table tr:last-child td{border:none;}
+.city-table tr:hover td{background:var(--bg2);}
+.city-name{font-weight:600;color:var(--text);}
+.city-bar{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-top:5px;}
+.city-bar-fill{height:100%;border-radius:3px;background:var(--g);}
+
+/* TIPS */
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.tip-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;}
+.tip-ico{font-size:24px;margin-bottom:10px;}
+.tip-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.tip-body{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* SOURCE NOTE */
+.source-note{font-size:12px;color:var(--muted);text-align:center;margin-top:40px;padding:16px;background:#fff;border-radius:12px;border:1px solid var(--border);}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="index.html">Tal<em>entry</em></a>
+  <div class="nav-r" id="navR">
+    <button class="btn-ghost" onclick="location.href='auth.html'">Log in</button>
+    <button class="btn-solid" onclick="location.href='browse-jobs.html'">Browse jobs</button>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <h1>Healthcare salary insights<br><em>for Nepal 2025</em></h1>
+  <p>Real salary data from actual job postings and surveys. Know your market value before you negotiate.</p>
+  <div class="sources">
+    <span class="src-pill">📊 KumariJob data</span>
+    <span class="src-pill">📊 PayScale Nepal</span>
+    <span class="src-pill">📊 Glassdoor</span>
+    <span class="src-pill">📊 WorldSalaries</span>
+    <span class="src-pill">📊 Talentry job postings</span>
+  </div>
+</div>
+
+<!-- AI SALARY ESTIMATOR -->
+<div class="estimator-wrap">
+  <div class="estimator">
+    <div class="est-title">🤖 AI Salary Estimator — get your personalized estimate</div>
+    <div class="est-row">
+      <div class="field"><label>Job role</label>
+        <select id="estRole">
+          <option>Biomedical Engineer</option>
+          <option>Lab Technician</option>
+          <option>Nurse / Staff Nurse</option>
+          <option>Radiographer</option>
+          <option>Pharmacist</option>
+          <option>Medical Officer / Doctor</option>
+          <option>Physiotherapist</option>
+          <option>Health Program Officer</option>
+          <option>Public Health Officer</option>
+        </select>
+      </div>
+      <div class="field"><label>Experience</label>
+        <select id="estExp">
+          <option>Fresh graduate (0 yrs)</option>
+          <option>1–2 years</option>
+          <option>3–5 years</option>
+          <option>5–10 years</option>
+          <option>10+ years</option>
+        </select>
+      </div>
+      <div class="field"><label>Sector</label>
+        <select id="estSector">
+          <option>Private hospital</option>
+          <option>Government hospital</option>
+          <option>INGO / NGO</option>
+          <option>Pharmaceutical company</option>
+          <option>Clinic / Polyclinic</option>
+        </select>
+      </div>
+      <button class="est-btn" onclick="estimateSalary()">Estimate →</button>
+    </div>
+    <div class="ai-analyzing" id="aiAnalyzing">
+      <div class="spin"></div>
+      <span style="font-size:13px;color:var(--muted);">AI is analyzing salary data...</span>
+    </div>
+    <div class="est-result" id="estResult">
+      <div class="est-range">
+        <div>
+          <div class="est-range-lbl">Estimated monthly salary range</div>
+          <div class="est-range-num" id="estRangeNum">Rs. 35,000 – 55,000</div>
+          <div class="est-range-lbl" id="estAvgLbl">Average: Rs. 45,000/month</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Annual estimate</div>
+          <div style="font-family:'Fraunces',serif;font-size:22px;color:var(--gd);" id="estAnnual">Rs. 5.4 lakhs/yr</div>
+          <div style="font-size:11px;color:var(--muted);" id="estPercentile">Top 40% of Nepal healthcare salaries</div>
+        </div>
+      </div>
+      <div class="est-tips" id="estTips"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN PAGE -->
+<div class="page">
+
+  <!-- ROLE SELECTOR -->
+  <div style="margin-top:48px;margin-bottom:8px;">
+    <div class="sec-label">Salary by role</div>
+    <h2 class="sec-title">Explore salaries by <em>healthcare role</em></h2>
+    <p class="sec-sub">Select a role to see detailed salary breakdown by experience, sector, and city.</p>
+  </div>
+
+  <div class="role-tabs" id="roleTabs">
+    <button class="rtab on" onclick="showRole('biomed',this)">🔧 Biomedical Engineer</button>
+    <button class="rtab" onclick="showRole('lab',this)">🧬 Lab Technician</button>
+    <button class="rtab" onclick="showRole('nurse',this)">🏥 Nurse</button>
+    <button class="rtab" onclick="showRole('radio',this)">🔬 Radiographer</button>
+    <button class="rtab" onclick="showRole('pharma',this)">💊 Pharmacist</button>
+    <button class="rtab" onclick="showRole('doctor',this)">🩺 Medical Officer</button>
+    <button class="rtab" onclick="showRole('physio',this)">🦾 Physiotherapist</button>
+    <button class="rtab" onclick="showRole('public',this)">🌍 Health Officer (INGO)</button>
+  </div>
+
+  <!-- SALARY HERO CARD -->
+  <div class="salary-hero-card" id="salaryHeroCard"></div>
+
+  <!-- EXPERIENCE TABLE -->
+  <div style="background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;margin-bottom:24px;">
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:18px;">Salary by experience level</div>
+    <table class="exp-table" id="expTable"></table>
+  </div>
+
+  <!-- SECTOR COMPARISON -->
+  <div style="margin-bottom:10px;"><div class="sec-label">Sector comparison</div><h3 style="font-family:'Fraunces',serif;font-size:22px;color:var(--text);letter-spacing:-0.5px;margin-bottom:8px;">Government vs Private vs <em>INGO</em></h3></div>
+  <div class="sector-grid" id="sectorGrid"></div>
+
+  <!-- CITY COMPARISON -->
+  <div style="background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;margin-bottom:28px;">
+    <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:18px;">Salary by city</div>
+    <table class="city-table" id="cityTable"></table>
+  </div>
+
+  <!-- TIPS -->
+  <div style="margin-bottom:16px;"><div class="sec-label">Negotiation tips</div><h3 style="font-family:'Fraunces',serif;font-size:22px;color:var(--text);letter-spacing:-0.5px;">How to earn <em>more</em></h3></div>
+  <div class="tips-grid">
+    <div class="tip-card"><div class="tip-ico">📈</div><div class="tip-title">Get certified</div><div class="tip-body">Additional certifications in your specialty can increase salary by 15–30%. In Nepal, international certifications (WHO, USAID training) are especially valued by INGOs and private hospitals.</div></div>
+    <div class="tip-card"><div class="tip-ico">🏥</div><div class="tip-title">Target INGOs and NGOs</div><div class="tip-body">International organizations like WHO, UNICEF, Save the Children typically pay 2–3x more than local private hospitals. They also offer USD-based salaries, benefits, and career growth.</div></div>
+    <div class="tip-card"><div class="tip-ico">💬</div><div class="tip-title">Negotiate with data</div><div class="tip-body">Come to salary discussions with data from this page. Knowing the market range gives you confidence to ask for 20–30% more than the initial offer — most employers expect negotiation.</div></div>
+    <div class="tip-card"><div class="tip-ico">📍</div><div class="tip-title">Location matters</div><div class="tip-body">Kathmandu and Lalitpur pay significantly more than other cities. Remote areas sometimes offer hardship allowances that increase effective salary by 25–40% on top of base pay.</div></div>
+  </div>
+
+  <div class="source-note">
+    📊 Salary data sourced from KumariJob.com, PayScale Nepal, Glassdoor, WorldSalaries.com, and Talentry job postings (2024–2025). Data represents monthly gross salary in NPR including basic pay and standard benefits. Actual salaries may vary based on employer, negotiation, and market conditions. Last updated: 2025.
+  </div>
+</div>
+
+<script type="module" src="navbar.js"></script>
+
+<script>
+const roles = {
+  biomed: {
+    title: 'Biomedical Engineer',
+    icon: '🔧',
+    avg: 45000,
+    min: 25000,
+    max: 120000,
+    median: 42000,
+    source: 'KumariJob, WorldSalaries 2025',
+    exp: [
+      { level: 'Fresh graduate', years: '0–1 yr', min: 25000, max: 40000, avg: 32000, growth: '+28% in 2 yrs', bar: 25 },
+      { level: 'Junior', years: '1–3 yrs', min: 35000, max: 55000, avg: 44000, growth: '+18% / yr', bar: 38 },
+      { level: 'Mid level', years: '3–5 yrs', min: 50000, max: 80000, avg: 63000, growth: '+12% / yr', bar: 55 },
+      { level: 'Senior', years: '5–10 yrs', min: 70000, max: 110000, avg: 88000, growth: '+8% / yr', bar: 78 },
+      { level: 'Lead / Manager', years: '10+ yrs', min: 90000, max: 150000, avg: 120000, growth: 'Top 10%', bar: 100 },
+    ],
+    sectors: [
+      { icon:'🏛️', name:'Government hospital', sal:'Rs. 28,000–55,000', badge:'Stable', badgeColor:'#dbeeff', badgeText:'#1a5fa8', pros:'Job security, pension, medical coverage, government benefits. Slow salary growth but very stable.' },
+      { icon:'🏥', name:'Private hospital', sal:'Rs. 35,000–90,000', badge:'Higher pay', badgeColor:'#d6f5eb', badgeText:'#064e38', pros:'Better base salary, performance bonuses, faster growth. Bir, Grande, Norvic top payers.' },
+      { icon:'🌍', name:'INGO / NGO', sal:'Rs. 60,000–150,000', badge:'Best pay', badgeColor:'#fff3d6', badgeText:'#7a4e00', pros:'WHO, UNICEF, Save the Children pay 2–3x private hospitals. USD allowances common.' },
+    ],
+    cities: [
+      { city:'Kathmandu', min:35000, max:120000, avg:58000, bar:100 },
+      { city:'Lalitpur (Patan)', min:32000, max:100000, avg:52000, bar:90 },
+      { city:'Bhaktapur', min:28000, max:80000, avg:44000, bar:76 },
+      { city:'Pokhara', min:25000, max:70000, avg:38000, bar:65 },
+      { city:'Bharatpur', min:22000, max:60000, avg:32000, bar:55 },
+      { city:'Biratnagar', min:20000, max:55000, avg:28000, bar:48 },
+    ]
+  },
+  lab: {
+    title: 'Lab Technician',
+    icon: '🧬',
+    avg: 32000,
+    min: 15000,
+    max: 65000,
+    median: 28000,
+    source: 'KumariJob 2025',
+    exp: [
+      { level: 'Fresh graduate', years: '0–1 yr', min: 15000, max: 25000, avg: 19000, growth: '+20% in 2 yrs', bar: 25 },
+      { level: 'Junior', years: '1–3 yrs', min: 22000, max: 35000, avg: 28000, growth: '+15% / yr', bar: 42 },
+      { level: 'Mid level', years: '3–5 yrs', min: 30000, max: 48000, avg: 38000, growth: '+12% / yr', bar: 60 },
+      { level: 'Senior', years: '5–10 yrs', min: 40000, max: 65000, avg: 50000, growth: '+8% / yr', bar: 80 },
+      { level: 'Lab Manager', years: '10+ yrs', min: 55000, max: 85000, avg: 68000, growth: 'Top 10%', bar: 100 },
+    ],
+    sectors: [
+      { icon:'🏛️', name:'Government hospital', sal:'Rs. 18,000–42,000', badge:'Stable', badgeColor:'#dbeeff', badgeText:'#1a5fa8', pros:'Government pay scale with regular increments, pension, medical benefits.' },
+      { icon:'🏥', name:'Private hospital', sal:'Rs. 22,000–55,000', badge:'Higher pay', badgeColor:'#d6f5eb', badgeText:'#064e38', pros:'Better salary, shift allowances. Grande, Norvic, KIST Medical offer good packages.' },
+      { icon:'🔬', name:'Diagnostic center', sal:'Rs. 25000–65000', badge:'Best pay', badgeColor:'#fff3d6', badgeText:'#7a4e00', pros:'Specialized labs pay premium for skills in microbiology, hematology, PCR testing.' },
+    ],
+    cities: [
+      { city:'Kathmandu', min:22000, max:65000, avg:36000, bar:100 },
+      { city:'Lalitpur (Patan)', min:20000, max:58000, avg:32000, bar:89 },
+      { city:'Pokhara', min:18000, max:48000, avg:26000, bar:72 },
+      { city:'Bharatpur', min:15000, max:40000, avg:22000, bar:61 },
+      { city:'Biratnagar', min:14000, max:38000, avg:20000, bar:56 },
+    ]
+  },
+  nurse: {
+    title: 'Staff Nurse',
+    icon: '🏥',
+    avg: 35000,
+    min: 18000,
+    max: 90000,
+    median: 30000,
+    source: 'Merojob, KumariJob 2025',
+    exp: [
+      { level: 'Fresh graduate', years: '0–1 yr', min: 18000, max: 28000, avg: 22000, growth: '+20% in 2 yrs', bar: 22 },
+      { level: 'Junior nurse', years: '1–3 yrs', min: 24000, max: 38000, avg: 30000, growth: '+15% / yr', bar: 38 },
+      { level: 'Staff nurse', years: '3–5 yrs', min: 32000, max: 52000, avg: 42000, growth: '+12% / yr', bar: 55 },
+      { level: 'Senior nurse', years: '5–10 yrs', min: 45000, max: 70000, avg: 56000, growth: '+10% / yr', bar: 75 },
+      { level: 'Charge nurse / Head', years: '10+ yrs', min: 60000, max: 100000, avg: 78000, growth: 'Top 10%', bar: 100 },
+    ],
+    sectors: [
+      { icon:'🏛️', name:'Government hospital', sal:'Rs. 22,000–55,000', badge:'Stable', badgeColor:'#dbeeff', badgeText:'#1a5fa8', pros:'Permanent positions with pension, medical insurance. Bir Hospital, TUTH are top employers.' },
+      { icon:'🏥', name:'Private hospital', sal:'Rs. 28,000–70,000', badge:'Higher pay', badgeColor:'#d6f5eb', badgeText:'#064e38', pros:'Grande, Norvic offer competitive packages with shift allowances and performance bonuses.' },
+      { icon:'🌍', name:'International / abroad', sal:'Rs. 80,000–200,000+', badge:'Best pay', badgeColor:'#fff3d6', badgeText:'#7a4e00', pros:'UAE, Qatar, UK, Australia hiring Nepali nurses. CTEVT-certified nurses qualify for abroad jobs.' },
+    ],
+    cities: [
+      { city:'Kathmandu', min:28000, max:90000, avg:44000, bar:100 },
+      { city:'Lalitpur (Patan)', min:25000, max:75000, avg:38000, bar:86 },
+      { city:'Pokhara', min:20000, max:60000, avg:30000, bar:68 },
+      { city:'Bharatpur', min:18000, max:52000, avg:26000, bar:59 },
+      { city:'Remote / Hardship areas', min:25000, max:70000, avg:48000, bar:109 },
+    ]
+  },
+  radio: {
+    title: 'Radiographer',
+    icon: '🔬',
+    avg: 38000,
+    min: 20000,
+    max: 85000,
+    median: 35000,
+    source: 'Paylab, WorldSalaries, KumariJob 2025',
+    exp: [
+      { level: 'Diploma holder', years: '0–1 yr', min: 20000, max: 30000, avg: 24000, growth: '+22% in 2 yrs', bar: 25 },
+      { level: 'Junior radiographer', years: '1–3 yrs', min: 28000, max: 42000, avg: 34000, growth: '+15% / yr', bar: 42 },
+      { level: 'Radiographer', years: '3–5 yrs', min: 35000, max: 56000, avg: 44000, growth: '+12% / yr', bar: 58 },
+      { level: 'Senior radiographer', years: '5–10 yrs', min: 45000, max: 72000, avg: 56000, growth: '+10% / yr', bar: 76 },
+      { level: 'Department head', years: '10+ yrs', min: 60000, max: 100000, avg: 78000, growth: 'Top 15%', bar: 100 },
+    ],
+    sectors: [
+      { icon:'🏛️', name:'Government hospital', sal:'Rs. 22,000–50,000', badge:'Stable', badgeColor:'#dbeeff', badgeText:'#1a5fa8', pros:'Government service with health benefits, pension and job security.' },
+      { icon:'🏥', name:'Private hospital', sal:'Rs. 30,000–72,000', badge:'Higher pay', badgeColor:'#d6f5eb', badgeText:'#064e38', pros:'Modern imaging centers and private hospitals pay competitive rates.' },
+      { icon:'🔬', name:'Imaging center', sal:'Rs. 28,000–84,000', badge:'Specialized', badgeColor:'#ede9ff', badgeText:'#4a30b0', pros:'MRI, CT, ultrasound specialization commands significant premium over standard X-ray roles.' },
+    ],
+    cities: [
+      { city:'Kathmandu', min:30000, max:85000, avg:48000, bar:100 },
+      { city:'Lalitpur (Patan)', min:28000, max:72000, avg:42000, bar:88 },
+      { city:'Pokhara', min:22000, max:58000, avg:32000, bar:67 },
+      { city:'Bharatpur', min:20000, max:50000, avg:28000, bar:58 },
+    ]
+  },
+  pharma: {
+    title: 'Pharmacist',
+    icon: '💊',
+    avg: 40000,
+    min: 20000,
+    max: 100000,
+    median: 36000,
+    source: 'PayScale, KumariJob 2025',
+    exp: [
+      { level: 'Fresh graduate', years: '0–1 yr', min: 20000, max: 30000, avg: 24000, growth: '+20% in 2 yrs', bar: 22 },
+      { level: 'Junior pharmacist', years: '1–3 yrs', min: 26000, max: 42000, avg: 33000, growth: '+16% / yr', bar: 38 },
+      { level: 'Staff pharmacist', years: '3–5 yrs', min: 35000, max: 58000, avg: 46000, growth: '+12% / yr', bar: 55 },
+      { level: 'Senior pharmacist', years: '5–10 yrs', min: 48000, max: 78000, avg: 60000, growth: '+10% / yr', bar: 75 },
+      { level: 'Chief pharmacist', years: '10+ yrs', min: 65000, max: 110000, avg: 85000, growth: 'Top 10%', bar: 100 },
+    ],
+    sectors: [
+      { icon:'🏛️', name:'Government pharmacy', sal:'Rs. 22,000–55,000', badge:'Stable', badgeColor:'#dbeeff', badgeText:'#1a5fa8', pros:'Government salary scale with pension, health coverage. Stable growth.' },
+      { icon:'🏥', name:'Hospital pharmacy', sal:'Rs. 28,000–72,000', badge:'Higher pay', badgeColor:'#d6f5eb', badgeText:'#064e38', pros:'Private hospitals offer clinical pharmacist roles with better pay.' },
+      { icon:'💊', name:'Pharmaceutical company', sal:'Rs. 35,000–100,000', badge:'Best pay', badgeColor:'#fff3d6', badgeText:'#7a4e00', pros:'Sales, marketing, and R&D roles in pharma companies pay significantly more.' },
+    ],
+    cities: [
+      { city:'Kathmandu', min:28000, max:100000, avg:52000, bar:100 },
+      { city:'Lalitpur (Patan)', min:25000, max:82000, avg:44000, bar:85 },
+      { city:'Pokhara', min:20000, max:62000, avg:34000, bar:65 },
+      { city:'Bharatpur', min:18000, max:55000, avg:28000, bar:54 },
+    ]
+  },
+  doctor: {
+    title: 'Medical Officer',
+    icon: '🩺',
+    avg: 85000,
+    min: 45000,
+    max: 250000,
+    median: 75000,
+    source: 'Merojob, Government health salary scale 2025',
+    exp: [
+      { level: 'House officer', years: '0–1 yr', min: 35000, max: 55000, avg: 44000, growth: '+30% in 2 yrs', bar: 18 },
+      { level: 'Medical officer', years: '1–3 yrs', min: 50000, max: 85000, avg: 65000, growth: '+20% / yr', bar: 30 },
+      { level: 'Senior medical officer', years: '3–5 yrs', min: 75000, max: 130000, avg: 95000, growth: '+15% / yr', bar: 50 },
+      { level: 'Specialist (MD/MS)', years: '5–10 yrs', min: 120000, max: 220000, avg: 165000, growth: '+12% / yr', bar: 80 },
+      { level: 'Senior consultant', years: '10+ yrs', min: 180000, max: 350000, avg: 250000, growth: 'Top 5%', bar: 100 },
+    ],
+    sectors: [
+      { icon:'🏛️', name:'Government hospital', sal:'Rs. 50,000–130,000', badge:'Stable', badgeColor:'#dbeeff', badgeText:'#1a5fa8', pros:'Government scale with pension, housing allowance, job security.' },
+      { icon:'🏥', name:'Private hospital', sal:'Rs. 80,000–250,000', badge:'Higher pay', badgeColor:'#d6f5eb', badgeText:'#064e38', pros:'Revenue sharing models can push earnings much higher for specialists.' },
+      { icon:'🌍', name:'INGO / International', sal:'Rs. 120,000–300,000+', badge:'Best pay', badgeColor:'#fff3d6', badgeText:'#7a4e00', pros:'WHO, MSF, IMC offer USD-based salaries with full benefits packages.' },
+    ],
+    cities: [
+      { city:'Kathmandu', min:65000, max:300000, avg:120000, bar:100 },
+      { city:'Lalitpur (Patan)', min:55000, max:240000, avg:100000, bar:83 },
+      { city:'Pokhara', min:50000, max:180000, avg:85000, bar:71 },
+      { city:'Remote / Rural areas', min:55000, max:150000, avg:110000, bar:92 },
+    ]
+  },
+  physio: {
+    title: 'Physiotherapist',
+    icon: '🦾',
+    avg: 32000,
+    min: 18000,
+    max: 75000,
+    median: 28000,
+    source: 'Merojob, KumariJob 2025',
+    exp: [
+      { level: 'Fresh graduate', years: '0–1 yr', min: 18000, max: 28000, avg: 22000, growth: '+18% in 2 yrs', bar: 25 },
+      { level: 'Junior physio', years: '1–3 yrs', min: 24000, max: 38000, avg: 30000, growth: '+14% / yr', bar: 42 },
+      { level: 'Physiotherapist', years: '3–5 yrs', min: 30000, max: 50000, avg: 38000, growth: '+12% / yr', bar: 58 },
+      { level: 'Senior physio', years: '5–10 yrs', min: 42000, max: 68000, avg: 52000, growth: '+10% / yr', bar: 78 },
+      { level: 'Head of dept', years: '10+ yrs', min: 55000, max: 90000, avg: 70000, growth: 'Top 15%', bar: 100 },
+    ],
+    sectors: [
+      { icon:'🏛️', name:'Government hospital', sal:'Rs. 20,000–45,000', badge:'Stable', badgeColor:'#dbeeff', badgeText:'#1a5fa8', pros:'Stable government employment. National Health Service opportunities.' },
+      { icon:'🏥', name:'Private hospital', sal:'Rs. 26,000–60,000', badge:'Higher pay', badgeColor:'#d6f5eb', badgeText:'#064e38', pros:'Private hospitals and rehabilitation centers pay competitive rates.' },
+      { icon:'🏃', name:'Sports / Private clinic', sal:'Rs. 35,000–90,000', badge:'Best pay', badgeColor:'#fff3d6', badgeText:'#7a4e00', pros:'Sports clubs, private clinics, and home visit physiotherapy offers highest earning potential.' },
+    ],
+    cities: [
+      { city:'Kathmandu', min:26000, max:75000, avg:42000, bar:100 },
+      { city:'Lalitpur (Patan)', min:22000, max:62000, avg:36000, bar:86 },
+      { city:'Pokhara', min:18000, max:50000, avg:28000, bar:67 },
+      { city:'Bharatpur', min:16000, max:42000, avg:24000, bar:57 },
+    ]
+  },
+  public: {
+    title: 'Health Program Officer (INGO)',
+    icon: '🌍',
+    avg: 85000,
+    min: 40000,
+    max: 200000,
+    median: 75000,
+    source: 'INGO salary surveys, Merojob 2025',
+    exp: [
+      { level: 'Program assistant', years: '0–1 yr', min: 35000, max: 55000, avg: 44000, growth: '+25% in 2 yrs', bar: 22 },
+      { level: 'Program officer', years: '1–3 yrs', min: 55000, max: 90000, avg: 70000, growth: '+18% / yr', bar: 42 },
+      { level: 'Senior program officer', years: '3–5 yrs', min: 80000, max: 130000, avg: 100000, growth: '+14% / yr', bar: 60 },
+      { level: 'Program manager', years: '5–10 yrs', min: 110000, max: 180000, avg: 140000, growth: '+10% / yr', bar: 80 },
+      { level: 'Director / Country rep', years: '10+ yrs', min: 150000, max: 300000, avg: 220000, growth: 'Top 5%', bar: 100 },
+    ],
+    sectors: [
+      { icon:'🌐', name:'UN agencies', sal:'Rs. 80,000–250,000', badge:'Top pay', badgeColor:'#fff3d6', badgeText:'#7a4e00', pros:'WHO, UNICEF, UNFPA, UNDP offer USD-based compensation with full benefits.' },
+      { icon:'🤝', name:'International NGO', sal:'Rs. 60,000–180,000', badge:'Good pay', badgeColor:'#d6f5eb', badgeText:'#064e38', pros:'Save the Children, Care Nepal, Oxfam offer competitive packages.' },
+      { icon:'🏛️', name:'Government / bilateral', sal:'Rs. 40,000–100,000', badge:'Stable', badgeColor:'#dbeeff', badgeText:'#1a5fa8', pros:'MoHP, bilateral projects. Stable but lower than international orgs.' },
+    ],
+    cities: [
+      { city:'Kathmandu', min:60000, max:250000, avg:110000, bar:100 },
+      { city:'Field offices', min:55000, max:180000, avg:95000, bar:86 },
+      { city:'Remote / Project areas', min:65000, max:200000, avg:120000, bar:109 },
+    ]
+  }
+};
+
+const expMultipliers = {
+  'Fresh graduate (0 yrs)': 0.55,
+  '1–2 years': 0.75,
+  '3–5 years': 1.0,
+  '5–10 years': 1.35,
+  '10+ years': 1.7
+};
+
+const sectorMultipliers = {
+  'Private hospital': 1.0,
+  'Government hospital': 0.75,
+  'INGO / NGO': 1.65,
+  'Pharmaceutical company': 1.4,
+  'Clinic / Polyclinic': 0.85
+};
+
+const roleBaseMap = {
+  'Biomedical Engineer': roles.biomed,
+  'Lab Technician': roles.lab,
+  'Nurse / Staff Nurse': roles.nurse,
+  'Radiographer': roles.radio,
+  'Pharmacist': roles.pharma,
+  'Medical Officer / Doctor': roles.doctor,
+  'Physiotherapist': roles.physio,
+  'Health Program Officer': roles.public,
+  'Public Health Officer': roles.public
+};
+
+function estimateSalary() {
+  const role = document.getElementById('estRole').value;
+  const exp = document.getElementById('estExp').value;
+  const sector = document.getElementById('estSector').value;
+
+  document.getElementById('aiAnalyzing').classList.add('show');
+  document.getElementById('estResult').classList.remove('show');
+
+  setTimeout(() => {
+    document.getElementById('aiAnalyzing').classList.remove('show');
+
+    const base = roleBaseMap[role] || roles.biomed;
+    const expMult = expMultipliers[exp] || 1.0;
+    const secMult = sectorMultipliers[sector] || 1.0;
+
+    const min = Math.round(base.min * expMult * secMult / 1000) * 1000;
+    const max = Math.round(base.max * expMult * secMult / 1000) * 1000;
+    const avg = Math.round((min + max) / 2 / 1000) * 1000;
+
+    document.getElementById('estRangeNum').textContent = `Rs. ${min.toLocaleString()} – ${max.toLocaleString()}`;
+    document.getElementById('estAvgLbl').textContent = `Average: Rs. ${avg.toLocaleString()}/month`;
+    document.getElementById('estAnnual').textContent = `Rs. ${(avg*12/100000).toFixed(1)} lakhs/yr`;
+
+    const pct = avg > 80000 ? 'Top 10%' : avg > 60000 ? 'Top 25%' : avg > 40000 ? 'Top 40%' : 'Mid range';
+    document.getElementById('estPercentile').textContent = `${pct} of Nepal healthcare salaries`;
+
+    const tips = [];
+    if(sector === 'Government hospital') tips.push('💡 Switch to private/INGO for 30–60% higher pay');
+    if(exp === 'Fresh graduate (0 yrs)') tips.push('📈 Salary grows 25-30% after 2 years');
+    if(sector === 'INGO / NGO') tips.push('✅ INGOs typically pay highest in Nepal');
+    tips.push('🎓 Certification can boost salary by 15-25%');
+    tips.push('📍 Kathmandu pays 20-40% more than other cities');
+
+    document.getElementById('estTips').innerHTML = tips.slice(0,3).map(t=>`<span class="est-tip">${t}</span>`).join('');
+    document.getElementById('estResult').classList.add('show');
+  }, 1500);
+}
+
+let currentRole = 'biomed';
+
+function showRole(roleKey, btn) {
+  currentRole = roleKey;
+  document.querySelectorAll('.rtab').forEach(b => b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+
+  const r = roles[roleKey];
+  const avgPct = ((r.avg - r.min) / (r.max - r.min) * 100).toFixed(0);
+
+  // Hero card
+  document.getElementById('salaryHeroCard').innerHTML = `
+    <div class="shc-top">
+      <div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:4px;">Average monthly salary</div>
+        <div class="shc-title">${r.icon} ${r.title}</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">Source: ${r.source}</div>
+      </div>
+      <div class="shc-avg">
+        <div class="shc-avg-num">Rs. ${r.avg.toLocaleString()}</div>
+        <div class="shc-avg-lbl">per month (average)</div>
+      </div>
+    </div>
+    <div class="shc-range-bar">
+      <div class="shc-bar-fill" style="left:0;width:100%;opacity:.3;background:var(--gm);"></div>
+      <div class="shc-bar-fill" style="left:0;width:${avgPct}%;"></div>
+      <div class="shc-bar-avg" style="left:${avgPct}%"></div>
+    </div>
+    <div class="shc-range-labels">
+      <span>Min: Rs. ${r.min.toLocaleString()}</span>
+      <span>Avg: Rs. ${r.avg.toLocaleString()}</span>
+      <span>Max: Rs. ${r.max.toLocaleString()}</span>
+    </div>
+    <div class="shc-stats">
+      <div class="shc-stat"><div class="shc-stat-num">Rs. ${r.median.toLocaleString()}</div><div class="shc-stat-lbl">Median salary</div></div>
+      <div class="shc-stat"><div class="shc-stat-num">Rs. ${r.min.toLocaleString()}</div><div class="shc-stat-lbl">Starting salary</div></div>
+      <div class="shc-stat"><div class="shc-stat-num">Rs. ${r.max.toLocaleString()}</div><div class="shc-stat-lbl">Top earners</div></div>
+      <div class="shc-stat"><div class="shc-stat-num">~6%</div><div class="shc-stat-lbl">Annual raise</div></div>
+    </div>
+  `;
+
+  // Experience table
+  document.getElementById('expTable').innerHTML = `
+    <thead><tr><th>Level</th><th>Experience</th><th>Monthly salary range</th><th>Avg/month</th><th>Growth</th><th>Scale</th></tr></thead>
+    <tbody>${r.exp.map(e=>`
+      <tr>
+        <td class="exp-level">${e.level}</td>
+        <td class="exp-years">${e.years}</td>
+        <td class="salary-range-cell">Rs. ${e.min.toLocaleString()} – ${e.max.toLocaleString()}</td>
+        <td style="font-weight:600;color:var(--text)">Rs. ${e.avg.toLocaleString()}</td>
+        <td><span class="growth-badge">${e.growth}</span></td>
+        <td><div class="bar-mini"><div class="bar-mini-fill" style="width:${e.bar}%"></div></div></td>
+      </tr>`).join('')}
+    </tbody>
+  `;
+
+  // Sectors
+  document.getElementById('sectorGrid').innerHTML = r.sectors.map(s=>`
+    <div class="sector-card">
+      <div class="sector-icon">${s.icon}</div>
+      <span class="sector-badge" style="background:${s.badgeColor};color:${s.badgeText}">${s.badge}</span>
+      <div class="sector-name">${s.name}</div>
+      <div class="sector-sal">${s.sal}</div>
+      <div class="sector-pros">${s.pros}</div>
+    </div>`).join('');
+
+  // Cities
+  document.getElementById('cityTable').innerHTML = `
+    <thead><tr><th>City</th><th>Salary range</th><th>Average</th><th>Scale</th></tr></thead>
+    <tbody>${r.cities.map(c=>`
+      <tr>
+        <td class="city-name">${c.city}</td>
+        <td style="color:var(--muted)">Rs. ${c.min.toLocaleString()} – ${c.max.toLocaleString()}</td>
+        <td style="font-weight:600;color:var(--g)">Rs. ${c.avg.toLocaleString()}</td>
+        <td><div class="city-bar"><div class="city-bar-fill" style="width:${Math.min(c.bar,100)}%"></div></div></td>
+      </tr>`).join('')}
+    </tbody>
+  `;
+}
+
+// Init
+showRole('biomed', document.querySelector('.rtab.on'));
+
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+</script>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="browse-jobs.html">🔍 Find jobs</a>
+  <a href="resume-builder.html">📄 Resume builder</a>
+  <a href="interview-prep.html">🎙 Interview prep</a>
+  <a href="salary-insights.html">💰 Salary insights</a>
+  <a href="auth.html">🔐 Log in</a>
+</div>
+</body>
+</html>

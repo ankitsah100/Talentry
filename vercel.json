@@ -1,14 +1,48 @@
 {
   "rewrites": [
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/jobs", "destination": "/browse-jobs.html" },
-    { "source": "/post-job", "destination": "/post-job.html" },
-    { "source": "/login", "destination": "/auth.html" },
-    { "source": "/signup", "destination": "/auth.html" },
-    { "source": "/profile", "destination": "/profile.html" },
-    { "source": "/interview", "destination": "/interview-prep.html" },
-    { "source": "/resume", "destination": "/resume-builder.html" },
-    { "source": "/apply", "destination": "/apply.html" },
-    { "source": "/dashboard", "destination": "/employer-dashboard.html" }
+    {
+      "source": "/admin",
+      "destination": "/admin.html"
+    },
+    {
+      "source": "/jobs",
+      "destination": "/browse-jobs.html"
+    },
+    {
+      "source": "/post-job",
+      "destination": "/post-job.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/auth.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/auth.html"
+    },
+    {
+      "source": "/profile",
+      "destination": "/profile.html"
+    },
+    {
+      "source": "/interview",
+      "destination": "/interview-prep.html"
+    },
+    {
+      "source": "/resume",
+      "destination": "/resume-builder.html"
+    },
+    {
+      "source": "/apply",
+      "destination": "/apply.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/employer-dashboard.html"
+    },
+    {
+      "source": "/salary",
+      "destination": "/salary-insights.html"
+    }
   ]
 }
