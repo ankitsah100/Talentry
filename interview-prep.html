@@ -309,7 +309,12 @@ Be encouraging but honest. Use STAR method tips when relevant.`;
     });
 
     const data = await response.json();
-    const text = data.content?.[0]?.text || '';
+    console.log('API response:', JSON.stringify(data));
+    
+    if(data.error) throw new Error('API Error: ' + (data.error.message || JSON.stringify(data.error)));
+    if(!data.content || !data.content[0]) throw new Error('No content in response: ' + JSON.stringify(data));
+    
+    const text = data.content[0].text || '';
     const clean = text.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
@@ -394,6 +399,7 @@ function insertHint(text){ document.getElementById('userInput').value = text; do
 <div class="mobile-menu" id="mobileMenu">
   <a href="browse-jobs.html">🔍 Find jobs</a>
   <a href="interview-prep.html">🎙 AI Interview prep</a>
+  <a href="resume-builder.html">📄 Resume builder</a>
   <a href="post-job.html">📝 Post a job</a>
   <a href="employer-dashboard.html">📊 Employer dashboard</a>
   <a href="profile.html">👤 My profile</a>
