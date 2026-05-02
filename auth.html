@@ -221,6 +221,13 @@ window._sb = supabase;
 // Check if already logged in
 const { data: { session } } = await supabase.auth.getSession();
 if (session) { window.location.href = 'browse-jobs.html'; }
+
+// Handle OAuth redirect - detect sign in event
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_IN' && session) {
+    window.location.href = 'browse-jobs.html';
+  }
+});
 </script>
 
 <script>
@@ -342,7 +349,7 @@ async function signInWithGoogle(){
   const { error } = await window._sb.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin + '/browse-jobs.html'
+      redirectTo: 'https://talentry-nu.vercel.app/browse-jobs.html'
     }
   });
   if(error){
