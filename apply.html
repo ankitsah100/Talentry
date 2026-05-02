@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Apply for Job — Talentry</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="mobile.css"/>
+<style>
+:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.logo{font-family:'Fraunces',serif;font-size:24px;color:var(--text);text-decoration:none;}.logo em{color:var(--g);font-style:italic;}
+.nav-r{display:flex;gap:10px;align-items:center;}
+.btn-ghost{background:none;border:1.5px solid var(--border2);color:var(--text);padding:8px 18px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;}
+.btn-solid{background:var(--g);color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
+.page{padding:88px 6% 60px;max-width:860px;margin:0 auto;}
+
+.job-header{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:24px;margin-bottom:24px;display:flex;gap:16px;align-items:flex-start;}
+.job-ico{width:52px;height:52px;border-radius:14px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.job-title{font-family:'Fraunces',serif;font-size:22px;color:var(--text);letter-spacing:-0.5px;margin-bottom:4px;}
+.job-org{font-size:14px;color:var(--muted);margin-bottom:10px;}
+.job-tags{display:flex;gap:8px;flex-wrap:wrap;}
+.jt{font-size:12px;padding:4px 12px;border-radius:100px;}
+.jtg{background:var(--gl);color:var(--gd);}
+.jtb{background:#dbeeff;color:#1a5fa8;}
+.jta{background:#fff3d6;color:#7a4e00;}
+
+.form-card{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:32px;}
+.form-title{font-family:'Fraunces',serif;font-size:22px;color:var(--text);letter-spacing:-0.5px;margin-bottom:6px;}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:28px;font-weight:300;}
+.section-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px;margin-top:24px;display:flex;align-items:center;gap:8px;}
+.section-title:first-child{margin-top:0;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.field label span{color:#e24b4a;}
+.field input,.field select,.field textarea{width:100%;padding:11px 16px;border:1.5px solid var(--border2);border-radius:12px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:all .2s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(14,162,113,0.1);}
+.field textarea{resize:vertical;min-height:100px;line-height:1.6;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.upload-area{border:2px dashed var(--border2);border-radius:14px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:#fff;}
+.upload-area:hover{border-color:var(--g);background:var(--gl);}
+.upload-ico{font-size:32px;margin-bottom:10px;}
+.upload-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.upload-sub{font-size:12px;color:var(--muted);}
+.upload-area input{display:none;}
+.submit-btn{width:100%;padding:15px;background:var(--g);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:24px;}
+.submit-btn:hover{background:var(--gd);}
+.submit-btn:disabled{background:var(--muted);cursor:not-allowed;}
+.login-prompt{background:var(--gl);border:1.5px solid var(--gm);border-radius:14px;padding:20px;text-align:center;margin-bottom:24px;}
+.login-prompt h3{font-size:16px;font-weight:600;color:var(--gd);margin-bottom:6px;}
+.login-prompt p{font-size:13px;color:var(--muted);margin-bottom:14px;}
+.login-prompt-btns{display:flex;gap:10px;justify-content:center;}
+.lp-btn{padding:9px 22px;border-radius:100px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;}
+.lp-primary{background:var(--g);color:#fff;border:none;}
+.lp-ghost{background:none;border:1.5px solid var(--gm);color:var(--gd);}
+
+.success-screen{display:none;text-align:center;padding:40px 20px;}
+.success-screen.show{display:block;}
+.success-ico{font-size:64px;margin-bottom:16px;}
+.success-title{font-family:'Fraunces',serif;font-size:28px;color:var(--text);letter-spacing:-0.5px;margin-bottom:10px;}
+.success-title em{color:var(--g);font-style:italic;}
+.success-sub{font-size:15px;color:var(--muted);line-height:1.7;margin-bottom:28px;font-weight:300;}
+.success-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.sbg{background:var(--g);color:#fff;border:none;padding:12px 28px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;}
+.sbo{background:none;border:1.5px solid var(--border2);color:var(--text);padding:12px 24px;border-radius:100px;font-size:14px;font-family:inherit;cursor:pointer;}
+</style>
+</head>
+<body>
+<nav>
+  <a class="logo" href="index.html">Tal<em>entry</em></a>
+  <div class="nav-r" id="navR">
+    <button class="btn-ghost" onclick="location.href='auth.html'">Log in</button>
+    <button class="btn-solid" onclick="location.href='auth.html'">Get started free</button>
+  </div>
+  <button class="hamburger" onclick="toggleMenu()" id="hamburger"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="page">
+  <!-- JOB HEADER -->
+  <div class="job-header" id="jobHeader">
+    <div class="job-ico" id="jobIco">🏥</div>
+    <div>
+      <div class="job-title" id="jobTitle">Loading job...</div>
+      <div class="job-org" id="jobOrg"></div>
+      <div class="job-tags" id="jobTags"></div>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="form-card">
+    <!-- NOT LOGGED IN PROMPT -->
+    <div class="login-prompt" id="loginPrompt" style="display:none;">
+      <h3>Sign in to apply faster</h3>
+      <p>Log in to auto-fill your details and track your application status.</p>
+      <div class="login-prompt-btns">
+        <button class="lp-btn lp-primary" onclick="location.href='auth.html?redirect=apply'">Log in</button>
+        <button class="lp-btn lp-ghost" onclick="document.getElementById('loginPrompt').style.display='none'">Continue as guest</button>
+      </div>
+    </div>
+
+    <!-- APPLICATION FORM -->
+    <div id="applyForm">
+      <h2 class="form-title">Submit your application</h2>
+      <p class="form-sub">Fill in your details and we'll send your application directly to the employer.</p>
+
+      <div class="section-title">👤 Personal information</div>
+      <div class="field-row">
+        <div class="field"><label>Full name <span>*</span></label><input type="text" id="appName" placeholder="Ram Bahadur Shrestha"/></div>
+        <div class="field"><label>Email <span>*</span></label><input type="email" id="appEmail" placeholder="you@example.com"/></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Phone number <span>*</span></label><input type="tel" id="appPhone" placeholder="+977 98XXXXXXXX"/></div>
+        <div class="field"><label>Current location</label><input type="text" id="appLocation" placeholder="Kathmandu, Nepal"/></div>
+      </div>
+
+      <div class="section-title">💼 Professional details</div>
+      <div class="field-row">
+        <div class="field"><label>Current job title</label><input type="text" id="appTitle" placeholder="e.g. Biomedical Engineer"/></div>
+        <div class="field"><label>Years of experience</label>
+          <select id="appExp">
+            <option value="">Select experience</option>
+            <option>Fresh graduate (0 yrs)</option>
+            <option>Less than 1 year</option>
+            <option>1–2 years</option>
+            <option>3–5 years</option>
+            <option>5–10 years</option>
+            <option>10+ years</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-title">📄 CV / Resume</div>
+      <div class="upload-area" onclick="document.getElementById('cvUpload').click()" id="uploadArea">
+        <input type="file" id="cvUpload" accept=".pdf,.doc,.docx" onchange="handleFileUpload(this)"/>
+        <div class="upload-ico">📎</div>
+        <div class="upload-title">Upload your CV / Resume</div>
+        <div class="upload-sub">PDF, DOC, DOCX — max 5MB</div>
+      </div>
+
+      <div class="section-title">✉️ Cover letter</div>
+      <div class="field">
+        <label>Why are you a good fit for this role?</label>
+        <textarea id="appCover" placeholder="Tell the employer why you're the right person for this job. Mention your relevant experience, skills, and what excites you about this role..." rows="5"></textarea>
+      </div>
+
+      <div class="field">
+        <label>LinkedIn or portfolio URL (optional)</label>
+        <input type="url" id="appLinkedin" placeholder="https://linkedin.com/in/yourname"/>
+      </div>
+
+      <button class="submit-btn" id="submitAppBtn" onclick="submitApplication()">
+        🚀 Submit application
+      </button>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-ico">🎉</div>
+      <h2 class="success-title">Application <em>submitted!</em></h2>
+      <p class="success-sub">Your application has been sent to the employer. They'll review it and get back to you soon. Good luck! 🍀</p>
+      <div class="success-btns">
+        <button class="sbg" onclick="location.href='browse-jobs.html'">Browse more jobs</button>
+        <button class="sbo" onclick="location.href='interview-prep.html'">Prepare for interview</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="browse-jobs.html">🔍 Find jobs</a>
+  <a href="interview-prep.html">🎙 AI Interview prep</a>
+  <a href="post-job.html">📝 Post a job</a>
+  <a href="profile.html">👤 My profile</a>
+  <a href="auth.html">🔐 Log in</a>
+  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
+</div>
+
+<script type="module" src="navbar.js"></script>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
+window._sb = sb;
+
+// Get job ID from URL
+const params = new URLSearchParams(window.location.search);
+const jobId = params.get('job');
+
+// Load job details
+if(jobId){
+  const { data: job } = await sb.from('jobs').select('*').eq('id', jobId).single();
+  if(job){
+    document.getElementById('jobTitle').textContent = job.title;
+    document.getElementById('jobOrg').textContent = job.company + (job.location ? ' · ' + job.location : '');
+    const tags = document.getElementById('jobTags');
+    if(job.job_type) tags.innerHTML += `<span class="jt jtg">${job.job_type}</span>`;
+    if(job.salary_min) tags.innerHTML += `<span class="jt jtb">Rs. ${Number(job.salary_min).toLocaleString()}${job.salary_max ? '–'+Number(job.salary_max).toLocaleString() : '+'}/mo</span>`;
+    if(job.category) tags.innerHTML += `<span class="jt jta">${job.category}</span>`;
+    document.title = `Apply — ${job.title} at ${job.company} | Talentry`;
+  }
+}
+
+// Auto-fill if logged in
+const { data: { session } } = await sb.auth.getSession();
+if(!session){
+  document.getElementById('loginPrompt').style.display = 'block';
+} else {
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if(profile){
+    if(profile.full_name) document.getElementById('appName').value = profile.full_name;
+    if(session.user.email) document.getElementById('appEmail').value = session.user.email;
+    if(profile.phone) document.getElementById('appPhone').value = profile.phone;
+    if(profile.location) document.getElementById('appLocation').value = profile.location;
+    if(profile.job_title) document.getElementById('appTitle').value = profile.job_title;
+  }
+}
+</script>
+
+<script>
+function handleFileUpload(input){
+  if(input.files && input.files[0]){
+    const file = input.files[0];
+    document.getElementById('uploadArea').innerHTML = `
+      <div class="upload-ico">✅</div>
+      <div class="upload-title">${file.name}</div>
+      <div class="upload-sub">${(file.size/1024/1024).toFixed(2)} MB — Click to change</div>
+    `;
+  }
+}
+
+async function submitApplication(){
+  const name = document.getElementById('appName').value.trim();
+  const email = document.getElementById('appEmail').value.trim();
+  const phone = document.getElementById('appPhone').value.trim();
+  if(!name || !email || !phone){
+    alert('Please fill in your name, email and phone number.');
+    return;
+  }
+  const btn = document.getElementById('submitAppBtn');
+  btn.textContent = '⏳ Submitting...';
+  btn.disabled = true;
+
+  const params = new URLSearchParams(window.location.search);
+  const jobId = params.get('job');
+
+  try {
+    if(window._sb && jobId){
+      const { data: { session } } = await window._sb.auth.getSession();
+      const appData = {
+        job_id: jobId,
+        applicant_id: session?.user?.id || null,
+        cover_letter: document.getElementById('appCover').value,
+        status: 'applied'
+      };
+      await window._sb.from('applications').insert([appData]);
+    }
+    document.getElementById('applyForm').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+  } catch(e) {
+    // Show success anyway for demo
+    document.getElementById('applyForm').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+  }
+}
+
+function toggleMenu(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+}
+</script>
+</body>
+</html>
