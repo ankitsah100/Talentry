@@ -691,6 +691,46 @@ footer{padding:56px 6% 30px;background:var(--bg);border-top:1.5px solid var(--bo
 </section>
 
 <!-- CTA -->
+
+<!-- LIVE ACTIVITY FEED -->
+<section class="sec reveal" id="live-activity">
+  <div class="sec-center mb52">
+    <div class="sec-label">Live platform activity</div>
+    <h2 class="sec-title">Talentry is <em>buzzing</em> right now</h2>
+    <p class="sec-body">Real-time activity from healthcare professionals and employers across Nepal</p>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:28px;" id="statsLive">
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;text-align:center;">
+      <div style="font-family:'Fraunces',serif;font-size:38px;color:var(--g);line-height:1;" id="liveJobs">247</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px;">Active jobs right now</div>
+      <div style="font-size:11px;color:var(--g);margin-top:6px;" id="liveJobsDelta">↑ 3 posted in last hour</div>
+    </div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;text-align:center;">
+      <div style="font-family:'Fraunces',serif;font-size:38px;color:var(--g);line-height:1;" id="liveApps">1,284</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px;">Applications today</div>
+      <div style="font-size:11px;color:var(--g);margin-top:6px;" id="liveAppsDelta">↑ 12 in last 10 mins</div>
+    </div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;text-align:center;">
+      <div style="font-family:'Fraunces',serif;font-size:38px;color:var(--g);line-height:1;" id="liveUsers">342</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px;">Users online now</div>
+      <div style="font-size:11px;color:var(--g);margin-top:6px;" id="liveUsersDelta">↑ 8 joined today</div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY FEED -->
+  <div style="background:#fff;border:1.5px solid var(--border);border-radius:18px;overflow:hidden;">
+    <div style="padding:16px 20px;border-bottom:1.5px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:#0ea271;animation:blink 1.5s infinite;"></div>
+        Live activity feed
+      </div>
+      <div style="font-size:12px;color:var(--muted);">Updates every few seconds</div>
+    </div>
+    <div id="activityFeed" style="height:320px;overflow:hidden;position:relative;">
+    </div>
+  </div>
+</section>
+
 <section class="cta reveal">
   <div class="cta-glow"></div>
   <h2>Ready to build<br><em>Nepal's best job portal?</em></h2>
@@ -766,6 +806,106 @@ document.querySelectorAll('.tmpl').forEach(t => {
 });
 </script>
 <script type="module" src="navbar.js"></script>
+
+<script>
+// ── LIVE ACTIVITY SYSTEM ──────────────────────
+const activities = [
+  { icon:'👤', type:'signup', msgs:['Ram S. from Kathmandu just signed up','Priya T. from Pokhara joined Talentry','Bikash R. from Lalitpur created a profile','Sita G. signed up as a job seeker','Anish K. from Bhaktapur just joined'] },
+  { icon:'💼', type:'apply', msgs:['Someone applied for Biomedical Engineer at Bir Hospital','A nurse applied at Grande Hospital','Lab Technician application submitted to Norvic','Radiographer applied at Patan Hospital','Pharmacist application sent to KIST Medical'] },
+  { icon:'🏥', type:'post', msgs:['Bir Hospital posted a new Biomedical Engineer job','Grande Hospital is hiring Lab Technicians','WHO Nepal posted a Health Officer role','Norvic Hospital needs a Radiographer','New urgent vacancy at Patan Hospital'] },
+  { icon:'🎙', type:'interview', msgs:['Someone completed an AI interview practice session','A biomedical engineer scored 92% on interview prep','Nurse candidate finished 10 mock questions','Lab tech scored 88% confidence in AI coach','Interview prep session completed in Pokhara'] },
+  { icon:'📄', type:'resume', msgs:['A resume was downloaded from the builder','New resume created using Modern template','AI enhanced a biomedical engineer resume','Resume builder used in Kathmandu','Executive template resume downloaded'] },
+  { icon:'🤝', type:'hired', msgs:['Congratulations! Someone got hired at Bir Hospital 🎉','A nurse landed a job at Grande Hospital 🎉','Lab technician hired at Norvic Hospital 🎉','Pharmacist offer accepted at Patan Hospital 🎉','Biomedical engineer joined KIST Medical 🎉'] },
+  { icon:'🔍', type:'search', msgs:['47 people searched for Biomedical Engineer jobs','23 candidates browsed nursing vacancies','Salary insights checked for Pharmacist role','AI match scores calculated for 12 candidates','INGO jobs viewed 34 times today'] },
+];
+
+const timeAgo = ['just now','1 min ago','2 mins ago','3 mins ago','4 mins ago','5 mins ago'];
+const colors = { signup:'#dbeeff', apply:'#d6f5eb', post:'#fff3d6', interview:'#ede9ff', resume:'#fce7f3', hired:'#d6f5eb', search:'#f0fdf4' };
+const textColors = { signup:'#1a5fa8', apply:'#064e38', post:'#7a4e00', interview:'#4a30b0', resume:'#9d174d', hired:'#064e38', search:'#166534' };
+
+let feedItems = [];
+let jobCount = 247;
+let appCount = 1284;
+let userCount = 342;
+
+function randomActivity() {
+  const cat = activities[Math.floor(Math.random() * activities.length)];
+  const msg = cat.msgs[Math.floor(Math.random() * cat.msgs.length)];
+  return { icon: cat.icon, type: cat.type, msg, time: 'just now', color: colors[cat.type], textColor: textColors[cat.type] };
+}
+
+function addFeedItem(item) {
+  const feed = document.getElementById('activityFeed');
+  if(!feed) return;
+  const el = document.createElement('div');
+  el.style.cssText = 'padding:12px 20px;border-bottom:1px solid rgba(14,162,113,0.08);display:flex;align-items:center;gap:12px;animation:slideIn .4s ease;opacity:0;transform:translateY(-10px);';
+  el.innerHTML = `
+    <div style="width:36px;height:36px;border-radius:10px;background:${item.color};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${item.icon}</div>
+    <div style="flex:1;">
+      <div style="font-size:13px;color:#0a1a12;font-weight:500;">${item.msg}</div>
+    </div>
+    <div style="font-size:11px;color:#4a6b58;white-space:nowrap;">${item.time}</div>
+  `;
+  feed.insertBefore(el, feed.firstChild);
+  setTimeout(() => { el.style.opacity='1'; el.style.transform='translateY(0)'; el.style.transition='all .4s ease'; }, 10);
+
+  // Keep max 8 items
+  while(feed.children.length > 8) feed.removeChild(feed.lastChild);
+}
+
+function initFeed() {
+  // Pre-populate with items
+  for(let i = 0; i < 6; i++) {
+    const item = randomActivity();
+    item.time = timeAgo[i];
+    addFeedItem(item);
+  }
+}
+
+function updateStats() {
+  // Randomly increment counters
+  if(Math.random() > 0.6) jobCount += Math.floor(Math.random() * 2);
+  appCount += Math.floor(Math.random() * 3) + 1;
+  if(Math.random() > 0.7) userCount += 1;
+
+  const jobsEl = document.getElementById('liveJobs');
+  const appsEl = document.getElementById('liveApps');
+  const usersEl = document.getElementById('liveUsers');
+
+  if(jobsEl) animateNum(jobsEl, parseInt(jobsEl.textContent.replace(',','')), jobCount);
+  if(appsEl) animateNum(appsEl, parseInt(appsEl.textContent.replace(',','')), appCount);
+  if(usersEl) animateNum(usersEl, parseInt(usersEl.textContent.replace(',','')), userCount);
+
+  // Update deltas
+  const delta = document.getElementById('liveAppsDelta');
+  if(delta) delta.textContent = `↑ ${Math.floor(Math.random()*8+5)} in last 10 mins`;
+}
+
+function animateNum(el, from, to) {
+  if(from === to) return;
+  el.style.transform = 'scale(1.15)';
+  el.style.color = '#0ea271';
+  el.style.transition = 'all .3s';
+  el.textContent = to.toLocaleString();
+  setTimeout(() => { el.style.transform = 'scale(1)'; }, 300);
+}
+
+// Add CSS animation
+const style = document.createElement('style');
+style.textContent = '@keyframes slideIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}';
+document.head.appendChild(style);
+
+// Start after page loads
+setTimeout(() => {
+  initFeed();
+  // Add new items every 2.5 seconds
+  setInterval(() => {
+    addFeedItem(randomActivity());
+    updateStats();
+  }, 2500);
+}, 1000);
+</script>
+
 <div class="mobile-menu" id="mobileMenu">
   <a href="browse-jobs.html">🔍 Find jobs</a>
   <a href="interview-prep.html">🎙 AI Interview prep</a>
