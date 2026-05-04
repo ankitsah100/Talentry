@@ -209,8 +209,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
       <div>
         <div class="sf-label">Language</div>
         <select class="sf-select" id="setupLang">
-          <option>English</option>
-          <option>Nepali (नेपाली)</option>
+          <option value="en">English</option>
+          <option value="ne">Nepali (नेपाली)</option>
+          <option value="hi">Hindi (हिन्दी)</option>
         </select>
       </div>
     </div>
@@ -366,11 +367,12 @@ let currentType = 'General HR';
 
 // ── LOAD VOICES ──────────────────────────────
 function loadVoices() {
-  voices = speechSynth.getVoices();
-  if(!voices.length) setTimeout(loadVoices, 200);
+  voices = window.speechSynthesis.getVoices();
 }
 loadVoices();
-window.speechSynthesis.onvoiceschanged = loadVoices;
+window.speechSynthesis.onvoiceschanged = () => {
+  voices = window.speechSynthesis.getVoices();
+};
 
 // ── CAMERA ───────────────────────────────────
 async function enableCamera() {
@@ -417,28 +419,104 @@ async function startInterview() {
     document.getElementById('noCameraMsg').style.display = 'none';
     const lbl = document.getElementById('cameraStatusLbl');
     if(lbl) lbl.textContent = 'Camera on ✅';
-    // AI reacts to seeing candidate
-    setTimeout(() => {
-      speakSlowly("Oh great! Yes, I can see you now. You look good! Are you ready to begin?");
-      setAIStatus('Can see you now! 👋');
-    }, 800);
+    isCameraOff = false;
   }
+
+  // Start camera monitoring loop
+  startCameraMonitor();
 
   // Generate questions with Claude AI
   await generateQuestions();
   
+  // Check camera state at start
+  const hasCam = cameraStream && cameraStream.getVideoTracks().length > 0 && cameraStream.getVideoTracks()[0].enabled;
+
+  // Wait a moment for video to render, then analyze appearance
+  let appearanceComment = null;
+  if(hasCam) {
+    await new Promise(r => setTimeout(r, 1500)); // let video render
+    setAIStatus('Checking your appearance...');
+    appearanceComment = await analyzeAppearance();
+  }
+
+  const camOpener = hasCam
+    ? `Oh wonderful! I can see you clearly. ${appearanceComment ? appearanceComment + ' ' : 'You look great! '}`
+    : "Hmm, I notice your camera is off. That is okay for practice, but in a real interview, always keep your camera on. ";
+
   // AI gives warm greeting before starting
   const candidateName = 'there';
-  const greetings = [
-    `Hello ${candidateName}! Welcome to your practice interview. My name is Priya, and I will be your interviewer today. This interview is for the ${currentRole} position. I will ask you ${questions.length} questions, and after each answer, I will give you detailed feedback. Don't worry, just relax and speak naturally. Okay? Let us begin!`,
-    `Hi ${candidateName}! Great to meet you. I am Priya, your AI interviewer. Today we are practicing for a ${currentRole} role. I will ask you ${questions.length} questions. Just answer naturally — there are no trick questions! Ready? Let us start.`,
-  ];
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
-  speakSlowly(greeting);
-  setAIStatus('Introducing...');
   
-  // Start first question after greeting finishes (estimate ~8 seconds for greeting)
-  setTimeout(() => askQuestion(0), 9000);
+  // Language-specific greetings
+  let greetings;
+  if(currentLang === 'ne') {
+    greetings = [
+      `नमस्ते! ${camOpener}मेरो नाम प्रिया हो, र म तपाईंको अन्तर्वार्ताकार हुँ। आज हामी ${currentRole} पदको लागि अभ्यास गर्दैछौं। म तपाईंलाई ${questions.length} प्रश्नहरू सोध्नेछु। आराम गर्नुहोस् र स्वाभाविक रूपमा उत्तर दिनुहोस्। ठीक छ? सुरु गरौं!`,
+      `नमस्कार! ${camOpener}म प्रिया हुँ, तपाईंको AI अन्तर्वार्ताकार। ${currentRole} को लागि ${questions.length} प्रश्नहरू छन्। आफ्नो अनुभव र ज्ञान सहजतासाथ साझा गर्नुहोस्। तयार हुनुभयो? सुरु गरौं!`,
+    ];
+  } else if(currentLang === 'hi') {
+    greetings = [
+      `नमस्ते! ${camOpener}मेरा नाम प्रिया है, और मैं आपका इंटरव्यूअर हूँ। आज हम ${currentRole} पद के लिए अभ्यास करेंगे। मैं आपसे ${questions.length} प्रश्न पूछूंगी। आराम से रहें और स्वाभाविक रूप से उत्तर दें। ठीक है? चलिए शुरू करते हैं!`,
+      `नमस्कार! ${camOpener}मैं प्रिया हूँ, आपकी AI इंटरव्यूअर। ${currentRole} के लिए ${questions.length} सवाल हैं। बिल्कुल नेचुरल तरीके से जवाब दीजिए — कोई ट्रिक नहीं है! तैयार हैं? शुरू करते हैं!`,
+    ];
+  } else {
+    greetings = [
+      `Hello there! ${camOpener}Welcome to your practice interview. My name is Priya, and I will be your interviewer today. This interview is for the ${currentRole} position. I will ask you ${questions.length} questions, and after each answer, I will give you detailed feedback. Don't worry, just relax and speak naturally. Okay? Let us begin!`,
+      `Hi there! ${camOpener}Great to meet you. I am Priya, your AI interviewer. Today we are practicing for a ${currentRole} role. I will ask you ${questions.length} questions. Just answer naturally — there are no trick questions! Ready? Let us start.`,
+    ];
+  }
+  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+  setAIStatus('Introducing...');
+  // Use onDone callback so first question starts right after greeting ends
+  speakSlowly(greeting, () => {
+    setTimeout(() => askQuestion(0), 600);
+  });
+}
+
+// ── CAPTURE FRAME FROM CAMERA ────────────────
+function captureFrame() {
+  if(!cameraStream) return null;
+  const vid = document.getElementById('candidateVideo');
+  if(!vid || vid.videoWidth === 0) return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 320;
+  canvas.height = 240;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(vid, 0, 0, 320, 240);
+  // Return base64 without the data:image/jpeg;base64, prefix
+  return canvas.toDataURL('image/jpeg', 0.7).replace('data:image/jpeg;base64,', '');
+}
+
+// ── ANALYZE APPEARANCE WITH VISION AI ────────
+async function analyzeAppearance() {
+  if(!cameraStream) return null;
+  const frameData = captureFrame();
+  if(!frameData) return null;
+
+  try {
+    const res = await fetch('/api/vision', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageData: frameData,
+        mediaType: 'image/jpeg',
+        prompt: `You are a friendly, observant AI interviewer named Priya. Look at this person and give ONE warm, genuine compliment about their appearance for an interview setting. Focus on:
+- Clothing color (e.g. "That navy blue shirt looks very professional!")
+- Attire style (formal, semi-formal, casual)
+- Overall presentation
+
+Rules:
+- Keep it to ONE sentence, max 20 words
+- Be warm and genuine, like a real interviewer would say
+- Examples: "Oh, that white formal shirt looks very sharp!", "That black outfit looks very professional and confident!", "I love that blue color on you — very professional!", "That formal attire suits you perfectly for an interview!"
+- If you cannot clearly see the person or clothes, say: "You look very presentable today!"
+- ONLY return the compliment sentence, nothing else`
+      })
+    });
+    const data = await res.json();
+    return data.content?.[0]?.text?.trim() || null;
+  } catch(e) {
+    return null;
+  }
 }
 
 async function generateQuestions() {
@@ -449,7 +527,7 @@ async function generateQuestions() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         system: `You are an expert HR interviewer for Nepal healthcare sector. Generate exactly 6 interview questions for the given role. Return ONLY a JSON array of 6 strings. No other text. Mix behavioral, technical and situational questions. Keep questions concise (max 25 words each).`,
-        messages: [{ role: 'user', content: `Role: ${currentRole}\nDifficulty: ${currentDiff}\nType: ${currentType}\nLanguage: ${currentLang}\n\nGenerate 6 interview questions.` }]
+        messages: [{ role: 'user', content: `Role: ${currentRole}\nDifficulty: ${currentDiff}\nType: ${currentType}\nLanguage: ${currentLang === 'ne' ? 'Nepali' : currentLang === 'hi' ? 'Hindi' : 'English'}\n\nGenerate 6 interview questions in ${currentLang === 'ne' ? 'Nepali language (नेपाली)' : currentLang === 'hi' ? 'Hindi language (हिन्दी)' : 'English'}. IMPORTANT: Write the questions ONLY in the specified language, not English.` }]
       })
     });
     const data = await res.json();
@@ -470,43 +548,37 @@ async function generateQuestions() {
 }
 
 // ── HUMAN-LIKE FILLERS ────────────────────────
-const openingFillers = [
-  "Alright, let's get started! ",
-  "Perfect, okay. So... ",
-  "Great! So my first question for you is... ",
-  "Wonderful! Let me begin by asking you... ",
-];
+const fillers = {
+  en: {
+    opening: ["Alright, let's get started! ","Perfect, okay. So... ","Great! So my first question for you is... ","Wonderful! Let me begin by asking you... "],
+    transition: ["Hmm, okay. Thank you for that. Now, ","That's interesting! Alright, moving on... ","I see, I see. Good. So... ","Okay, noted. Let me ask you now... ","Right, thank you. So my next question is... ","Mmm, that's a good point. Okay, so... ","Good, good. Alright, let's talk about... ","I appreciate that answer. Now... "],
+    positive: ["Hmm, that's a great answer! ","Wow, very impressive! ","I like that response. ","That's exactly what we look for! ","Excellent point! ","Very good, I appreciate that. "],
+    encourage: ["Take your time, there's no rush. ","Feel free to give me as much detail as you'd like. ","Just speak naturally, like you would in a real conversation. "],
+  },
+  ne: {
+    opening: ["ठीक छ, सुरु गरौं! ","राम्रो! त्यसोभए... ","उत्तम! मेरो पहिलो प्रश्न छ... ","बढिया! मलाई तपाईंलाई सोध्न दिनुहोस्... "],
+    transition: ["हम्म, ठीक छ। धन्यवाद। अब, ","रोचक! ठीक छ, अगाडि बढौं... ","म देख्दैछु। राम्रो। त्यसोभए... ","ठीक छ, अर्को प्रश्न... ","धन्यवाद। मेरो अर्को प्रश्न छ... ","हम्म, राम्रो कुरा। त्यसोभए... "],
+    positive: ["हम्म, राम्रो जवाफ! ","वाह, धेरै राम्रो! ","मलाई त्यो जवाफ मन पर्यो। ","हामीले यही खोज्दछौं! ","उत्कृष्ट! ","धेरै राम्रो, म प्रशंसा गर्छु। "],
+    encourage: ["समय लिनुहोस्, हतार छैन। ","जति चाहनुहुन्छ विस्तारमा भन्नुहोस्। ","स्वाभाविक रूपमा बोल्नुहोस्। "],
+  },
+  hi: {
+    opening: ["चलिए शुरू करते हैं! ","बढ़िया! तो... ","अच्छा! मेरा पहला सवाल है... ","शानदार! मैं आपसे पूछना चाहती हूँ... "],
+    transition: ["हम्म, ठीक है। शुक्रिया। अब, ","दिलचस्प! चलिए आगे बढ़ते हैं... ","समझ गई। अच्छा। तो... ","ठीक है, अगला सवाल... ","शुक्रिया। मेरा अगला सवाल है... ","हम्म, अच्छी बात है। तो... "],
+    positive: ["हम्म, बहुत अच्छा जवाब! ","वाह, बहुत शानदार! ","मुझे यह जवाब पसंद आया। ","हम यही देखना चाहते थे! ","बेहतरीन! ","बहुत अच्छा, मैं सराहना करती हूँ। "],
+    encourage: ["समय लीजिए, कोई जल्दी नहीं। ","जितना चाहें उतना विस्तार से बताइए। ","बिल्कुल स्वाभाविक तरीके से बोलिए। "],
+  }
+};
 
-const transitionFillers = [
-  "Hmm, okay. Thank you for that. Now, ",
-  "That's interesting! Alright, moving on... ",
-  "I see, I see. Good. So... ",
-  "Okay, noted. Let me ask you now... ",
-  "Right, thank you. So my next question is... ",
-  "Mmm, that's a good point. Okay, so... ",
-  "Good, good. Alright, let's talk about... ",
-  "I appreciate that answer. Now... ",
-];
-
-const positiveReactions = [
-  "Hmm, that's a great answer! ",
-  "Wow, very impressive! ",
-  "I like that response. ",
-  "That's exactly what we look for! ",
-  "Excellent point! ",
-  "Very good, I appreciate that. ",
-];
-
-const encouragements = [
-  "Take your time, there's no rush. ",
-  "Feel free to give me as much detail as you'd like. ",
-  "Just speak naturally, like you would in a real conversation. ",
-];
+function getLangFillers() {
+  const code = currentLang === 'ne' ? 'ne' : currentLang === 'hi' ? 'hi' : 'en';
+  return fillers[code] || fillers.en;
+}
 
 function getHumanIntro(index) {
-  if(index === 0) return openingFillers[Math.floor(Math.random() * openingFillers.length)];
-  const reaction = Math.random() > 0.4 ? positiveReactions[Math.floor(Math.random() * positiveReactions.length)] : '';
-  const transition = transitionFillers[Math.floor(Math.random() * transitionFillers.length)];
+  const f = getLangFillers();
+  if(index === 0) return f.opening[Math.floor(Math.random() * f.opening.length)];
+  const reaction = Math.random() > 0.4 ? f.positive[Math.floor(Math.random() * f.positive.length)] : '';
+  const transition = f.transition[Math.floor(Math.random() * f.transition.length)];
   return reaction + transition;
 }
 
@@ -529,8 +601,8 @@ function askQuestion(index) {
   speakSlowly(`${intro}${q} ${encourage}`);
 }
 
-function speakText(text) {
-  speakSlowly(text);
+function speakText(text, onDone) {
+  speakSlowly(text, onDone);
 }
 
 function setAISpeaking(speaking) {
@@ -583,7 +655,14 @@ function startRecording() {
   recognition = new SpeechRecognition();
   recognition.continuous = true;
   recognition.interimResults = true;
-  recognition.lang = currentLang === 'Nepali (नेपाली)' ? 'ne-NP' : 'en-US';
+  // Set recognition language based on selection
+  if(currentLang === 'ne' || currentLang === 'Nepali (नेपाली)') {
+    recognition.lang = 'ne-NP';
+  } else if(currentLang === 'hi' || currentLang === 'Hindi (हिन्दी)') {
+    recognition.lang = 'hi-IN';
+  } else {
+    recognition.lang = 'en-US';
+  }
 
   recognition.onresult = (e) => {
     let interim = '';
@@ -628,7 +707,7 @@ async function analyzeAnswer() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system: `You are an expert interview coach for Nepal healthcare jobs. Analyze the candidate's answer and return ONLY a JSON object:
+        system: `You are an expert interview coach for Nepal healthcare jobs. The interview is in ${currentLang === 'ne' ? 'Nepali' : currentLang === 'hi' ? 'Hindi' : 'English'}. Analyze the candidate's answer and return ONLY a JSON object:
 {
   "confidence": 75,
   "clarity": 80,
@@ -680,17 +759,38 @@ function showFeedback(result) {
 
   // AI speaks human-like feedback
   const isLast2 = currentQ >= questions.length - 1;
-  const fbPhrases = [
-    `Hmm, okay. Let me share some feedback. ${result.feedback}`,
-    `Right, so... that was a good attempt. ${result.feedback}`,
-    `Mmm, interesting answer. ${result.feedback}`,
-    `Okay, I see what you were going for there. ${result.feedback}`,
-  ];
-  const endPhrase = isLast2
-    ? "That was your last question! Well done for completing the interview. Let me show you your final results."
-    : "Alright! Are you ready for the next question?";
+  let fbPhrases, endPhrase;
+  if(currentLang === 'ne') {
+    fbPhrases = [
+      `हम्म, ठीक छ। मेरो प्रतिक्रिया: ${result.feedback}`,
+      `राम्रो प्रयास। ${result.feedback}`,
+      `रोचक जवाफ। ${result.feedback}`,
+    ];
+    endPhrase = isLast2
+      ? "यो तपाईंको अन्तिम प्रश्न थियो! धेरै राम्रो गर्नुभयो। अन्तिम परिणाम हेर्नुहोस्।"
+      : "ठीक छ! अर्को प्रश्नको लागि तयार हुनुहुन्छ?";
+  } else if(currentLang === 'hi') {
+    fbPhrases = [
+      `हम्म, ठीक है। मेरी प्रतिक्रिया: ${result.feedback}`,
+      `अच्छा प्रयास। ${result.feedback}`,
+      `दिलचस्प जवाब। ${result.feedback}`,
+    ];
+    endPhrase = isLast2
+      ? "यह आपका आखिरी सवाल था! बहुत अच्छे! अंतिम परिणाम देखिए।"
+      : "ठीक है! अगले सवाल के लिए तैयार हैं?";
+  } else {
+    fbPhrases = [
+      `Hmm, okay. Let me share some feedback. ${result.feedback}`,
+      `Right, so... that was a good attempt. ${result.feedback}`,
+      `Mmm, interesting answer. ${result.feedback}`,
+      `Okay, I see what you were going for there. ${result.feedback}`,
+    ];
+    endPhrase = isLast2
+      ? "That was your last question! Well done for completing the interview. Let me show you your final results."
+      : "Alright! Are you ready for the next question?";
+  }
   const fbSpeak = fbPhrases[Math.floor(Math.random() * fbPhrases.length)];
-  setTimeout(() => speakSlowly(`${fbSpeak} ${endPhrase}`), 300);
+  setTimeout(() => speakSlowly(`${fbSpeak} ${endPhrase}`), 400);
 }
 
 function retryQuestion() {
@@ -732,6 +832,7 @@ function endInterview() {
     speechSynth.cancel();
     if(recognition) recognition.stop();
     if(cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+    if(cameraMonitorInterval) clearInterval(cameraMonitorInterval);
     showEndScreen();
   }
 }
@@ -747,6 +848,59 @@ function toggleMute() {
 }
 
 let isCameraOff = false;
+let cameraWasOff = false;
+let cameraMonitorInterval = null;
+
+function startCameraMonitor() {
+  // Check camera state every 1.5 seconds
+  cameraMonitorInterval = setInterval(() => {
+    if(!cameraStream) return;
+    const tracks = cameraStream.getVideoTracks();
+    if(tracks.length === 0) return;
+    const isOff = !tracks[0].enabled || tracks[0].readyState === 'ended';
+
+    if(isOff && !cameraWasOff) {
+      // Camera just turned off
+      cameraWasOff = true;
+      document.getElementById('candidateVideo').style.opacity = '0';
+      document.getElementById('noCameraMsg').style.display = 'flex';
+      document.getElementById('camBtn').textContent = '🚫';
+      document.getElementById('camBtn').classList.add('muted');
+      const lbl = document.getElementById('cameraStatusLbl');
+      if(lbl) lbl.textContent = 'Camera off ❌';
+      notify('📷 Camera off detected');
+      if(!isRecording && speechSynth && !speechSynth.speaking) {
+        const phrases = [
+          "Oh, hmm... I seem to have lost your video. Could you please turn your camera back on? In a real interview, maintaining eye contact is very important.",
+          "Hmm, I can no longer see you. Please turn your camera on — it really matters in interviews!",
+          "Oh! I lost your video. For a realistic practice, please keep your camera on. Interviewers really appreciate that.",
+        ];
+        speakSlowly(phrases[Math.floor(Math.random()*phrases.length)]);
+      }
+    } else if(!isOff && cameraWasOff) {
+      // Camera just turned back on
+      cameraWasOff = false;
+      document.getElementById('candidateVideo').style.opacity = '1';
+      document.getElementById('noCameraMsg').style.display = 'none';
+      document.getElementById('camBtn').textContent = '📷';
+      document.getElementById('camBtn').classList.remove('muted');
+      const lbl = document.getElementById('cameraStatusLbl');
+      if(lbl) lbl.textContent = 'Camera on ✅';
+      notify('✅ Camera back on!');
+      if(!isRecording && !speechSynth.speaking) {
+        // Analyze appearance when camera turns back on
+        setTimeout(async () => {
+          const comment = await analyzeAppearance();
+          const phrase = comment
+            ? `Oh great! I can see you again. By the way, ${comment.toLowerCase()} Always keep your camera on during real interviews. Now, where were we?`
+            : "Oh great! I can see you again. Good. Always keep your camera on during real interviews too. Now, where were we?";
+          speakSlowly(phrase);
+        }, 800);
+      }
+    }
+  }, 1500);
+}
+
 function toggleCamera() {
   const btn = document.getElementById('camBtn');
   const vid = document.getElementById('candidateVideo');
@@ -765,61 +919,128 @@ function toggleCamera() {
   if(vid) vid.style.opacity = isCameraOff ? '0' : '1';
   if(noMsg) noMsg.style.display = isCameraOff ? 'flex' : 'none';
 
+  const lbl = document.getElementById('cameraStatusLbl');
+
   if(isCameraOff) {
+    cameraWasOff = true;
+    if(lbl) lbl.textContent = 'Camera off ❌';
     notify('📷 Camera off');
-    // AI notices camera is off naturally
-    setTimeout(() => {
-      if(isCameraOff) {
-        const phrases = [
-          "Oh, hmm... I seem to have lost your video. Could you turn your camera back on? In a real interview, it's very important to maintain eye contact.",
-          "Hmm, I can't see you anymore. Please turn your camera on — eye contact really matters in interviews!",
-          "Oh! Your camera seems to be off. For a realistic practice, please keep it on. Interviewers appreciate candidates who look confident on camera.",
-        ];
-        speakSlowly(phrases[Math.floor(Math.random()*phrases.length)]);
-      }
-    }, 800);
+    if(!speechSynth.speaking) {
+      const phrases = [
+        "Oh, hmm... I seem to have lost your video. Could you turn your camera back on? In a real interview, maintaining eye contact is very important.",
+        "Hmm, I can no longer see you. Please turn your camera on — eye contact really matters in interviews!",
+        "Oh! Your camera seems to be off. Please keep it on for a realistic practice. Interviewers really appreciate candidates who are visible.",
+      ];
+      setTimeout(() => speakSlowly(phrases[Math.floor(Math.random()*phrases.length)]), 500);
+    }
   } else {
-    notify('✅ Camera on — great!');
-    setTimeout(() => {
-      speakSlowly("Oh yes! I can see you now. That is much better. Remember to look directly at the camera — it creates good eye contact. Whenever you are ready, just click the mic button to start answering.");
-    }, 500);
+    cameraWasOff = false;
+    if(lbl) lbl.textContent = 'Camera on ✅';
+    notify('✅ Camera on!');
+    if(!speechSynth.speaking) {
+      setTimeout(async () => {
+        const comment = await analyzeAppearance();
+        const phrase = comment
+          ? `Oh yes! I can see you now. ${comment} Remember to look directly at the camera for good eye contact.`
+          : "Oh yes! I can see you now. That is much better. Remember to look directly at the camera for good eye contact.";
+        speakSlowly(phrase);
+      }, 800);
+    }
   }
 }
 
-// Speak slowly with pauses - better for interview simulation
-function speakSlowly(text) {
+// ── BEST VOICE PICKER (language-aware) ────────
+function getBestVoice(lang) {
+  const all = window.speechSynthesis.getVoices();
+  const code = lang || currentLang || 'en';
+
+  if(code === 'ne' || code === 'Nepali (नेपाली)') {
+    // Nepali voices
+    const neVoice = all.find(v => v.lang === 'ne-NP' || v.lang === 'ne')
+      || all.find(v => v.lang.startsWith('ne'));
+    if(neVoice) return neVoice;
+    // Fallback: Hindi is similar sounding
+    return all.find(v => v.lang === 'hi-IN' || v.lang.startsWith('hi'))
+      || all.find(v => v.lang.startsWith('en'));
+  }
+
+  if(code === 'hi' || code === 'Hindi (हिन्दी)') {
+    // Hindi voices
+    const hiVoice = all.find(v => v.name === 'Google हिन्दी')
+      || all.find(v => v.name.includes('Lekha'))
+      || all.find(v => v.lang === 'hi-IN')
+      || all.find(v => v.lang.startsWith('hi'));
+    if(hiVoice) return hiVoice;
+    // Fallback to English
+    return all.find(v => v.lang.startsWith('en'));
+  }
+
+  // English voices — priority list
+  const priority = [
+    'Google UK English Female',
+    'Microsoft Aria Online (Natural) - English (United States)',
+    'Microsoft Jenny Online (Natural) - English (United States)',
+    'Samantha',
+    'Karen',
+    'Victoria',
+    'Moira',
+    'Google US English',
+    'Microsoft Zira',
+  ];
+  for(const name of priority) {
+    const v = all.find(v => v.name === name);
+    if(v) return v;
+  }
+  return all.find(v => v.lang.startsWith('en-') && v.name.includes('Female'))
+    || all.find(v => v.lang.startsWith('en'))
+    || all[0];
+}
+
+// ── NATURAL SPEECH ENGINE ─────────────────────
+function speakSlowly(text, onDone) {
   speechSynth.cancel();
   setAISpeaking(true);
   setAIStatus('Speaking...');
 
-  // Split into sentences for more natural pauses
-  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  // Add natural SSML-like pauses using commas and breaks
+  // Split on sentence boundaries
+  const sentences = text.match(/[^.!?…]+[.!?…]+/g) || [text];
   let idx = 0;
+  const voice = getBestVoice(currentLang);
 
   function speakNext() {
     if(idx >= sentences.length) {
       setAISpeaking(false);
-      setAIStatus('Waiting for your answer...');
+      setAIStatus('Waiting for your answer... 🎤');
+      if(onDone) onDone();
       return;
     }
-    const utter = new SpeechSynthesisUtterance(sentences[idx].trim());
-    const femaleVoice = voices.find(v =>
-      v.name.includes('Samantha') ||
-      v.name.includes('Google UK English Female') ||
-      v.name.includes('Victoria') ||
-      v.name.includes('Karen') ||
-      v.name.includes('Female')
-    ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
 
-    if(femaleVoice) utter.voice = femaleVoice;
-    utter.rate = 0.78;
-    utter.pitch = 1.08;
-    utter.volume = 1;
+    const raw = sentences[idx].trim();
+    if(!raw) { idx++; speakNext(); return; }
+
+    const utter = new SpeechSynthesisUtterance(raw);
+    if(voice) utter.voice = voice;
+
+    // Natural rate — not too slow, not robotic
+    // Vary rate slightly for natural feel
+    const baseRate = 0.88;
+    const variation = (Math.random() * 0.06) - 0.03; // ±0.03
+    utter.rate = baseRate + variation;
+    utter.pitch = 1.0 + (Math.random() * 0.06 - 0.03); // slight pitch variation
+    utter.volume = 0.95;
+
+    // Natural pause based on punctuation
+    let pause = 280;
+    if(raw.endsWith('?')) pause = 420;
+    if(raw.endsWith('!')) pause = 350;
+    if(raw.endsWith('...') || raw.endsWith('…')) pause = 500;
 
     utter.onend = () => {
       idx++;
-      setTimeout(speakNext, 320); // natural pause between sentences
+      setTimeout(speakNext, pause);
     };
+    utter.onerror = () => { idx++; speakNext(); };
     speechSynth.speak(utter);
   }
   speakNext();
