@@ -269,7 +269,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
     <div class="candidate-panel" id="candidatePanel">
       <div class="candidate-label" id="candidateLabel">
         <span style="width:7px;height:7px;border-radius:50%;background:#ef4444;display:inline-block;animation:blink 1s infinite;"></span>
-        You
+        You — <span id="cameraStatusLbl">No camera</span>
       </div>
       <div class="mic-indicator" id="micIndicator">🎤</div>
       <div class="no-camera" id="noCameraMsg">
@@ -295,6 +295,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
     </div>
     <div class="ctrl-btns">
       <button class="ctrl-btn ctrl-mute" id="muteBtn" onclick="toggleMute()" title="Mute/Unmute">🎤</button>
+      <button class="ctrl-btn ctrl-mute" id="camBtn" onclick="toggleCamera()" title="Camera On/Off">📷</button>
       <button class="ctrl-btn ctrl-answer" id="answerBtn" onclick="toggleAnswer()" title="Start/Stop answering">▶</button>
       <button class="ctrl-btn ctrl-end" onclick="endInterview()" title="End interview">✕</button>
     </div>
@@ -414,13 +415,30 @@ async function startInterview() {
     vid.srcObject = cameraStream;
     vid.style.display = 'block';
     document.getElementById('noCameraMsg').style.display = 'none';
+    const lbl = document.getElementById('cameraStatusLbl');
+    if(lbl) lbl.textContent = 'Camera on ✅';
+    // AI reacts to seeing candidate
+    setTimeout(() => {
+      speakSlowly("Oh great! Yes, I can see you now. You look good! Are you ready to begin?");
+      setAIStatus('Can see you now! 👋');
+    }, 800);
   }
 
   // Generate questions with Claude AI
   await generateQuestions();
   
-  // Start first question after 1.5s
-  setTimeout(() => askQuestion(0), 1500);
+  // AI gives warm greeting before starting
+  const candidateName = 'there';
+  const greetings = [
+    `Hello ${candidateName}! Welcome to your practice interview. My name is Priya, and I will be your interviewer today. This interview is for the ${currentRole} position. I will ask you ${questions.length} questions, and after each answer, I will give you detailed feedback. Don't worry, just relax and speak naturally. Okay? Let us begin!`,
+    `Hi ${candidateName}! Great to meet you. I am Priya, your AI interviewer. Today we are practicing for a ${currentRole} role. I will ask you ${questions.length} questions. Just answer naturally — there are no trick questions! Ready? Let us start.`,
+  ];
+  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+  speakSlowly(greeting);
+  setAIStatus('Introducing...');
+  
+  // Start first question after greeting finishes (estimate ~8 seconds for greeting)
+  setTimeout(() => askQuestion(0), 9000);
 }
 
 async function generateQuestions() {
@@ -451,6 +469,47 @@ async function generateQuestions() {
   setAIStatus('Ready');
 }
 
+// ── HUMAN-LIKE FILLERS ────────────────────────
+const openingFillers = [
+  "Alright, let's get started! ",
+  "Perfect, okay. So... ",
+  "Great! So my first question for you is... ",
+  "Wonderful! Let me begin by asking you... ",
+];
+
+const transitionFillers = [
+  "Hmm, okay. Thank you for that. Now, ",
+  "That's interesting! Alright, moving on... ",
+  "I see, I see. Good. So... ",
+  "Okay, noted. Let me ask you now... ",
+  "Right, thank you. So my next question is... ",
+  "Mmm, that's a good point. Okay, so... ",
+  "Good, good. Alright, let's talk about... ",
+  "I appreciate that answer. Now... ",
+];
+
+const positiveReactions = [
+  "Hmm, that's a great answer! ",
+  "Wow, very impressive! ",
+  "I like that response. ",
+  "That's exactly what we look for! ",
+  "Excellent point! ",
+  "Very good, I appreciate that. ",
+];
+
+const encouragements = [
+  "Take your time, there's no rush. ",
+  "Feel free to give me as much detail as you'd like. ",
+  "Just speak naturally, like you would in a real conversation. ",
+];
+
+function getHumanIntro(index) {
+  if(index === 0) return openingFillers[Math.floor(Math.random() * openingFillers.length)];
+  const reaction = Math.random() > 0.4 ? positiveReactions[Math.floor(Math.random() * positiveReactions.length)] : '';
+  const transition = transitionFillers[Math.floor(Math.random() * transitionFillers.length)];
+  return reaction + transition;
+}
+
 // ── ASK QUESTION ─────────────────────────────
 function askQuestion(index) {
   currentQ = index;
@@ -462,41 +521,16 @@ function askQuestion(index) {
   document.getElementById('answerBtn').textContent = '▶';
   document.getElementById('answerBtn').classList.remove('recording');
   document.getElementById('transcriptBox').style.display = 'none';
+  setAIStatus('Asking question...');
 
-  // AI speaks the question
-  speakText(`Question ${index + 1}. ${q}`);
+  // Add human-like intro before question
+  const intro = getHumanIntro(index);
+  const encourage = index === 0 ? encouragements[Math.floor(Math.random()*encouragements.length)] : '';
+  speakSlowly(`${intro}${q} ${encourage}`);
 }
 
 function speakText(text) {
-  speechSynth.cancel();
-  setAIStatus('Speaking...');
-  setAISpeaking(true);
-
-  const utter = new SpeechSynthesisUtterance(text);
-  
-  // Pick a female English voice
-  const femaleVoice = voices.find(v => 
-    v.name.includes('Female') || 
-    v.name.includes('Samantha') || 
-    v.name.includes('Victoria') ||
-    v.name.includes('Google UK English Female') ||
-    v.name.includes('Karen') ||
-    (v.lang.startsWith('en') && v.name.includes('f'))
-  ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-  
-  if(femaleVoice) utter.voice = femaleVoice;
-  utter.rate = 0.92;
-  utter.pitch = 1.05;
-  utter.volume = 1;
-
-  utter.onend = () => {
-    setAISpeaking(false);
-    setAIStatus('Waiting for your answer...');
-    // Hint to start answering
-    document.getElementById('answerBtn').style.animation = 'rec-pulse 2s 3';
-  };
-
-  speechSynth.speak(utter);
+  speakSlowly(text);
 }
 
 function setAISpeaking(speaking) {
@@ -523,6 +557,14 @@ function startRecording() {
   if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
     alert('Speech recognition not supported in this browser. Please use Chrome.');
     return;
+  }
+
+  // Check if camera is on — remind user to stay on camera
+  if(cameraStream && cameraStream.getVideoTracks().length > 0) {
+    const videoTrack = cameraStream.getVideoTracks()[0];
+    if(!videoTrack.enabled) {
+      notify('📷 Please turn on your camera for a more realistic interview experience!');
+    }
   }
 
   speechSynth.cancel();
@@ -556,6 +598,11 @@ function startRecording() {
 
   recognition.onerror = () => stopRecording();
   recognition.start();
+  
+  // Small confirmation that AI is listening
+  setTimeout(() => {
+    if(isRecording) setAIStatus("Listening... 👂 Go ahead!");
+  }, 500);
 }
 
 function stopRecording() {
@@ -631,8 +678,19 @@ function showFeedback(result) {
 
   document.getElementById('feedbackOverlay').classList.add('show');
 
-  // AI speaks brief feedback
-  setTimeout(() => speakText(`Your answer scored ${result.confidence} percent for confidence. ${result.feedback}`), 300);
+  // AI speaks human-like feedback
+  const isLast2 = currentQ >= questions.length - 1;
+  const fbPhrases = [
+    `Hmm, okay. Let me share some feedback. ${result.feedback}`,
+    `Right, so... that was a good attempt. ${result.feedback}`,
+    `Mmm, interesting answer. ${result.feedback}`,
+    `Okay, I see what you were going for there. ${result.feedback}`,
+  ];
+  const endPhrase = isLast2
+    ? "That was your last question! Well done for completing the interview. Let me show you your final results."
+    : "Alright! Are you ready for the next question?";
+  const fbSpeak = fbPhrases[Math.floor(Math.random() * fbPhrases.length)];
+  setTimeout(() => speakSlowly(`${fbSpeak} ${endPhrase}`), 300);
 }
 
 function retryQuestion() {
@@ -666,7 +724,7 @@ function showEndScreen() {
   document.getElementById('finalGrade').textContent = grade;
   document.getElementById('endScreen').classList.add('show');
 
-  speakText(`Interview complete! Your overall score is ${overall} percent. Grade ${grade}. Great practice! Keep improving and you will do great in your real interview.`);
+  speakSlowly(`Interview complete! Your overall score is ${overall} percent. Grade ${grade}. Great practice! Keep improving and you will do great in your real interview.`);
 }
 
 function endInterview() {
@@ -686,6 +744,85 @@ function toggleMute() {
   if(cameraStream) {
     cameraStream.getAudioTracks().forEach(t => t.enabled = !isMuted);
   }
+}
+
+let isCameraOff = false;
+function toggleCamera() {
+  const btn = document.getElementById('camBtn');
+  const vid = document.getElementById('candidateVideo');
+  const noMsg = document.getElementById('noCameraMsg');
+
+  if(!cameraStream) {
+    notify('📷 Enable camera first from the setup screen');
+    return;
+  }
+
+  isCameraOff = !isCameraOff;
+  cameraStream.getVideoTracks().forEach(t => t.enabled = !isCameraOff);
+  btn.textContent = isCameraOff ? '🚫' : '📷';
+  btn.classList.toggle('muted', isCameraOff);
+
+  if(vid) vid.style.opacity = isCameraOff ? '0' : '1';
+  if(noMsg) noMsg.style.display = isCameraOff ? 'flex' : 'none';
+
+  if(isCameraOff) {
+    notify('📷 Camera off');
+    // AI notices camera is off naturally
+    setTimeout(() => {
+      if(isCameraOff) {
+        const phrases = [
+          "Oh, hmm... I seem to have lost your video. Could you turn your camera back on? In a real interview, it's very important to maintain eye contact.",
+          "Hmm, I can't see you anymore. Please turn your camera on — eye contact really matters in interviews!",
+          "Oh! Your camera seems to be off. For a realistic practice, please keep it on. Interviewers appreciate candidates who look confident on camera.",
+        ];
+        speakSlowly(phrases[Math.floor(Math.random()*phrases.length)]);
+      }
+    }, 800);
+  } else {
+    notify('✅ Camera on — great!');
+    setTimeout(() => {
+      speakSlowly("Oh yes! I can see you now. That is much better. Remember to look directly at the camera — it creates good eye contact. Whenever you are ready, just click the mic button to start answering.");
+    }, 500);
+  }
+}
+
+// Speak slowly with pauses - better for interview simulation
+function speakSlowly(text) {
+  speechSynth.cancel();
+  setAISpeaking(true);
+  setAIStatus('Speaking...');
+
+  // Split into sentences for more natural pauses
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  let idx = 0;
+
+  function speakNext() {
+    if(idx >= sentences.length) {
+      setAISpeaking(false);
+      setAIStatus('Waiting for your answer...');
+      return;
+    }
+    const utter = new SpeechSynthesisUtterance(sentences[idx].trim());
+    const femaleVoice = voices.find(v =>
+      v.name.includes('Samantha') ||
+      v.name.includes('Google UK English Female') ||
+      v.name.includes('Victoria') ||
+      v.name.includes('Karen') ||
+      v.name.includes('Female')
+    ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+
+    if(femaleVoice) utter.voice = femaleVoice;
+    utter.rate = 0.78;
+    utter.pitch = 1.08;
+    utter.volume = 1;
+
+    utter.onend = () => {
+      idx++;
+      setTimeout(speakNext, 320); // natural pause between sentences
+    };
+    speechSynth.speak(utter);
+  }
+  speakNext();
 }
 
 function notify(msg) {
