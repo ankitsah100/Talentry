@@ -254,7 +254,21 @@ const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publisha
 
 async function loadProfile(){
   const { data: { session } } = await sb.auth.getSession();
-  if(!session){ return; }
+  if(!session){
+    // Show guest prompt instead of blank page
+    const main = document.querySelector('.profile-main') || document.querySelector('.page') || document.body;
+    const guestDiv = document.createElement('div');
+    guestDiv.style.cssText = 'max-width:520px;margin:100px auto;text-align:center;padding:40px;background:#fff;border-radius:24px;border:1.5px solid rgba(14,162,113,0.14);';
+    guestDiv.innerHTML = '<div style="font-size:56px;margin-bottom:16px">👤</div>'
+      + '<h2 style="font-family:Fraunces,serif;font-size:26px;color:#0a1a12;letter-spacing:-0.5px;margin-bottom:10px">Your profile</h2>'
+      + '<p style="font-size:15px;color:#4a6b58;margin-bottom:28px;font-weight:300">Create your profile to save applications, track interviews, and get personalized job matches.</p>'
+      + '<a href="auth.html" style="background:#0ea271;color:#fff;padding:13px 32px;border-radius:100px;font-size:15px;font-weight:600;text-decoration:none;display:inline-block;margin-right:10px;">Create free account</a>'
+      + '<a href="auth.html" style="background:none;border:1.5px solid rgba(14,162,113,0.28);color:#0a1a12;padding:13px 24px;border-radius:100px;font-size:14px;text-decoration:none;display:inline-block;">Log in</a>';
+    // Insert after nav
+    const nav = document.querySelector('nav');
+    if(nav) nav.insertAdjacentElement('afterend', guestDiv);
+    return;
+  }
 
   const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
   if(!profile) return;

@@ -395,6 +395,21 @@ async function submitJob(){
     return;
   }
 
+  // Check if user is logged in before posting
+  if(window._sb) {
+    const { data: { session } } = await window._sb.auth.getSession();
+    if(!session) {
+      // Save form data and redirect to login
+      sessionStorage.setItem('pendingJob', JSON.stringify({title, company, email}));
+      const err=document.getElementById('errorMsg');
+      err.textContent='Please log in or sign up to post your job. Your details have been saved!';
+      err.style.background='#fff3d6'; err.style.color='#7a4e00';
+      err.classList.add('show');
+      setTimeout(() => { location.href='auth.html?redirect=post-job'; }, 2000);
+      return;
+    }
+  }
+
   document.getElementById('errorMsg').classList.remove('show');
   const btn=document.getElementById('submitBtn');
   btn.textContent='⏳ Posting your job...';
