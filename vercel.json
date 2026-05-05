@@ -47,6 +47,10 @@
     {
       "source": "/video-interview",
       "destination": "/video-interview.html"
+    },
+    {
+      "source": "/swipe",
+      "destination": "/swipe-jobs.html"
     }
   ]
 }
