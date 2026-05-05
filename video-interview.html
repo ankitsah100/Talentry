@@ -247,59 +247,36 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
       <!-- ANIMATED FACE -->
       <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:20px;">
         <div id="aiFaceWrap" style="position:relative;margin-bottom:14px;">
-          <svg id="aiFace" width="160" height="180" viewBox="0 0 160 180" xmlns="http://www.w3.org/2000/svg">
-            <!-- Glow ring -->
-            <circle cx="80" cy="85" r="76" fill="none" stroke="rgba(78,205,164,0.25)" stroke-width="2" id="glowRing"/>
-            <!-- Head -->
-            <ellipse cx="80" cy="85" rx="62" ry="70" fill="#f9d5bc"/>
-            <!-- Hair -->
-            <ellipse cx="80" cy="38" rx="62" ry="32" fill="#3d2b1f"/>
-            <rect x="18" y="38" width="14" height="50" rx="7" fill="#3d2b1f"/>
-            <rect x="128" y="38" width="14" height="50" rx="7" fill="#3d2b1f"/>
-            <!-- Ears -->
-            <ellipse cx="18" cy="90" rx="8" ry="11" fill="#f0c8a0"/>
-            <ellipse cx="142" cy="90" rx="8" ry="11" fill="#f0c8a0"/>
-            <!-- Eyebrows -->
-            <path d="M50 62 Q62 57 72 62" stroke="#3d2b1f" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <path d="M88 62 Q98 57 110 62" stroke="#3d2b1f" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <!-- Eyes -->
-            <g id="eyeGroup">
-              <!-- Left eye -->
-              <ellipse cx="61" cy="78" rx="11" ry="12" fill="white"/>
-              <ellipse cx="61" cy="79" rx="7" ry="7" fill="#4a3728"/>
-              <ellipse cx="61" cy="79" rx="4" ry="4" fill="#1a0a05"/>
-              <ellipse cx="64" cy="76" rx="2.5" ry="2.5" fill="white"/>
-              <!-- Right eye -->
-              <ellipse cx="99" cy="78" rx="11" ry="12" fill="white"/>
-              <ellipse cx="99" cy="79" rx="7" ry="7" fill="#4a3728"/>
-              <ellipse cx="99" cy="79" rx="4" ry="4" fill="#1a0a05"/>
-              <ellipse cx="102" cy="76" rx="2.5" ry="2.5" fill="white"/>
-            </g>
-            <!-- Blink overlay -->
-            <ellipse id="leftBlink" cx="61" cy="78" rx="11" ry="0" fill="#f9d5bc"/>
-            <ellipse id="rightBlink" cx="99" cy="78" rx="11" ry="0" fill="#f9d5bc"/>
-            <!-- Nose -->
-            <ellipse cx="80" cy="102" rx="5" ry="3.5" fill="#e8b89a"/>
-            <path d="M75 105 Q80 109 85 105" stroke="#d4956e" stroke-width="1.5" fill="none"/>
-            <!-- Mouth -->
-            <g id="mouthGroup">
-              <!-- Lips closed (default) -->
-              <path id="mouthClosed" d="M64 124 Q80 132 96 124" stroke="#c4706e" stroke-width="2.5" fill="#e89090" stroke-linecap="round"/>
-              <!-- Mouth talking (animated) -->
-              <ellipse id="mouthOpen" cx="80" cy="126" rx="14" ry="0" fill="#8b3a3a"/>
-              <ellipse id="mouthInner" cx="80" cy="127" rx="10" ry="0" fill="#c45050"/>
-              <!-- Teeth -->
-              <rect id="teeth" x="68" y="125" width="24" height="0" rx="2" fill="white"/>
-            </g>
-            <!-- Cheeks -->
-            <ellipse cx="45" cy="106" rx="12" ry="8" fill="rgba(255,150,150,0.2)"/>
-            <ellipse cx="115" cy="106" rx="12" ry="8" fill="rgba(255,150,150,0.2)"/>
-            <!-- Neck -->
-            <rect x="68" y="152" width="24" height="20" rx="4" fill="#f0c8a0"/>
-            <!-- Collar -->
-            <path d="M30 172 Q80 160 130 172 L130 180 Q80 170 30 180 Z" fill="#1a5276"/>
-            <path d="M80 162 L70 180 L90 180 Z" fill="#fff"/>
-          </svg>
+          <!-- Real human avatar using DiceBear Avataaars API — proper face -->
+          <div style="position:relative;width:160px;height:170px;">
+            <div id="glowRing" style="position:absolute;inset:-6px;border-radius:50%;border:3px solid rgba(78,205,164,0.3);transition:all .3s;"></div>
+            <!-- Realistic avatar — DiceBear Notionists style (clear face) -->
+            <img
+              id="aiFaceImg"
+              src="https://api.dicebear.com/9.x/notionists/svg?seed=Priya&backgroundColor=b6e3f4,c0aede,d1d4f9&gesture=ok&brows=variant01&eyes=variant04&lips=variant13&nose=variant01&hair=variant27&body=variant19"
+              width="160" height="170"
+              style="width:160px;height:170px;border-radius:50%;object-fit:cover;display:block;background:#b6e3f4;"
+              onerror="tryNextAvatar(this)"
+            />
+            <script>
+            function tryNextAvatar(img) {
+              const fallbacks = [
+                'https://api.dicebear.com/9.x/big-smile/svg?seed=Priya&backgroundColor=b6e3f4&hair=long01,long02&skinColor=9c5722,ae5d29',
+                'https://api.dicebear.com/9.x/lorelei/svg?seed=Priya&backgroundColor=b6e3f4',
+                'https://ui-avatars.com/api/?name=Priya&size=160&background=0ea271&color=fff&rounded=true&bold=true',
+              ];
+              const idx = parseInt(img.dataset.fallback || '0');
+              if(idx < fallbacks.length) {
+                img.dataset.fallback = idx + 1;
+                img.src = fallbacks[idx];
+              }
+            }
+            </script>
+            <!-- Mouth animation overlay -->
+            <div id="mouthOverlay" style="position:absolute;bottom:38px;left:50%;transform:translateX(-50%);width:28px;height:0px;background:rgba(100,40,40,0.7);border-radius:0 0 14px 14px;transition:height .08s ease;overflow:hidden;">
+              <div style="width:100%;height:40%;background:rgba(255,255,255,0.7);border-radius:2px;margin-top:1px;"></div>
+            </div>
+          </div>
 
           <!-- Sound bars below face -->
           <div class="ai-sound-bars" id="soundBars" style="margin-top:4px;">
@@ -313,7 +290,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
         </div>
 
         <div class="ai-name" style="color:#fff;font-size:15px;font-weight:600;">Priya</div>
-        <div class="ai-status" id="aiStatus" style="color:rgba(255,255,255,.5);font-size:12px;margin-top:3px;">Ready to start</div>
+        <div class="ai-status" id="aiStatus" style="color:rgba(255,255,255,.5);font-size:12px;margin-top:3px;">Priya — AI Interviewer</div>
         <div class="thinking" id="thinkingIndicator" style="margin-top:8px;">
           <div class="think-dot"></div>
           <div class="think-dot"></div>
@@ -609,28 +586,28 @@ async function generateQuestions() {
 const fillers = {
   en: {
     opening: [
-      "Alright, let's get started! ",
-      "Okay so, my first question for you is... ",
-      "Great! Let me kick things off with... ",
-      "Perfect! So here's what I want to ask you first... ",
+      "My first question for you is — ",
+      "Let's begin with — ",
+      "Starting off — ",
+      "First question — ",
     ],
     transition: [
-      "Hmm, okay. That's actually a solid answer. Now, ",
-      "Ooh interesting! Alright, moving on... ",
-      "I see what you mean. Good stuff. So... ",
-      "Okay noted, I like that. Let me ask you now... ",
-      "Right, thank you for sharing that. So my next one is... ",
-      "Mmm, that's a valid point. Okay so... ",
-      "Nice, I appreciate that. Let's talk about... ",
-      "That was good! Alright, next up... ",
+      "Next question — ",
+      "Moving on — ",
+      "My next question is — ",
+      "Next up — ",
+      "Now, ",
+      "Following up — ",
+      "Next, ",
+      "The next question is — ",
     ],
     positive: [
-      "Hmm, that's actually a really great answer! ",
-      "Wow okay, very impressive! ",
-      "Oh I love that response! ",
-      "That's exactly the kind of thing we look for! ",
-      "Yes! That was a solid point! ",
-      "Nice, really good answer! ",
+      "That was a great answer! ",
+      "Very impressive! ",
+      "I loved that response! ",
+      "That's exactly what we look for! ",
+      "Solid point! ",
+      "Really good answer! ",
     ],
     encourage: [
       "Take your time, no rush at all. ",
@@ -642,20 +619,20 @@ const fillers = {
   // 🇳🇵 NEPALI-ENGLISH MIX (GenZ Nepali style)
   ne: {
     opening: [
-      "Aba suru garau! Mero pehilo question chai... ",
-      "Okay, changa cha! Mero first question ho... ",
-      "Suru garxau ta! Yo mero pahilo question... ",
-      "Jaau, suru! Mero pehilo question chai... ",
+      "Mero pahilo question chai — ",
+      "Pahilo question sodhxu — ",
+      "Suru garxau, pahilo question — ",
+      "Pahilo question yesto cha — ",
     ],
     transition: [
-      "Hmm, ramro cha! Aba aarkotira jaau — ",
-      "Interesting answer diyau! Okay, next question... ",
-      "Bujhein, nice! Aba arko question sodhxu — ",
-      "Wah, ramro thiyo! Aba next ma jaau... ",
-      "Okay sahi cha! Aba mero arko question chai... ",
-      "Achha thiyo! Aba arko sodhxu — ",
-      "Ramro answer diyau! Chalau aba... ",
-      "Appreciate garxu! Aba arko question... ",
+      "Arko question chai — ",
+      "Next question sodhxu — ",
+      "Aba arko question — ",
+      "Next ma jaau — ",
+      "Arko sodhxu — ",
+      "Thik cha, next question — ",
+      "Aba sodhxu — ",
+      "Arko question yesto cha — ",
     ],
     positive: [
       "Wah, ramro answer diyau! ",
@@ -783,71 +760,46 @@ function startMouthAnimation() {
   stopMouthAnimation();
   let phase = 0;
   mouthInterval = setInterval(() => {
-    const open = document.getElementById('mouthOpen');
-    const inner = document.getElementById('mouthInner');
-    const teeth = document.getElementById('teeth');
-    const closed = document.getElementById('mouthClosed');
-    if(!open) return;
-    
-    // Oscillate mouth open/close naturally
-    const openAmt = Math.abs(Math.sin(phase)) * 7 + Math.random() * 3;
-    open.setAttribute('ry', openAmt);
-    inner.setAttribute('ry', Math.max(0, openAmt - 2));
-    teeth.setAttribute('height', Math.max(0, openAmt - 1));
-    closed.style.opacity = openAmt < 2 ? '1' : '0';
-    phase += 0.35;
-  }, 80);
+    const overlay = document.getElementById('mouthOverlay');
+    if(!overlay) return;
+    // Oscillate mouth open naturally
+    const openAmt = Math.abs(Math.sin(phase)) * 9 + Math.random() * 3;
+    overlay.style.height = openAmt + 'px';
+    phase += 0.32;
+  }, 75);
 }
 
 function stopMouthAnimation() {
   if(mouthInterval) { clearInterval(mouthInterval); mouthInterval = null; }
-  // Close mouth
-  const open = document.getElementById('mouthOpen');
-  const inner = document.getElementById('mouthInner');
-  const teeth = document.getElementById('teeth');
-  const closed = document.getElementById('mouthClosed');
-  if(open) { open.setAttribute('ry','0'); }
-  if(inner) { inner.setAttribute('ry','0'); }
-  if(teeth) { teeth.setAttribute('height','0'); }
-  if(closed) { closed.style.opacity = '1'; }
+  const overlay = document.getElementById('mouthOverlay');
+  if(overlay) overlay.style.height = '0px';
 }
 
-// ── EYE BLINK + MOVEMENT ─────────────────────
 function startEyeMovement() {
-  // Random blinking
-  if(blinkInterval) clearInterval(blinkInterval);
-  blinkInterval = setInterval(() => {
-    if(Math.random() > 0.7) doBlink();
-  }, 2200);
-
-  // Subtle eye movement (look around)
+  // Subtle head bob when speaking
   if(eyeInterval) clearInterval(eyeInterval);
   eyeInterval = setInterval(() => {
-    const dx = (Math.random() - 0.5) * 3;
-    const dy = (Math.random() - 0.5) * 2;
-    const eyeGroup = document.getElementById('eyeGroup');
-    if(eyeGroup) eyeGroup.setAttribute('transform', `translate(${dx},${dy})`);
-  }, 2500);
+    const img = document.getElementById('aiFaceImg');
+    if(!img) return;
+    const dy = (Math.random() - 0.5) * 3;
+    img.style.transform = `translateY(${dy}px)`;
+    img.style.transition = 'transform 0.5s ease';
+  }, 800);
 }
 
-function doBlink() {
-  const lb = document.getElementById('leftBlink');
-  const rb = document.getElementById('rightBlink');
-  if(!lb || !rb) return;
-  // Close eyes
-  lb.setAttribute('ry', '12');
-  rb.setAttribute('ry', '12');
-  setTimeout(() => {
-    lb.setAttribute('ry', '0');
-    rb.setAttribute('ry', '0');
-  }, 120);
-}
+function doBlink() {} // not needed with real image
 
-// Start blinking even when idle
+// Subtle idle head movement
 setTimeout(() => {
-  if(blinkInterval) clearInterval(blinkInterval);
-  blinkInterval = setInterval(() => { doBlink(); }, 3500 + Math.random()*2000);
-}, 2000);
+  blinkInterval = setInterval(() => {
+    const img = document.getElementById('aiFaceImg');
+    if(img && !mouthInterval) {
+      const dx = (Math.random() - 0.5) * 2;
+      img.style.transform = `translateX(${dx}px)`;
+      img.style.transition = 'transform 1.2s ease';
+    }
+  }, 3000);
+}, 1500);
 
 function setAIStatus(text) {
   document.getElementById('aiStatus').textContent = text;
@@ -1193,44 +1145,50 @@ function getBestVoice(lang) {
   const all = window.speechSynthesis.getVoices();
   const code = lang || currentLang || 'en';
 
-  if(code === 'ne' || code === 'Nepali (नेपाली)') {
-    // Nepali voices
-    const neVoice = all.find(v => v.lang === 'ne-NP' || v.lang === 'ne')
-      || all.find(v => v.lang.startsWith('ne'));
-    if(neVoice) return neVoice;
-    // Fallback: Hindi is similar sounding
-    return all.find(v => v.lang === 'hi-IN' || v.lang.startsWith('hi'))
-      || all.find(v => v.lang.startsWith('en'));
+  if(code === 'ne') {
+    // NEPALI: Best smooth voice priority order
+    // Microsoft Natural voices are closest to ChatGPT quality
+    const nepaliBest = [
+      'Microsoft Swara Online (Natural) - Hindi (India)',   // Most natural for Nepali
+      'Microsoft Madhur Online (Natural) - Hindi (India)',  // Male option
+      'Google हिन्दी',                                      // Google Hindi - smooth
+      'Lekha',                                              // Apple Hindi
+      'Microsoft Hemant - Hindi (India)',
+      'Microsoft Kalpana - Hindi (India)',
+    ];
+    for(const name of nepaliBest) {
+      const v = all.find(v => v.name === name);
+      if(v) return v;
+    }
+    // Any Hindi voice beats robotic Nepali
+    const hi = all.find(v => v.lang === 'hi-IN') || all.find(v => v.lang.startsWith('hi'));
+    if(hi) return hi;
+    // Any Nepali voice if available
+    const ne = all.find(v => v.lang === 'ne-NP') || all.find(v => v.lang.startsWith('ne'));
+    if(ne) return ne;
   }
 
-  if(code === 'hi' || code === 'Hindi (हिन्दी)') {
-    // Hindi voices
-    const hiVoice = all.find(v => v.name === 'Google हिन्दी')
-      || all.find(v => v.name.includes('Lekha'))
-      || all.find(v => v.lang === 'hi-IN')
-      || all.find(v => v.lang.startsWith('hi'));
-    if(hiVoice) return hiVoice;
-    // Fallback to English
-    return all.find(v => v.lang.startsWith('en'));
-  }
-
-  // English voices — priority list
-  const priority = [
-    'Google UK English Female',
+  // ENGLISH: Microsoft Natural voices are ChatGPT-level smooth
+  const enBest = [
     'Microsoft Aria Online (Natural) - English (United States)',
     'Microsoft Jenny Online (Natural) - English (United States)',
-    'Samantha',
-    'Karen',
-    'Victoria',
-    'Moira',
+    'Microsoft Emma Online (Natural) - English (United Kingdom)',
+    'Microsoft Libby Online (Natural) - English (United Kingdom)',
+    'Microsoft Sonia Online (Natural) - English (United Kingdom)',
+    'Google UK English Female',
+    'Samantha',           // macOS
+    'Karen',              // macOS Australia
+    'Moira',              // macOS Ireland
+    'Victoria',           // macOS
     'Google US English',
-    'Microsoft Zira',
+    'Microsoft Zira Desktop - English (United States)',
   ];
-  for(const name of priority) {
+  for(const name of enBest) {
     const v = all.find(v => v.name === name);
     if(v) return v;
   }
-  return all.find(v => v.lang.startsWith('en-') && v.name.includes('Female'))
+  return all.find(v => v.lang.startsWith('en-GB'))
+    || all.find(v => v.lang.startsWith('en-US'))
     || all.find(v => v.lang.startsWith('en'))
     || all[0];
 }
@@ -1261,13 +1219,16 @@ function speakSlowly(text, onDone) {
     const utter = new SpeechSynthesisUtterance(raw);
     if(voice) utter.voice = voice;
 
-    // Natural rate — not too slow, not robotic
-    // Vary rate slightly for natural feel
-    const baseRate = 0.88;
-    const variation = (Math.random() * 0.06) - 0.03; // ±0.03
+    // Natural rate — tuned per language for ChatGPT-like smoothness
+    const isNepali = currentLang === 'ne';
+    // Slightly slower for Nepali so Devanagari words are clear
+    const baseRate = isNepali ? 0.85 : 0.92;
+    // Very small variation — too much makes it sound uneven
+    const variation = (Math.random() * 0.04) - 0.02;
     utter.rate = baseRate + variation;
-    utter.pitch = 1.0 + (Math.random() * 0.06 - 0.03); // slight pitch variation
-    utter.volume = 0.95;
+    // Nepali: slightly higher pitch sounds more natural on Hindi voices
+    utter.pitch = isNepali ? 1.1 : 1.0;
+    utter.volume = 1.0;
 
     // Natural pause based on punctuation
     let pause = 280;
