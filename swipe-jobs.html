@@ -1,16 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const _sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co','sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
-const { data: { session } } = await _sb.auth.getSession();
-if (!session) {
-  // Save current page so we can redirect back after login
+<style id="authGuardStyle">body{visibility:hidden!important;}</style>
+<script>
+// INSTANT auth check — reads Supabase session from localStorage synchronously
+// No network request needed — Supabase caches session in localStorage
+(function(){
+  try {
+    // Supabase stores session under this key pattern
+    var keys = Object.keys(localStorage);
+    var sessionKey = keys.find(function(k){ return k.includes('supabase') && k.includes('auth'); });
+    if(sessionKey){
+      var data = JSON.parse(localStorage.getItem(sessionKey));
+      var session = data && (data.session || (data.currentSession));
+      if(session && session.access_token){
+        // Valid session found — show page
+        var st = document.getElementById('authGuardStyle');
+        if(st) st.textContent = '';
+        return; // all good
+      }
+    }
+  } catch(e){}
+  // No session — redirect instantly (page still hidden)
   sessionStorage.setItem('redirectAfterLogin', window.location.href);
-  window.location.href = 'auth.html';
-}
+  window.location.replace('auth.html');
+})();
 </script>
+
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Swipe Jobs — Talentry</title>
