@@ -216,7 +216,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var
 </div>
 
 <!-- Single unified script - no module issues -->
-<script src="https://esm.sh/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // Wait for Supabase UMD to load
 document.addEventListener('DOMContentLoaded', async function() {
@@ -233,19 +233,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     goHome(sb, session.user.id);
     return;
   }
-
-  // Expose functions to global scope for onclick handlers
-  window._sb = sb;
-  window.doLogin = doLogin;
-  window.doSignup = doSignup;
-  window.doForgot = doForgot;
-  window.googleLogin = googleLogin;
-  window.resendEmail = resendEmail;
-  window.switchTab = switchTab;
-  window.selectRole = selectRole;
-  window.togglePass = togglePass;
-  window.checkStrength = checkStrength;
-  window.showLogin = showLogin;
 
   // Handle OAuth callback (Google)
   sb.auth.onAuthStateChange(async (event, session) => {
@@ -429,6 +416,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById('tabSignup').classList.remove('on');
   }
   window.showLogin = showLogin;
+
+  // Expose ALL functions to global scope (must be after definitions)
+  window._sb = sb;
+  window.doLogin = doLogin;
+  window.doSignup = doSignup;
+  window.doForgot = doForgot;
+  window.googleLogin = googleLogin;
+  window.resendEmail = resendEmail;
+  window.selectRole = selectRole;
 
 }); // end DOMContentLoaded
 
