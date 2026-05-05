@@ -111,15 +111,28 @@ async function updateNavbar() {
     // Guest — show general nav
     if (navLinks) navLinks.innerHTML = GUEST_NAV;
     navR.innerHTML = `
-      <button class="btn-ghost" onclick="location.href='auth.html'">Log in</button>
-      <button class="btn-solid" onclick="location.href='auth.html'">Get started free</button>
+      <button class="btn-ghost" onclick="location.href='auth.html'" style="display:none" id="loginGhost">Log in</button>
+      <button class="btn-solid" onclick="location.href='auth.html'" style="font-size:13px;padding:8px 16px;" id="loginSolid">Log in</button>
     `;
+    // On desktop show both buttons
+    if(window.innerWidth > 768) {
+      const ghost = document.getElementById('loginGhost');
+      if(ghost) ghost.style.display = '';
+    }
   }
 }
 
 function toggleUserDropdown() {
   const dd = document.getElementById('userDropdown');
-  if (dd) dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+  if (!dd) return;
+  const isHidden = dd.style.display === 'none' || dd.style.display === '';
+  dd.style.display = isHidden ? 'block' : 'none';
+  // On mobile — position dropdown better
+  if(isHidden && window.innerWidth <= 768) {
+    dd.style.right = '0';
+    dd.style.left = 'auto';
+    dd.style.minWidth = '220px';
+  }
 }
 
 async function signOut() {

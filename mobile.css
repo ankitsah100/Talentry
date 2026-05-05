@@ -205,9 +205,11 @@
 .hamburger.open span:nth-child(2) { opacity: 0; }
 .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
 
-/* HIDE NAV-R BUTTONS ON MOBILE */
+/* MOBILE NAV — show avatar but hide text buttons */
 @media (max-width: 768px) {
-  #navR { display: none !important; }
+  #navR .btn-ghost { display: none !important; }
+  #navR .btn-solid { display: none !important; }
+  #navR { display: flex !important; }
   .hamburger { display: flex !important; }
 
   /* BETTER CARD PADDING ON MOBILE */
