@@ -243,6 +243,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
     <div class="ai-panel" id="aiPanel">
       <div class="ai-panel-grid"></div>
       <div class="ai-panel-label">🤖 Priya — AI Interviewer</div>
+      <div id="langBadge" style="position:absolute;top:14px;right:14px;background:rgba(14,162,113,0.2);border:1px solid rgba(78,205,164,0.4);color:var(--gm);font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;z-index:3;"></div>
 
       <!-- ANIMATED FACE -->
       <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:20px;">
@@ -398,7 +399,7 @@ let transcript = '';
 let speechSynth = window.speechSynthesis;
 let voices = [];
 let currentRole = 'Biomedical Engineer';
-let currentLang = 'English';
+let currentLang = 'en'; // 'en' or 'ne'
 let currentDiff = 'Medium';
 let currentType = 'General HR';
 
@@ -447,6 +448,10 @@ async function startInterview() {
   // Show interview screen
   document.getElementById('setupScreen').style.display = 'none';
   document.getElementById('interviewScreen').classList.add('show');
+
+  // Show language badge
+  const badge = document.getElementById('langBadge');
+  if(badge) badge.textContent = currentLang === 'ne' ? '🇳🇵 Nepali' : '🇬🇧 English';
 
   // Setup candidate video
   if(cameraStream) {
@@ -860,7 +865,7 @@ function startRecording() {
   recognition.continuous = true;
   recognition.interimResults = true;
   // Set recognition language based on selection
-  if(currentLang === 'ne' || currentLang === 'Nepali (नेपाली)') {
+  if(currentLang === 'ne' || currentLang === 'ne') {
     recognition.lang = 'ne-NP';
   } else if(false) {
     recognition.lang = 'hi-IN';
