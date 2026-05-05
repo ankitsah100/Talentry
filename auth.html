@@ -2,459 +2,462 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Login / Sign Up — Talentry</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);min-height:100vh;display:flex;flex-direction:column;}
-nav{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
-.logo{font-family:'Fraunces',serif;font-size:24px;color:var(--text);text-decoration:none;}.logo em{color:var(--g);font-style:italic;}
-.nav-back{font-size:13px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}.nav-back:hover{color:var(--g);}
-.main{flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 64px);}
-.left{background:var(--gd);padding:60px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;}
-.left-glow{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(78,205,164,0.2),transparent 65%);bottom:-100px;right:-100px;pointer-events:none;}
-.left-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
-.left-top{position:relative;}
-.left-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.85);font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;margin-bottom:28px;border:1px solid rgba(255,255,255,0.15);}
-.left-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gm);animation:blink 2s infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.left h2{font-family:'Fraunces',serif;font-size:clamp(28px,3.5vw,42px);color:#fff;line-height:1.15;letter-spacing:-1px;margin-bottom:16px;}
-.left h2 em{color:var(--gm);font-style:italic;}
-.left p{font-size:15px;color:rgba(255,255,255,0.6);line-height:1.75;font-weight:300;max-width:360px;}
-.left-features{display:flex;flex-direction:column;gap:14px;position:relative;}
-.lf{display:flex;align-items:center;gap:14px;}
-.lf-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);}
-.lf-text{font-size:13.5px;color:rgba(255,255,255,0.75);line-height:1.5;}
-.lf-text strong{color:#fff;font-weight:600;}
-.left-stats{display:flex;gap:28px;position:relative;}
-.lst strong{font-family:'Fraunces',serif;font-size:24px;color:#fff;display:block;}
-.lst span{font-size:12px;color:rgba(255,255,255,0.5);}
-.right{display:flex;align-items:center;justify-content:center;padding:40px;}
-.auth-box{width:100%;max-width:440px;}
-.auth-tabs{display:flex;background:var(--bg2);border-radius:14px;padding:4px;margin-bottom:32px;border:1.5px solid var(--border);}
-.atab{flex:1;padding:11px;border-radius:10px;border:none;background:transparent;font-size:14px;font-weight:500;font-family:inherit;color:var(--muted);cursor:pointer;transition:all .2s;}
-.atab.on{background:#fff;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.06);}
-.role-select{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
-.role-card{border:1.5px solid var(--border2);border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;text-align:center;}
+:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+.left{background:var(--gd);padding:60px 8%;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
+.left-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;}
+.left-logo{font-family:'Fraunces',serif;font-size:28px;color:#fff;text-decoration:none;margin-bottom:48px;display:inline-block;}
+.left-logo em{color:var(--gm);font-style:italic;}
+.left h1{font-family:'Fraunces',serif;font-size:clamp(28px,4vw,42px);color:#fff;letter-spacing:-1px;line-height:1.15;margin-bottom:14px;}
+.left h1 em{color:var(--gm);font-style:italic;}
+.left p{font-size:15px;color:rgba(255,255,255,.55);font-weight:300;line-height:1.8;margin-bottom:32px;}
+.feat{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:14px;color:rgba(255,255,255,.7);}
+.feat-dot{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.right{padding:40px 8%;display:flex;flex-direction:column;justify-content:center;overflow-y:auto;}
+.form-box{max-width:420px;width:100%;margin:0 auto;}
+/* TABS */
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--bg2);border-radius:14px;padding:4px;margin-bottom:28px;}
+.tab{padding:10px;border-radius:10px;border:none;background:none;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;color:var(--muted);transition:all .2s;}
+.tab.on{background:#fff;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.08);}
+/* FORM */
+.form-title{font-family:'Fraunces',serif;font-size:24px;color:var(--text);letter-spacing:-0.5px;margin-bottom:6px;}
+.form-sub{font-size:14px;color:var(--muted);margin-bottom:24px;font-weight:300;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em;}
+.field label span{color:#ef4444;}
+.field input{width:100%;padding:11px 14px;border:1.5px solid var(--border2);border-radius:12px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:all .2s;}
+.field input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(14,162,113,.1);}
+.pass-wrap{position:relative;}
+.pass-wrap input{padding-right:44px;}
+.pass-wrap button{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+/* ROLE CARDS */
+.role-label{font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em;}
+.role-req{color:#ef4444;}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.role-card{border:1.5px solid var(--border2);border-radius:14px;padding:14px 12px;cursor:pointer;transition:all .2s;text-align:center;background:#fff;}
 .role-card:hover{border-color:var(--gm);}
 .role-card.on{border-color:var(--g);background:var(--gl);}
-.role-ico{font-size:24px;margin-bottom:8px;}
-.role-name{font-size:13.5px;font-weight:600;color:var(--text);}
-.role-desc{font-size:11.5px;color:var(--muted);margin-top:3px;}
-.form-title{font-family:'Fraunces',serif;font-size:26px;color:var(--text);letter-spacing:-0.5px;margin-bottom:6px;}
-.form-sub{font-size:14px;color:var(--muted);margin-bottom:28px;font-weight:300;}
-.field{margin-bottom:16px;}
-.field label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
-.field input{width:100%;padding:12px 16px;border:1.5px solid var(--border2);border-radius:12px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:all .2s;}
-.field input:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(14,162,113,0.1);}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.pass-wrap{position:relative;}
-.pass-wrap input{padding-right:46px;}
-.pass-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);}
-.divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+.role-ico{font-size:22px;margin-bottom:6px;}
+.role-name{font-size:13px;font-weight:600;color:var(--text);}
+.role-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+/* GOOGLE */
+.social-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border:1.5px solid var(--border2);border-radius:12px;background:#fff;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;transition:all .2s;margin-bottom:14px;}
+.social-btn:hover{border-color:var(--g);background:var(--bg2);}
+.google-ico{width:20px;height:20px;border-radius:4px;background:#4285F4;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
 .divider-line{flex:1;height:1px;background:var(--border2);}
 .divider-text{font-size:12px;color:var(--muted);}
-.social-btns{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
-.social-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px;border:1.5px solid var(--border2);border-radius:12px;background:#fff;font-size:14px;font-weight:500;font-family:inherit;color:var(--text);cursor:pointer;transition:all .2s;}
-.social-btn:hover{border-color:var(--gm);background:var(--bg2);}
-.social-icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
-.submit-btn{width:100%;padding:14px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:4px;}
+/* SUBMIT */
+.submit-btn{width:100%;padding:13px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;transition:all .2s;margin-top:4px;}
 .submit-btn:hover{background:var(--gd);}
 .submit-btn:disabled{background:var(--muted);cursor:not-allowed;}
-.form-note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.6;}
-.form-note a{color:var(--g);text-decoration:none;cursor:pointer;}
-.forgot{font-size:12.5px;color:var(--g);text-decoration:none;display:block;text-align:right;margin-top:6px;margin-bottom:4px;cursor:pointer;}
-.strength-wrap{margin-top:6px;}
-.strength-bars{display:flex;gap:4px;margin-bottom:4px;}
-.sbar{height:3px;flex:1;border-radius:2px;background:var(--border2);transition:background .3s;}
-.strength-text{font-size:11px;color:var(--muted);}
-.terms-cb{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;}
-.terms-cb input{margin-top:2px;accent-color:var(--g);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
-.terms-cb span{font-size:12.5px;color:var(--muted);line-height:1.6;}
-.terms-cb a{color:var(--g);text-decoration:none;}
-.error-msg{background:#ffe8e8;color:#9b1c1c;border:1px solid #f5c1c1;border-radius:10px;padding:12px 16px;font-size:13px;margin-bottom:16px;display:none;}
+/* ERROR */
+.error-msg{font-size:13.5px;padding:12px 14px;border-radius:10px;background:#ffe8e8;color:#9b1c1c;margin-bottom:14px;display:none;line-height:1.6;}
 .error-msg.show{display:block;}
-.success-screen{display:none;text-align:center;padding:20px 0;}
+.error-msg.success{background:var(--gl);color:var(--gd);}
+.error-msg.warn{background:#fff3d6;color:#7a4e00;}
+/* TERMS */
+.terms-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:14px;font-size:12.5px;color:var(--muted);}
+.terms-row input{margin-top:2px;flex-shrink:0;}
+.terms-row a{color:var(--g);}
+/* STRENGTH */
+.strength-bars{display:flex;gap:4px;margin-top:6px;}
+.sb{height:3px;flex:1;border-radius:2px;background:var(--border2);}
+.strength-text{font-size:11px;color:var(--muted);margin-top:4px;}
+/* FORGOT */
+.forgot{font-size:12.5px;color:var(--g);background:none;border:none;cursor:pointer;font-family:inherit;text-align:right;display:block;margin-top:6px;margin-bottom:4px;margin-left:auto;}
+/* SUCCESS */
+.success-screen{display:none;text-align:center;padding:30px 0;}
 .success-screen.show{display:block;}
-.success-ico{font-size:56px;margin-bottom:16px;}
-.success-title{font-family:'Fraunces',serif;font-size:28px;color:var(--text);letter-spacing:-0.5px;margin-bottom:8px;}
-.success-title em{color:var(--g);font-style:italic;}
-.success-sub{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px;font-weight:300;}
-.success-btn{display:inline-block;background:var(--g);color:#fff;border:none;padding:13px 32px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;text-decoration:none;}
-.hidden{display:none;}
+.success-ico{font-size:52px;margin-bottom:14px;}
+.success-title{font-family:'Fraunces',serif;font-size:22px;color:var(--text);letter-spacing:-0.5px;margin-bottom:8px;}
+.success-msg{font-size:14px;color:var(--muted);line-height:1.7;}
+/* SWITCH */
+.switch-text{font-size:13px;color:var(--muted);text-align:center;margin-top:18px;}
+.switch-text button{background:none;border:none;color:var(--g);font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
+/* HIDDEN */
+.hidden{display:none!important;}
+/* MOBILE */
+@media(max-width:700px){body{grid-template-columns:1fr;}.left{display:none;}.right{padding:24px 5%;}}
 </style>
-<link rel="stylesheet" href="mobile.css"/>
 </head>
 <body>
-<nav>
-  <a class="logo" href="index.html">Tal<em>entry</em></a>
-  <a class="nav-back" href="index.html">← Back to home</a>
-</nav>
-<div class="main">
-  <div class="left">
-    <div class="left-grid"></div>
-    <div class="left-glow"></div>
-    <div class="left-top">
-      <div class="left-badge"><div class="left-badge-dot"></div>Nepal's #1 healthcare job portal</div>
-      <h2>Your healthcare<br>career starts <em>here</em></h2>
-      <p>Join 10,000+ healthcare professionals and 200+ hospitals already on Talentry.</p>
+
+<!-- LEFT PANEL -->
+<div class="left">
+  <div class="left-grid"></div>
+  <a class="left-logo" href="index.html">Tal<em>entry</em></a>
+  <h1>Nepal's AI healthcare<br><em>job portal</em></h1>
+  <p>Join 10,000+ healthcare professionals and 200+ hospitals already on Talentry.</p>
+  <div class="feat"><div class="feat-dot">🤖</div>AI job matching & interview coach</div>
+  <div class="feat"><div class="feat-dot">📄</div>Resume builder with 6 templates</div>
+  <div class="feat"><div class="feat-dot">💰</div>Salary insights for Nepal healthcare</div>
+  <div class="feat"><div class="feat-dot">🎬</div>AI video interview practice</div>
+  <div class="feat"><div class="feat-dot">💼</div>Swipe jobs — Tinder-style</div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="right">
+  <div class="form-box">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab on" id="tabLogin" onclick="switchTab('login')">Log in</button>
+      <button class="tab" id="tabSignup" onclick="switchTab('signup')">Sign up free</button>
     </div>
-    <div class="left-features">
-      <div class="lf"><div class="lf-icon">🤖</div><div class="lf-text"><strong>AI job matching</strong> — Jobs matched to your real skills</div></div>
-      <div class="lf"><div class="lf-icon">🎙</div><div class="lf-text"><strong>AI interview prep</strong> — Practice and get scored</div></div>
-      <div class="lf"><div class="lf-icon">💬</div><div class="lf-text"><strong>WhatsApp alerts</strong> — Never miss an opportunity</div></div>
-      <div class="lf"><div class="lf-icon">📄</div><div class="lf-text"><strong>Resume builder</strong> — 32 ATS-ready templates</div></div>
-      <div class="lf"><div class="lf-icon">💰</div><div class="lf-text"><strong>Salary insights</strong> — Know your market value</div></div>
+
+    <!-- ERROR -->
+    <div class="error-msg" id="errorMsg"></div>
+    <div id="resendWrap" style="display:none;text-align:center;margin-bottom:12px;">
+      <button onclick="resendEmail()" style="background:none;border:none;color:var(--g);font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;">📧 Resend confirmation email</button>
     </div>
-    <div class="left-stats">
-      <div class="lst"><strong>500+</strong><span>Active jobs</span></div>
-      <div class="lst"><strong>200+</strong><span>Hospitals</span></div>
-      <div class="lst"><strong>Free</strong><span>Forever</span></div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-ico" id="successIco">🎉</div>
+      <div class="success-title" id="successTitle">You're in!</div>
+      <div class="success-msg" id="successMsg">Taking you there...</div>
+      <button id="successBtn" style="display:none;margin-top:18px;background:var(--g);color:#fff;border:none;padding:11px 26px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;" onclick="showLogin()">→ Go to login</button>
     </div>
-  </div>
-  <div class="right">
-    <div class="auth-box">
-      <div class="auth-tabs">
-        <button class="atab on" onclick="switchTab('login')">Log in</button>
-        <button class="atab" onclick="switchTab('signup')">Sign up free</button>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="form-title">Welcome back</div>
+      <div class="form-sub">Log in to your Talentry account</div>
+
+      <button class="social-btn" onclick="googleLogin()">
+        <div class="google-ico">G</div>
+        Continue with Google
+      </button>
+      <div class="divider"><div class="divider-line"></div><span class="divider-text">or continue with email</span><div class="divider-line"></div></div>
+
+      <div class="field"><label>Email address</label><input type="email" id="loginEmail" placeholder="you@example.com"/></div>
+      <div class="field">
+        <label>Password</label>
+        <div class="pass-wrap">
+          <input type="password" id="loginPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/>
+          <button onclick="togglePass('loginPass',this)">👁</button>
+        </div>
+        <button class="forgot" onclick="doForgot()">Forgot password?</button>
+      </div>
+      <button class="submit-btn" id="loginBtn" onclick="doLogin()">Log in to Talentry</button>
+      <div class="switch-text">Don't have an account? <button onclick="switchTab('signup')">Sign up free</button></div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" class="hidden">
+      <div class="form-title">Create your account</div>
+      <div class="form-sub">Join Talentry free — no credit card needed</div>
+
+      <button class="social-btn" onclick="googleLogin()">
+        <div class="google-ico">G</div>
+        Sign up with Google
+      </button>
+      <div class="divider"><div class="divider-line"></div><span class="divider-text">or sign up with email</span><div class="divider-line"></div></div>
+
+      <!-- ROLE SELECTION - required, no default -->
+      <div class="role-label">I am a <span class="role-req">*</span></div>
+      <div class="role-grid">
+        <div class="role-card" id="roleJobseeker" onclick="selectRole('jobseeker')">
+          <div class="role-ico">👤</div>
+          <div class="role-name">Job Seeker</div>
+          <div class="role-desc">Find healthcare jobs</div>
+        </div>
+        <div class="role-card" id="roleEmployer" onclick="selectRole('employer')">
+          <div class="role-ico">🏥</div>
+          <div class="role-name">Employer</div>
+          <div class="role-desc">Post jobs & hire</div>
+        </div>
       </div>
 
-      <!-- ERROR -->
-      <div class="error-msg" id="errorMsg"></div>
+      <div class="field-row">
+        <div class="field"><label>First name <span>*</span></label><input type="text" id="firstName" placeholder="Ram"/></div>
+        <div class="field"><label>Last name</label><input type="text" id="lastName" placeholder="Shrestha"/></div>
+      </div>
+      <div class="field"><label>Email address <span>*</span></label><input type="email" id="signupEmail" placeholder="you@example.com"/></div>
+      <div class="field"><label>Phone number</label><input type="tel" id="signupPhone" placeholder="+977 98XXXXXXXX"/></div>
 
-      <!-- LOGIN -->
-      <div id="loginForm">
-        <h2 class="form-title">Welcome back</h2>
-        <p class="form-sub">Log in to your Talentry account</p>
-        <div class="social-btns">
-          <button class="social-btn" onclick="signInWithGoogle()"><div class="social-icon" style="background:#4285F4;color:#fff;width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">G</div>Continue with Google</button>
-        </div>
-        <div class="divider"><div class="divider-line"></div><span class="divider-text">or continue with email</span><div class="divider-line"></div></div>
-        <div class="field">
-          <label>Email address</label>
-          <input type="email" id="loginEmail" placeholder="you@example.com"/>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <div class="pass-wrap">
-            <input type="password" id="loginPass" placeholder="Enter your password"/>
-            <button class="pass-toggle" onclick="togglePass('loginPass',this)">👁</button>
-          </div>
-          <span class="forgot" onclick="handleForgot()">Forgot password?</span>
-        </div>
-        <button class="submit-btn" id="loginBtn" onclick="handleLogin()">Log in to Talentry</button>
-        <p class="form-note">Don't have an account? <a onclick="switchTab('signup')">Sign up free</a></p>
+      <!-- Jobseeker fields -->
+      <div id="jobseekerFields" class="hidden">
+        <div class="field"><label>Current job title</label><input type="text" id="jobTitle" placeholder="e.g. Biomedical Engineer"/></div>
       </div>
 
-      <!-- SIGNUP -->
-      <div id="signupForm" class="hidden">
-        <h2 class="form-title">Create your account</h2>
-        <p class="form-sub">Join Talentry free — no credit card needed</p>
-        <div class="social-btns">
-          <button class="social-btn" onclick="signInWithGoogle()"><div class="social-icon" style="background:#4285F4;color:#fff;width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">G</div>Sign up with Google</button>
-        </div>
-        <div class="divider"><div class="divider-line"></div><span class="divider-text">or sign up with email</span><div class="divider-line"></div></div>
-        <div style="font-size:13px;font-weight:600;color:#0a1a12;margin-bottom:10px;">Choose your role <span style="color:#ef4444">*</span></div>
-        <div class="role-select">
-          <div class="role-card" id="roleJobseeker" onclick="selectRole('jobseeker')">
-            <div class="role-ico">👤</div>
-            <div class="role-name">Job seeker</div>
-            <div class="role-desc">Find healthcare jobs</div>
-          </div>
-          <div class="role-card" id="roleEmployer" onclick="selectRole('employer')">
-            <div class="role-ico">🏥</div>
-            <div class="role-name">Employer</div>
-            <div class="role-desc">Post jobs & hire</div>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field"><label>First name</label><input type="text" id="firstName" placeholder="Ram"/></div>
-          <div class="field"><label>Last name</label><input type="text" id="lastName" placeholder="Shrestha"/></div>
-        </div>
-        <div class="field"><label>Email address</label><input type="email" id="signupEmail" placeholder="you@example.com"/></div>
-        <div class="field"><label>Phone (for WhatsApp alerts)</label><input type="tel" id="signupPhone" placeholder="+977 98XXXXXXXX"/></div>
-        <div id="jobseekerFields">
-          <div class="field"><label>Job title / Role</label><input type="text" id="jobTitle" placeholder="e.g. Biomedical Engineer"/></div>
-        </div>
-        <div id="employerFields" class="hidden">
-          <div class="field"><label>Hospital / Company name</label><input type="text" id="companyName" placeholder="e.g. Bir Hospital"/></div>
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <div class="pass-wrap">
-            <input type="password" id="signupPass" placeholder="Create a strong password" oninput="checkStrength(this.value)"/>
-            <button class="pass-toggle" onclick="togglePass('signupPass',this)">👁</button>
-          </div>
-          <div class="strength-wrap">
-            <div class="strength-bars">
-              <div class="sbar" id="sb1"></div><div class="sbar" id="sb2"></div>
-              <div class="sbar" id="sb3"></div><div class="sbar" id="sb4"></div>
-            </div>
-            <div class="strength-text" id="strengthText"></div>
-          </div>
-        </div>
-        <div class="terms-cb">
-          <input type="checkbox" id="termsCheck"/>
-          <span>I agree to Talentry's <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>.</span>
-        </div>
-        <button class="submit-btn" id="signupBtn" onclick="handleSignup()">Create free account</button>
-        <p class="form-note">Already have an account? <a onclick="switchTab('login')">Log in</a></p>
+      <!-- Employer fields -->
+      <div id="employerFields" class="hidden">
+        <div class="field"><label>Hospital / Company name <span>*</span></label><input type="text" id="companyName" placeholder="e.g. Bir Hospital"/></div>
       </div>
 
-      <!-- SUCCESS -->
-      <div class="success-screen" id="successScreen">
-        <div class="success-ico">🎉</div>
-        <h2 class="success-title">Welcome to <em>Talentry!</em></h2>
-        <p class="success-sub" id="successMsg">Your account is ready. Start exploring healthcare jobs across Nepal.</p>
-        <button class="success-btn" onclick="location.href='browse-jobs.html'">Browse jobs →</button>
+      <div class="field">
+        <label>Password <span>*</span></label>
+        <div class="pass-wrap">
+          <input type="password" id="signupPass" placeholder="Min. 6 characters" oninput="checkStrength(this.value)"/>
+          <button onclick="togglePass('signupPass',this)">👁</button>
+        </div>
+        <div class="strength-bars"><div class="sb" id="sb1"></div><div class="sb" id="sb2"></div><div class="sb" id="sb3"></div><div class="sb" id="sb4"></div></div>
+        <div class="strength-text" id="strengthText"></div>
       </div>
+
+      <div class="terms-row">
+        <input type="checkbox" id="termsCheck"/>
+        <span>I agree to Talentry's <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a></span>
+      </div>
+
+      <button class="submit-btn" id="signupBtn" onclick="doSignup()">Create free account</button>
+      <div class="switch-text">Already have an account? <button onclick="switchTab('login')">Log in</button></div>
     </div>
+
   </div>
 </div>
 
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const supabase = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
-window._sb = supabase;
+<!-- Single unified script - no module issues -->
+<script src="https://esm.sh/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+// Wait for Supabase UMD to load
+document.addEventListener('DOMContentLoaded', async function() {
 
-async function resendConfirmation() {
-  const email = document.getElementById('loginEmail').value.trim();
-  if(!email) { alert('Please enter your email address first'); return; }
-  const { error } = await supabase.auth.resend({ type: 'signup', email });
-  if(!error) {
-    document.getElementById('errorMsg').textContent = '✅ Confirmation email resent! Check your inbox.';
-    document.getElementById('errorMsg').style.background = '#d6f5eb';
-    document.getElementById('errorMsg').style.color = '#064e38';
-    document.getElementById('resendWrap').style.display = 'none';
-  } else {
-    alert('Could not resend: ' + error.message);
+  // Init Supabase
+  const sb = window.supabase.createClient(
+    'https://eteyskwaqjtcybaolnto.supabase.co',
+    'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe'
+  );
+
+  // If already logged in, redirect away from auth page
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    goHome(sb, session.user.id);
+    return;
   }
-}
 
-// Check if already logged in
-const { data: { session } } = await supabase.auth.getSession();
-if (session) {
-  const redirect = sessionStorage.getItem('redirectAfterLogin');
-  sessionStorage.removeItem('redirectAfterLogin');
-  // Never redirect back to auth page — prevents loop
-  const safePage = redirect && redirect.indexOf('auth.html') === -1 ? redirect : 'browse-jobs.html';
-  window.location.href = safePage;
-}
+  // Expose functions to global scope for onclick handlers
+  window._sb = sb;
+  window.doLogin = doLogin;
+  window.doSignup = doSignup;
+  window.doForgot = doForgot;
+  window.googleLogin = googleLogin;
+  window.resendEmail = resendEmail;
+  window.switchTab = switchTab;
+  window.selectRole = selectRole;
+  window.togglePass = togglePass;
+  window.checkStrength = checkStrength;
+  window.showLogin = showLogin;
 
-// Handle OAuth redirect (Google sign in)
-supabase.auth.onAuthStateChange((event, session) => {
-  // Only handle OAuth callback — not initial page load
-  if (event === 'SIGNED_IN' && session) {
-    // Check if this was triggered by OAuth (URL has #access_token or code param)
-    const isOAuth = window.location.hash.includes('access_token') || 
-                    window.location.search.includes('code=');
-    if (isOAuth) {
+  // Handle OAuth callback (Google)
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session && window.location.hash.includes('access_token')) {
+      goHome(sb, session.user.id);
+    }
+  });
+
+  async function goHome(sb, userId) {
+    try {
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', userId).single();
       const redirect = sessionStorage.getItem('redirectAfterLogin');
       sessionStorage.removeItem('redirectAfterLogin');
-      const safePage = redirect && !redirect.includes('auth.html') ? redirect : 'browse-jobs.html';
-      window.location.href = safePage;
+      let dest = 'browse-jobs.html';
+      if (profile?.role === 'employer') dest = 'employer-dashboard.html';
+      if (redirect && !redirect.includes('auth.html')) dest = redirect;
+      window.location.href = dest;
+    } catch(e) {
+      const redirect = sessionStorage.getItem('redirectAfterLogin');
+      sessionStorage.removeItem('redirectAfterLogin');
+      window.location.href = (redirect && !redirect.includes('auth.html')) ? redirect : 'browse-jobs.html';
     }
   }
-});
-</script>
 
-<script>
-let currentRole = '';
-
-function switchTab(tab){
-  document.querySelectorAll('.atab').forEach((t,i)=>t.classList.toggle('on',(tab==='login'&&i===0)||(tab==='signup'&&i===1)));
-  document.getElementById('loginForm').classList.toggle('hidden',tab!=='login');
-  document.getElementById('signupForm').classList.toggle('hidden',tab!=='signup');
-  document.getElementById('errorMsg').classList.remove('show');
-}
-
-function selectRole(role){
-  currentRole = role;
-  document.getElementById('roleJobseeker').classList.toggle('on',role==='jobseeker');
-  document.getElementById('roleEmployer').classList.toggle('on',role==='employer');
-  document.getElementById('jobseekerFields').classList.toggle('hidden',role!=='jobseeker');
-  document.getElementById('employerFields').classList.toggle('hidden',role!=='employer');
-  // Clear error border
-  document.getElementById('roleJobseeker').style.border='';
-  document.getElementById('roleEmployer').style.border='';
-}
-
-function togglePass(id,btn){
-  const inp=document.getElementById(id);
-  inp.type=inp.type==='password'?'text':'password';
-  btn.textContent=inp.type==='password'?'👁':'🙈';
-}
-
-function checkStrength(val){
-  let score=0;
-  if(val.length>=8)score++;
-  if(/[A-Z]/.test(val))score++;
-  if(/[0-9]/.test(val))score++;
-  if(/[^A-Za-z0-9]/.test(val))score++;
-  const colors=['','#e24b4a','#f0a500','#0ea271','#064e38'];
-  const labels=['','Weak','Fair','Good','Strong'];
-  for(let i=1;i<=4;i++) document.getElementById('sb'+i).style.background=i<=score?colors[score]:'';
-  document.getElementById('strengthText').textContent=val.length?labels[score]:'';
-  document.getElementById('strengthText').style.color=colors[score];
-}
-
-function showError(msg){
-  const el=document.getElementById('errorMsg');
-  const resend=document.getElementById('resendWrap');
-  // User-friendly messages
-  if(msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')){
-    msg='❌ Wrong email or password. Did you confirm your email after signing up?';
-    if(resend) resend.style.display='block';
-  } else if(msg.includes('Email not confirmed') || msg.includes('email_not_confirmed')){
-    msg='📧 Please confirm your email first. Check your inbox for the confirmation link.';
-    el.style.background='#fff3d6'; el.style.color='#7a4e00'; el.style.border='1.5px solid #f59e0b';
-    if(resend) resend.style.display='block';
-  } else if(msg.includes('User already registered')){
-    msg='⚠️ This email is already registered. Please log in instead.';
-  } else if(msg.includes('Password should be at least')){
-    msg='❌ Password must be at least 6 characters.';
-  } else if(msg.includes('Unable to validate email')){
-    msg='❌ Please enter a valid email address.';
-  } else if(msg.includes('Too many requests')){
-    msg='⏳ Too many attempts. Please wait a few minutes.';
-  }
-  el.textContent=msg;
-  el.classList.add('show');
-}
-
-async function handleLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const password=document.getElementById('loginPass').value;
-  if(!email||!password){showError('Please enter your email and password.');return;}
-  const btn=document.getElementById('loginBtn');
-  btn.textContent='Logging in...';btn.disabled=true;
-  document.getElementById('errorMsg').classList.remove('show');
-  const {error}=await window._sb.auth.signInWithPassword({email,password});
-  if(error){showError(error.message);btn.textContent='Log in to Talentry';btn.disabled=false;return;}
-  document.getElementById('loginForm').classList.add('hidden');
-  document.getElementById('successScreen').classList.add('show');
-  // Get role from profile to show correct redirect
-  let landingPage = 'browse-jobs.html';
-  try {
-    const { data: profile } = await window._sb.from('profiles').select('role').eq('id', (await window._sb.auth.getUser()).data.user.id).single();
-    if(profile?.role === 'employer') landingPage = 'employer-dashboard.html';
-  } catch(e) {}
-  const redirect = sessionStorage.getItem('redirectAfterLogin');
-  sessionStorage.removeItem('redirectAfterLogin');
-  const safePage = redirect && !redirect.includes('auth.html') ? redirect : landingPage;
-  document.getElementById('successMsg').textContent = landingPage === 'employer-dashboard.html' ? '🏥 Welcome! Taking you to your dashboard...' : '👋 Welcome back! Taking you to jobs...';
-  setTimeout(() => { location.href = safePage; }, 1200);
-}
-
-async function handleSignup(){
-  if(!document.getElementById('termsCheck').checked){showError('Please agree to the Terms of Service.');return;}
-  const email=document.getElementById('signupEmail').value.trim();
-  const password=document.getElementById('signupPass').value;
-  const firstName=document.getElementById('firstName').value.trim();
-  const lastName=document.getElementById('lastName').value.trim();
-  const phone=document.getElementById('signupPhone').value.trim();
-  if(!currentRole){showError('⚠️ Please select your role — Job Seeker or Employer.');document.getElementById('roleJobseeker').style.border='2px solid #ef4444';document.getElementById('roleEmployer').style.border='2px solid #ef4444';return;}
-  if(!email||!password||!firstName){showError('Please fill in all required fields.');return;}
-  if(password.length<6){showError('Password must be at least 6 characters.');return;}
-  const btn=document.getElementById('signupBtn');
-  btn.textContent='Creating account...';btn.disabled=true;
-  document.getElementById('errorMsg').classList.remove('show');
-  const fullName=firstName+' '+lastName;
-  const extraData={full_name:fullName,phone,role:currentRole};
-  if(currentRole==='jobseeker') extraData.job_title=document.getElementById('jobTitle').value.trim();
-  if(currentRole==='employer') extraData.company_name=document.getElementById('companyName').value.trim();
-  const {data:signupData, error}=await window._sb.auth.signUp({email,password,options:{data:extraData}});
-  if(error){showError(error.message);btn.textContent='Create free account';btn.disabled=false;return;}
-  
-  // Manually upsert profile to ensure role is saved correctly
-  if(signupData?.user){
-    try {
-      await window._sb.from('profiles').upsert({
-        id: signupData.user.id,
-        full_name: fullName,
-        email: email,
-        phone: phone,
-        role: currentRole,
-        job_title: currentRole==='jobseeker' ? document.getElementById('jobTitle').value.trim() : null,
-        company_name: currentRole==='employer' ? document.getElementById('companyName').value.trim() : null,
-        created_at: new Date().toISOString()
-      }, { onConflict: 'id' });
-    } catch(e) { console.log('Profile save error:', e); }
-  }
-  
-  document.getElementById('signupForm').classList.add('hidden');
-  document.getElementById('successScreen').classList.add('show');
-  const msgEl = document.getElementById('successMsg');
-  if(msgEl) {
-    msgEl.textContent = currentRole === 'employer'
-      ? '🏥 Employer account created! Check your email inbox and click the confirmation link, then log in.'
-      : '👤 Account created! Check your email inbox and click the confirmation link, then log in.';
-  }
-  // Show login tab button after 3 seconds
-  setTimeout(() => {
-    const ss = document.getElementById('successScreen');
-    if(ss) {
-      const btn = document.createElement('button');
-      btn.textContent = '→ Go to login';
-      btn.style.cssText = 'margin-top:16px;background:#0ea271;color:#fff;border:none;padding:11px 24px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;';
-      btn.onclick = () => { 
-        ss.classList.remove('show');
-        document.getElementById('loginForm').classList.remove('hidden');
-        document.querySelectorAll('.atab').forEach((t,i)=>t.classList.toggle('on',i===0));
-      };
-      ss.appendChild(btn);
+  function showErr(msg, type) {
+    const el = document.getElementById('errorMsg');
+    const resend = document.getElementById('resendWrap');
+    el.className = 'error-msg show' + (type === 'warn' ? ' warn' : type === 'success' ? ' success' : '');
+    // Friendly messages
+    if (msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')) {
+      msg = '❌ Wrong email or password. If you just signed up, please confirm your email first.';
+      if (resend) resend.style.display = 'block';
+    } else if (msg.includes('Email not confirmed') || msg.includes('email_not_confirmed')) {
+      msg = '📧 Please confirm your email first — check your inbox for the confirmation link.';
+      el.className = 'error-msg show warn';
+      if (resend) resend.style.display = 'block';
+    } else if (msg.includes('User already registered') || msg.includes('already been registered')) {
+      msg = '⚠️ This email is already registered. Please log in instead.';
+    } else if (msg.includes('Password should be at least') || msg.includes('password')) {
+      msg = '❌ Password must be at least 6 characters.';
+    } else if (msg.includes('Too many requests') || msg.includes('rate limit')) {
+      msg = '⏳ Too many attempts. Please wait a few minutes.';
+    } else if (msg.includes('Unable to validate email') || msg.includes('invalid email')) {
+      msg = '❌ Please enter a valid email address.';
     }
-  }, 2000);
+    el.textContent = msg;
+  }
+
+  function hideErr() {
+    document.getElementById('errorMsg').classList.remove('show');
+    document.getElementById('resendWrap').style.display = 'none';
+  }
+
+  async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+    if (!email || !password) { showErr('Please enter your email and password.'); return; }
+    const btn = document.getElementById('loginBtn');
+    btn.textContent = 'Logging in...'; btn.disabled = true;
+    hideErr();
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { showErr(error.message); btn.textContent = 'Log in to Talentry'; btn.disabled = false; return; }
+    const { data: { user } } = await sb.auth.getUser();
+    showSuccess('🎉', "You're in!", 'Welcome back! Redirecting you...');
+    setTimeout(() => goHome(sb, user.id), 1200);
+  }
+
+  let currentRole = '';
+
+  function selectRole(role) {
+    currentRole = role;
+    document.getElementById('roleJobseeker').classList.toggle('on', role === 'jobseeker');
+    document.getElementById('roleEmployer').classList.toggle('on', role === 'employer');
+    document.getElementById('jobseekerFields').classList.toggle('hidden', role !== 'jobseeker');
+    document.getElementById('employerFields').classList.toggle('hidden', role !== 'employer');
+    document.getElementById('roleJobseeker').style.borderColor = '';
+    document.getElementById('roleEmployer').style.borderColor = '';
+  }
+  window.selectRole = selectRole;
+
+  async function doSignup() {
+    if (!currentRole) {
+      showErr('⚠️ Please select your role — Job Seeker or Employer.');
+      document.getElementById('roleJobseeker').style.borderColor = '#ef4444';
+      document.getElementById('roleEmployer').style.borderColor = '#ef4444';
+      return;
+    }
+    if (!document.getElementById('termsCheck').checked) { showErr('Please agree to the Terms of Service.'); return; }
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPass').value;
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const phone = document.getElementById('signupPhone').value.trim();
+    if (!email || !password || !firstName) { showErr('Please fill in all required fields.'); return; }
+    if (password.length < 6) { showErr('Password must be at least 6 characters.'); return; }
+    if (currentRole === 'employer' && !document.getElementById('companyName').value.trim()) {
+      showErr('Please enter your hospital or company name.'); return;
+    }
+    const btn = document.getElementById('signupBtn');
+    btn.textContent = 'Creating account...'; btn.disabled = true;
+    hideErr();
+    const fullName = (firstName + ' ' + lastName).trim();
+    const extraData = {
+      full_name: fullName,
+      phone: phone,
+      role: currentRole,
+      job_title: currentRole === 'jobseeker' ? document.getElementById('jobTitle').value.trim() : '',
+      company_name: currentRole === 'employer' ? document.getElementById('companyName').value.trim() : ''
+    };
+    const { data: signupData, error } = await sb.auth.signUp({
+      email, password,
+      options: { data: extraData }
+    });
+    if (error) { showErr(error.message); btn.textContent = 'Create free account'; btn.disabled = false; return; }
+
+    // Save profile manually to ensure role is stored
+    if (signupData?.user) {
+      try {
+        await sb.from('profiles').upsert({
+          id: signupData.user.id,
+          full_name: fullName,
+          email: email,
+          phone: phone,
+          role: currentRole,
+          job_title: extraData.job_title,
+          company_name: extraData.company_name
+        }, { onConflict: 'id' });
+      } catch(e) { console.log('Profile save:', e); }
+    }
+
+    showSuccess(
+      '📧',
+      'Check your email!',
+      `We sent a confirmation link to ${email}. Click it to activate your account, then come back to log in.`
+    );
+    setTimeout(() => { document.getElementById('successBtn').style.display = 'inline-block'; }, 2000);
+  }
+
+  async function doForgot() {
+    const email = document.getElementById('loginEmail').value.trim();
+    if (!email) { showErr('Enter your email first, then click Forgot password.'); return; }
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://talentry-nu.vercel.app/auth.html'
+    });
+    if (!error) {
+      showErr('✅ Password reset email sent! Check your inbox.', 'success');
+    } else {
+      showErr(error.message);
+    }
+  }
+
+  async function googleLogin() {
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: 'https://talentry-nu.vercel.app/auth.html' }
+    });
+    if (error) showErr('Google sign in failed: ' + error.message);
+  }
+
+  async function resendEmail() {
+    const email = document.getElementById('loginEmail').value.trim() || document.getElementById('signupEmail').value.trim();
+    if (!email) { showErr('Enter your email address first.'); return; }
+    const { error } = await sb.auth.resend({ type: 'signup', email });
+    if (!error) { showErr('✅ Confirmation email resent! Check your inbox.', 'success'); document.getElementById('resendWrap').style.display = 'none'; }
+    else showErr('Could not resend: ' + error.message);
+  }
+
+  function showSuccess(ico, title, msg) {
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('signupForm').classList.add('hidden');
+    document.getElementById('successIco').textContent = ico;
+    document.getElementById('successTitle').textContent = title;
+    document.getElementById('successMsg').textContent = msg;
+    document.getElementById('successScreen').classList.add('show');
+  }
+
+  function showLogin() {
+    document.getElementById('successScreen').classList.remove('show');
+    document.getElementById('loginForm').classList.remove('hidden');
+    document.getElementById('tabLogin').classList.add('on');
+    document.getElementById('tabSignup').classList.remove('on');
+  }
+  window.showLogin = showLogin;
+
+}); // end DOMContentLoaded
+
+// These can be defined outside since they don't need sb
+function switchTab(tab) {
+  document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('signupForm').classList.toggle('hidden', tab !== 'signup');
+  document.getElementById('successScreen').classList.remove('show');
+  document.getElementById('tabLogin').classList.toggle('on', tab === 'login');
+  document.getElementById('tabSignup').classList.toggle('on', tab === 'signup');
+  document.getElementById('errorMsg').classList.remove('show');
+  document.getElementById('resendWrap').style.display = 'none';
 }
 
-async function handleForgot(){
-  const email=document.getElementById('loginEmail').value.trim();
-  if(!email){showError('Enter your email address first, then click Forgot password.');return;}
-  await window._sb.auth.resetPasswordForEmail(email);
-  showError('✅ Password reset email sent! Check your inbox.');
-  document.getElementById('errorMsg').style.background='#d6f5eb';
-  document.getElementById('errorMsg').style.color='#064e38';
+function togglePass(id, btn) {
+  const inp = document.getElementById(id);
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
 }
-</script>
-<div class="mobile-menu" id="mobileMenu">
-  <a href="browse-jobs.html">🔍 Find jobs</a>
-  <a href="interview-prep.html">🎙 AI Interview prep</a>
-  <a href="post-job.html">📝 Post a job</a>
-  <a href="employer-dashboard.html">📊 Employer dashboard</a>
-  <a href="profile.html">👤 My profile</a>
-  <a href="auth.html">🔐 Log in</a>
-  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
-</div>
-<script>
-function toggleMenu(){
-  document.getElementById("mobileMenu").classList.toggle("open");
-  const h=document.getElementById("hamburger");
-  h.classList.toggle("open");
+
+function checkStrength(val) {
+  const score = [val.length >= 6, val.length >= 10, /[A-Z]/.test(val) || /[0-9]/.test(val), /[!@#$%^&*]/.test(val)].filter(Boolean).length;
+  const colors = ['','#ef4444','#f59e0b','#0ea271','#064e38'];
+  const labels = ['','Weak','Fair','Strong','Very strong'];
+  for(let i=1;i<=4;i++) document.getElementById('sb'+i).style.background = i<=score ? colors[score] : '';
+  const st = document.getElementById('strengthText');
+  st.textContent = val.length ? labels[score] : '';
+  st.style.color = colors[score];
 }
-document.addEventListener("click",function(e){
-  const menu=document.getElementById("mobileMenu");
-  const btn=document.getElementById("hamburger");
-  if(menu && !menu.contains(e.target) && !btn.contains(e.target)){
-    menu.classList.remove("open");
-  }
-});
 </script>
 </body>
 </html>
-<script>
-async function signInWithGoogle(){
-  const { error } = await window._sb.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: 'https://talentry-nu.vercel.app/browse-jobs.html'
-    }
-  });
-  if(error){
-    const err = document.getElementById('errorMsg');
-    err.textContent = '❌ Google sign in failed: ' + error.message;
-    err.classList.add('show');
-  }
-}
-</script>
