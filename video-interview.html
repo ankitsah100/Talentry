@@ -211,7 +211,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
         <select class="sf-select" id="setupLang">
           <option value="en">English</option>
           <option value="ne">Nepali (नेपाली)</option>
-          <option value="hi">Hindi (हिन्दी)</option>
+
         </select>
       </div>
     </div>
@@ -239,30 +239,87 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 
   <!-- VIDEO AREA -->
   <div class="video-area">
-    <!-- AI INTERVIEWER -->
+    <!-- AI INTERVIEWER FACE -->
     <div class="ai-panel" id="aiPanel">
       <div class="ai-panel-grid"></div>
-      <div class="ai-panel-label">🤖 AI Interviewer</div>
-      <div class="ai-avatar-wrap">
-        <div class="ai-avatar-ring" id="aiRing">
-          <div class="ai-avatar-inner">🤖</div>
+      <div class="ai-panel-label">🤖 Priya — AI Interviewer</div>
+
+      <!-- ANIMATED FACE -->
+      <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:20px;">
+        <div id="aiFaceWrap" style="position:relative;margin-bottom:14px;">
+          <svg id="aiFace" width="160" height="180" viewBox="0 0 160 180" xmlns="http://www.w3.org/2000/svg">
+            <!-- Glow ring -->
+            <circle cx="80" cy="85" r="76" fill="none" stroke="rgba(78,205,164,0.25)" stroke-width="2" id="glowRing"/>
+            <!-- Head -->
+            <ellipse cx="80" cy="85" rx="62" ry="70" fill="#f9d5bc"/>
+            <!-- Hair -->
+            <ellipse cx="80" cy="38" rx="62" ry="32" fill="#3d2b1f"/>
+            <rect x="18" y="38" width="14" height="50" rx="7" fill="#3d2b1f"/>
+            <rect x="128" y="38" width="14" height="50" rx="7" fill="#3d2b1f"/>
+            <!-- Ears -->
+            <ellipse cx="18" cy="90" rx="8" ry="11" fill="#f0c8a0"/>
+            <ellipse cx="142" cy="90" rx="8" ry="11" fill="#f0c8a0"/>
+            <!-- Eyebrows -->
+            <path d="M50 62 Q62 57 72 62" stroke="#3d2b1f" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M88 62 Q98 57 110 62" stroke="#3d2b1f" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <!-- Eyes -->
+            <g id="eyeGroup">
+              <!-- Left eye -->
+              <ellipse cx="61" cy="78" rx="11" ry="12" fill="white"/>
+              <ellipse cx="61" cy="79" rx="7" ry="7" fill="#4a3728"/>
+              <ellipse cx="61" cy="79" rx="4" ry="4" fill="#1a0a05"/>
+              <ellipse cx="64" cy="76" rx="2.5" ry="2.5" fill="white"/>
+              <!-- Right eye -->
+              <ellipse cx="99" cy="78" rx="11" ry="12" fill="white"/>
+              <ellipse cx="99" cy="79" rx="7" ry="7" fill="#4a3728"/>
+              <ellipse cx="99" cy="79" rx="4" ry="4" fill="#1a0a05"/>
+              <ellipse cx="102" cy="76" rx="2.5" ry="2.5" fill="white"/>
+            </g>
+            <!-- Blink overlay -->
+            <ellipse id="leftBlink" cx="61" cy="78" rx="11" ry="0" fill="#f9d5bc"/>
+            <ellipse id="rightBlink" cx="99" cy="78" rx="11" ry="0" fill="#f9d5bc"/>
+            <!-- Nose -->
+            <ellipse cx="80" cy="102" rx="5" ry="3.5" fill="#e8b89a"/>
+            <path d="M75 105 Q80 109 85 105" stroke="#d4956e" stroke-width="1.5" fill="none"/>
+            <!-- Mouth -->
+            <g id="mouthGroup">
+              <!-- Lips closed (default) -->
+              <path id="mouthClosed" d="M64 124 Q80 132 96 124" stroke="#c4706e" stroke-width="2.5" fill="#e89090" stroke-linecap="round"/>
+              <!-- Mouth talking (animated) -->
+              <ellipse id="mouthOpen" cx="80" cy="126" rx="14" ry="0" fill="#8b3a3a"/>
+              <ellipse id="mouthInner" cx="80" cy="127" rx="10" ry="0" fill="#c45050"/>
+              <!-- Teeth -->
+              <rect id="teeth" x="68" y="125" width="24" height="0" rx="2" fill="white"/>
+            </g>
+            <!-- Cheeks -->
+            <ellipse cx="45" cy="106" rx="12" ry="8" fill="rgba(255,150,150,0.2)"/>
+            <ellipse cx="115" cy="106" rx="12" ry="8" fill="rgba(255,150,150,0.2)"/>
+            <!-- Neck -->
+            <rect x="68" y="152" width="24" height="20" rx="4" fill="#f0c8a0"/>
+            <!-- Collar -->
+            <path d="M30 172 Q80 160 130 172 L130 180 Q80 170 30 180 Z" fill="#1a5276"/>
+            <path d="M80 162 L70 180 L90 180 Z" fill="#fff"/>
+          </svg>
+
+          <!-- Sound bars below face -->
+          <div class="ai-sound-bars" id="soundBars" style="margin-top:4px;">
+            <div class="sound-bar inactive"></div>
+            <div class="sound-bar inactive"></div>
+            <div class="sound-bar inactive"></div>
+            <div class="sound-bar inactive"></div>
+            <div class="sound-bar inactive"></div>
+            <div class="sound-bar inactive"></div>
+          </div>
         </div>
-      </div>
-      <div class="ai-sound-bars" id="soundBars">
-        <div class="sound-bar inactive"></div>
-        <div class="sound-bar inactive"></div>
-        <div class="sound-bar inactive"></div>
-        <div class="sound-bar inactive"></div>
-        <div class="sound-bar inactive"></div>
-        <div class="sound-bar inactive"></div>
-      </div>
-      <div class="ai-name">Priya — AI Interviewer</div>
-      <div class="ai-status" id="aiStatus">Ready to start</div>
-      <div class="thinking" id="thinkingIndicator">
-        <div class="think-dot"></div>
-        <div class="think-dot"></div>
-        <div class="think-dot"></div>
-        <span>Analyzing your answer...</span>
+
+        <div class="ai-name" style="color:#fff;font-size:15px;font-weight:600;">Priya</div>
+        <div class="ai-status" id="aiStatus" style="color:rgba(255,255,255,.5);font-size:12px;margin-top:3px;">Ready to start</div>
+        <div class="thinking" id="thinkingIndicator" style="margin-top:8px;">
+          <div class="think-dot"></div>
+          <div class="think-dot"></div>
+          <div class="think-dot"></div>
+          <span style="color:rgba(255,255,255,.4);font-size:12px;">Thinking...</span>
+        </div>
       </div>
     </div>
 
@@ -450,10 +507,10 @@ async function startInterview() {
   let greetings;
   if(currentLang === 'ne') {
     greetings = [
-      `Hey, namaste! ${camOpener}My name is Priya, and I'll be your interviewer today. Aaja hami ${currentRole} ko lagi practice garxa. Ma timilai ${questions.length} vota questions sodhne xu — just relax and naturally answer gara. Kei tension lina paraina, okay? Let's go!`,
-      `Hey hey! ${camOpener}Priya here, timro AI interviewer. Aaja ${currentRole} position ko lagi ${questions.length} questions cha.आफूलाई natural rakhnu, like you're just talking to a friend. Ready cha? Suru garau!`,
+      `Namaste! ${camOpener}Ma Priya ho, timro aajako interviewer. Aaja hami ${currentRole} ko lagi sanga practice garxau. Ma timile ${questions.length} vota question sodhne chu — ek dum relax gara, jasto saathisanga kura gardai cha tyesari answer deu. Tension lina pardaina, okay? Suru garau!`,
+      `Hey, namaste! ${camOpener}Priya this side, timro AI interviewer. Aaja ${currentRole} ko lagi practice session cha — ${questions.length} questions huncha. Afno comfortable pace ma answer deu, kei garo hudaina. Ready cha? Jaau ta!`,
     ];
-  } else if(currentLang === 'hi') {
+  } else if(false) {
     greetings = [
       `Hey, hi! ${camOpener}Main Priya hoon, aur main aaj tumhari interviewer hoon. Aaj hum ${currentRole} ke liye practice karenge. Main tumse ${questions.length} questions puchungi — bas relax karo aur naturally answer do. Koi tension nahi, okay? Let's go!`,
       `Hey hey! ${camOpener}Priya here, tumhari AI interviewer. Aaj ${currentRole} position ke liye ${questions.length} questions hain. Apne aap ko natural rakho, jaise kisi dost se baat kar rahe ho. Ready ho? Shuru karte hain!`,
@@ -466,9 +523,10 @@ async function startInterview() {
   }
   const greeting = greetings[Math.floor(Math.random() * greetings.length)];
   setAIStatus('Introducing...');
-  // Use onDone callback so first question starts right after greeting ends
   speakSlowly(greeting, () => {
-    setTimeout(() => askQuestion(0), 600);
+    setTimeout(() => {
+      askQuestion(0);  // First question fires right after greeting ends
+    }, 800);
   });
 }
 
@@ -527,7 +585,7 @@ async function generateQuestions() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         system: `You are an expert HR interviewer for Nepal healthcare sector. Generate exactly 6 interview questions for the given role. Return ONLY a JSON array of 6 strings. No other text. Mix behavioral, technical and situational questions. Keep questions concise (max 25 words each).`,
-        messages: [{ role: 'user', content: `Role: ${currentRole}\nDifficulty: ${currentDiff}\nType: ${currentType}\nLanguage: ${currentLang === 'ne' ? 'Nepali' : currentLang === 'hi' ? 'Hindi' : 'English'}\n\nGenerate 6 interview questions. Language style: ${currentLang === 'ne' ? 'Nepali-English mix (GenZ style) — write mostly in English but mix in natural Nepali words like yaar, cha, garnu, ramro, sahi, etc. Like how young Nepalis actually talk. Example: Hey, tell me about your experience as a Biomedical Engineer — ke ramro lagcha timile yo field ma?' : currentLang === 'hi' ? 'Hinglish mix (GenZ style) — write mostly in English but mix in natural Hindi words like yaar, hai, kya, accha, bata, etc. Like how young Indians actually talk. Example: Hey, tell me about your experience as a Biomedical Engineer — kya achha lagta hai tumhe is field mein?' : 'Natural conversational English'}. Keep questions concise, friendly and GenZ-relatable.` }]
+        messages: [{ role: 'user', content: `Role: ${currentRole}\nDifficulty: ${currentDiff}\nType: ${currentType}\nLanguage: ${currentLang === 'ne' ? 'Nepali' : false ? 'Hindi' : 'English'}\n\nGenerate 6 interview questions. Language style: ${currentLang === 'ne' ? 'Nepali-English mix (GenZ style) — write mostly in English but mix in natural Nepali words like yaar, cha, garnu, ramro, sahi, etc. Like how young Nepalis actually talk. Example: Hey, tell me about your experience as a Biomedical Engineer — ke ramro lagcha timile yo field ma?' : false ? 'Hinglish mix (GenZ style) — write mostly in English but mix in natural Hindi words like yaar, hai, kya, accha, bata, etc. Like how young Indians actually talk. Example: Hey, tell me about your experience as a Biomedical Engineer — kya achha lagta hai tumhe is field mein?' : 'Natural conversational English'}. Keep questions concise, friendly and GenZ-relatable.` }]
       })
     });
     const data = await res.json();
@@ -584,33 +642,33 @@ const fillers = {
   // 🇳🇵 NEPALI-ENGLISH MIX (GenZ Nepali style)
   ne: {
     opening: [
-      "Okay, let's start garau! ",
-      "Cool! So mero first question chai... ",
-      "Alright yaar, suru garau! Mero pehilo question... ",
-      "Perfect! So here we go — mero question... ",
+      "Aba suru garau! Mero pehilo question chai... ",
+      "Okay, changa cha! Mero first question ho... ",
+      "Suru garxau ta! Yo mero pahilo question... ",
+      "Jaau, suru! Mero pehilo question chai... ",
     ],
     transition: [
-      "Hmm, okay. That was actually ramro answer! Aba, ",
-      "Interesting cha! Alright, next question tira jaau... ",
-      "Okay bujhein. Good stuff. So aba... ",
-      "Nice, I liked that answer! Aba next question... ",
-      "Right, thank you for sharing! Aba mero next question chai... ",
-      "Mmm, solid point cha! Okay so... ",
-      "Wah, that was good! Aba arko question... ",
-      "Appreciate that answer! Chalau, aba... ",
+      "Hmm, ramro cha! Aba aarkotira jaau — ",
+      "Interesting answer diyau! Okay, next question... ",
+      "Bujhein, nice! Aba arko question sodhxu — ",
+      "Wah, ramro thiyo! Aba next ma jaau... ",
+      "Okay sahi cha! Aba mero arko question chai... ",
+      "Achha thiyo! Aba arko sodhxu — ",
+      "Ramro answer diyau! Chalau aba... ",
+      "Appreciate garxu! Aba arko question... ",
     ],
     positive: [
-      "Wah yaar, that was actually a solid answer! ",
-      "Wow, really ramro cha! ",
-      "Oh I love that! Very thoughtful answer! ",
-      "Exactly yaar, that's what we're looking for! ",
-      "Sahi cha! That was a great point! ",
-      "Nice, really good! Proud of you! ",
+      "Wah, ramro answer diyau! ",
+      "Nice cha, sahi kura garyu! ",
+      "Yehi ta hami khojirako thiyo! ",
+      "Solid answer cha! Ramro lagyo! ",
+      "Sahi cha bhai, keep it up! ",
+      "Ramro thiyo, proud of you! ",
     ],
     encourage: [
-      "Time leu, no rush at all! ",
-      "Jati detail dinu cha, deu! ",
-      "Just be yourself, naturally bola! ",
+      "Slowly bola, kei hudaina! ",
+      "Jati kura cha, sab bana! ",
+      "Natural raha, comfortable feel gara! ",
     ],
   },
 
@@ -649,7 +707,7 @@ const fillers = {
 };
 
 function getLangFillers() {
-  const code = currentLang === 'ne' ? 'ne' : currentLang === 'hi' ? 'hi' : 'en';
+  const code = currentLang === 'ne' ? 'ne' : false ? 'hi' : 'en';
   return fillers[code] || fillers.en;
 }
 
@@ -665,7 +723,7 @@ function getHumanIntro(index) {
 function askQuestion(index) {
   currentQ = index;
   const q = questions[index];
-  
+
   document.getElementById('qNum').textContent = `Question ${index + 1} of ${questions.length}`;
   document.getElementById('qText').textContent = q;
   document.getElementById('progNum').textContent = `${index + 1}/${questions.length}`;
@@ -674,10 +732,24 @@ function askQuestion(index) {
   document.getElementById('transcriptBox').style.display = 'none';
   setAIStatus('Asking question...');
 
-  // Add human-like intro before question
-  const intro = getHumanIntro(index);
-  const encourage = index === 0 ? encouragements[Math.floor(Math.random()*encouragements.length)] : '';
-  speakSlowly(`${intro}${q} ${encourage}`);
+  // Cancel any existing speech first
+  speechSynth.cancel();
+  setAISpeaking(false);
+
+  const f = getLangFillers();
+  const intro = index === 0
+    ? f.opening[Math.floor(Math.random() * f.opening.length)]
+    : getHumanIntro(index);
+  const encourage = index === 0 && f.encourage
+    ? f.encourage[Math.floor(Math.random() * f.encourage.length)]
+    : '';
+
+  // Small delay to ensure speech engine is ready
+  setTimeout(() => {
+    speakSlowly(`${intro}${q} ${encourage}`, () => {
+      setAIStatus('Waiting for your answer... 🎤');
+    });
+  }, 400);
 }
 
 function speakText(text, onDone) {
@@ -685,11 +757,97 @@ function speakText(text, onDone) {
 }
 
 function setAISpeaking(speaking) {
-  const ring = document.getElementById('aiRing');
   const bars = document.querySelectorAll('.sound-bar');
-  ring.classList.toggle('speaking', speaking);
   bars.forEach(b => b.classList.toggle('inactive', !speaking));
+
+  // Animate face
+  if(speaking) {
+    startMouthAnimation();
+    startEyeMovement();
+    // Glow ring pulse
+    const ring = document.getElementById('glowRing');
+    if(ring) ring.style.stroke = 'rgba(78,205,164,0.6)';
+  } else {
+    stopMouthAnimation();
+    const ring = document.getElementById('glowRing');
+    if(ring) ring.style.stroke = 'rgba(78,205,164,0.25)';
+  }
 }
+
+// ── MOUTH ANIMATION ───────────────────────────
+let mouthInterval = null;
+let blinkInterval = null;
+let eyeInterval = null;
+
+function startMouthAnimation() {
+  stopMouthAnimation();
+  let phase = 0;
+  mouthInterval = setInterval(() => {
+    const open = document.getElementById('mouthOpen');
+    const inner = document.getElementById('mouthInner');
+    const teeth = document.getElementById('teeth');
+    const closed = document.getElementById('mouthClosed');
+    if(!open) return;
+    
+    // Oscillate mouth open/close naturally
+    const openAmt = Math.abs(Math.sin(phase)) * 7 + Math.random() * 3;
+    open.setAttribute('ry', openAmt);
+    inner.setAttribute('ry', Math.max(0, openAmt - 2));
+    teeth.setAttribute('height', Math.max(0, openAmt - 1));
+    closed.style.opacity = openAmt < 2 ? '1' : '0';
+    phase += 0.35;
+  }, 80);
+}
+
+function stopMouthAnimation() {
+  if(mouthInterval) { clearInterval(mouthInterval); mouthInterval = null; }
+  // Close mouth
+  const open = document.getElementById('mouthOpen');
+  const inner = document.getElementById('mouthInner');
+  const teeth = document.getElementById('teeth');
+  const closed = document.getElementById('mouthClosed');
+  if(open) { open.setAttribute('ry','0'); }
+  if(inner) { inner.setAttribute('ry','0'); }
+  if(teeth) { teeth.setAttribute('height','0'); }
+  if(closed) { closed.style.opacity = '1'; }
+}
+
+// ── EYE BLINK + MOVEMENT ─────────────────────
+function startEyeMovement() {
+  // Random blinking
+  if(blinkInterval) clearInterval(blinkInterval);
+  blinkInterval = setInterval(() => {
+    if(Math.random() > 0.7) doBlink();
+  }, 2200);
+
+  // Subtle eye movement (look around)
+  if(eyeInterval) clearInterval(eyeInterval);
+  eyeInterval = setInterval(() => {
+    const dx = (Math.random() - 0.5) * 3;
+    const dy = (Math.random() - 0.5) * 2;
+    const eyeGroup = document.getElementById('eyeGroup');
+    if(eyeGroup) eyeGroup.setAttribute('transform', `translate(${dx},${dy})`);
+  }, 2500);
+}
+
+function doBlink() {
+  const lb = document.getElementById('leftBlink');
+  const rb = document.getElementById('rightBlink');
+  if(!lb || !rb) return;
+  // Close eyes
+  lb.setAttribute('ry', '12');
+  rb.setAttribute('ry', '12');
+  setTimeout(() => {
+    lb.setAttribute('ry', '0');
+    rb.setAttribute('ry', '0');
+  }, 120);
+}
+
+// Start blinking even when idle
+setTimeout(() => {
+  if(blinkInterval) clearInterval(blinkInterval);
+  blinkInterval = setInterval(() => { doBlink(); }, 3500 + Math.random()*2000);
+}, 2000);
 
 function setAIStatus(text) {
   document.getElementById('aiStatus').textContent = text;
@@ -737,7 +895,7 @@ function startRecording() {
   // Set recognition language based on selection
   if(currentLang === 'ne' || currentLang === 'Nepali (नेपाली)') {
     recognition.lang = 'ne-NP';
-  } else if(currentLang === 'hi' || currentLang === 'Hindi (हिन्दी)') {
+  } else if(false) {
     recognition.lang = 'hi-IN';
   } else {
     recognition.lang = 'en-US';
@@ -786,7 +944,7 @@ async function analyzeAnswer() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system: `You are an expert interview coach for Nepal healthcare jobs. The interview is in ${currentLang === 'ne' ? 'Nepali' : currentLang === 'hi' ? 'Hindi' : 'English'}. Analyze the candidate's answer and return ONLY a JSON object:
+        system: `You are an expert interview coach for Nepal healthcare jobs. The interview is in ${currentLang === 'ne' ? 'Nepali' : false ? 'Hindi' : 'English'}. Analyze the candidate's answer and return ONLY a JSON object:
 {
   "confidence": 75,
   "clarity": 80,
@@ -841,15 +999,15 @@ function showFeedback(result) {
   let fbPhrases, endPhrase;
   if(currentLang === 'ne') {
     fbPhrases = [
-      `Okay, so here's my feedback yaar. ${result.feedback}`,
-      `Hmm, not bad! Aba sunau — ${result.feedback}`,
-      `Interesting answer cha! But ${result.feedback}`,
-      `Wah, solid try! Okay so, ${result.feedback}`,
+      `Okay, mero feedback sunau. ${result.feedback}`,
+      `Hmm, naramro hoina! Aba yesto pani garna milxa — ${result.feedback}`,
+      `Interesting thiyo answer! Tara ${result.feedback}`,
+      `Wah, ramro try! Aba yesto pani soch — ${result.feedback}`,
     ];
     endPhrase = isLast2
-      ? "That was your last question yaar! Wah, ramro garyo! Let me show you your final results!"
-      : "Okay, ready cha next question ko lagi? Let's go!";
-  } else if(currentLang === 'hi') {
+      ? "Yo timro last question thiyo! Wah, ramro garyu! Aba final result herna sakinxa."
+      : "Okay, next question ko lagi ready cha? Jaau!";
+  } else if(false) {
     fbPhrases = [
       `Okay, so here's my feedback yaar. ${result.feedback}`,
       `Hmm, not bad! Ab suno — ${result.feedback}`,
