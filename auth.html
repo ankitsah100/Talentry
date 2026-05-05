@@ -223,7 +223,9 @@ const { data: { session } } = await supabase.auth.getSession();
 if (session) {
   const redirect = sessionStorage.getItem('redirectAfterLogin');
   sessionStorage.removeItem('redirectAfterLogin');
-  window.location.href = redirect || 'browse-jobs.html';
+  // Never redirect back to auth page — prevents loop
+  const safePage = redirect && redirect.indexOf('auth.html') === -1 ? redirect : 'browse-jobs.html';
+  window.location.href = safePage;
 }
 
 // Handle OAuth redirect - detect sign in event
@@ -232,7 +234,9 @@ supabase.auth.onAuthStateChange((event, session) => {
     // Redirect back to where user was trying to go
     const redirect = sessionStorage.getItem('redirectAfterLogin');
     sessionStorage.removeItem('redirectAfterLogin');
-    window.location.href = redirect || 'browse-jobs.html';
+    // Never redirect back to auth page — prevents loop
+    const safePage = redirect && redirect.indexOf('auth.html') === -1 ? redirect : 'browse-jobs.html';
+    window.location.href = safePage;
   }
 });
 </script>

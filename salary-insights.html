@@ -3,26 +3,30 @@
 <head>
 <style id="authGuardStyle">body{visibility:hidden!important;}</style>
 <script>
-// INSTANT auth check — reads Supabase session from localStorage synchronously
-// No network request needed — Supabase caches session in localStorage
 (function(){
   try {
-    // Supabase stores session under this key pattern
-    var keys = Object.keys(localStorage);
-    var sessionKey = keys.find(function(k){ return k.includes('supabase') && k.includes('auth'); });
-    if(sessionKey){
-      var data = JSON.parse(localStorage.getItem(sessionKey));
-      var session = data && (data.session || (data.currentSession));
-      if(session && session.access_token){
-        // Valid session found — show page
-        var st = document.getElementById('authGuardStyle');
-        if(st) st.textContent = '';
-        return; // all good
+    // Supabase v2 stores session under: sb-{project-ref}-auth-token
+    var key = 'sb-eteyskwaqjtcybaolnto-auth-token';
+    var raw = localStorage.getItem(key);
+    if(raw){
+      var data = JSON.parse(raw);
+      // Check access_token exists and not expired
+      if(data && data.access_token){
+        var exp = data.expires_at || 0;
+        if(exp === 0 || (Date.now() / 1000) < exp){
+          // Valid session — show page
+          document.getElementById('authGuardStyle').textContent = '';
+          return;
+        }
       }
     }
   } catch(e){}
-  // No session — redirect instantly (page still hidden)
-  sessionStorage.setItem('redirectAfterLogin', window.location.href);
+  // No valid session — redirect to login
+  var current = window.location.href;
+  // Never save auth.html as redirect target (prevents loop)
+  if(current.indexOf('auth.html') === -1){
+    sessionStorage.setItem('redirectAfterLogin', current);
+  }
   window.location.replace('auth.html');
 })();
 </script>
