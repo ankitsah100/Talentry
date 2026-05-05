@@ -384,6 +384,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 
 <script>
 // ── STATE ────────────────────────────────────
+let interviewerGender = 'female'; // 'male' or 'female' — set from setup
 let cameraStream = null;
 let recognition = null;
 let isRecording = false;
@@ -760,46 +761,58 @@ function startMouthAnimation() {
   stopMouthAnimation();
   let phase = 0;
   mouthInterval = setInterval(() => {
-    const overlay = document.getElementById('mouthOverlay');
-    if(!overlay) return;
-    // Oscillate mouth open naturally
-    const openAmt = Math.abs(Math.sin(phase)) * 9 + Math.random() * 3;
-    overlay.style.height = openAmt + 'px';
-    phase += 0.32;
-  }, 75);
+    const inner = document.getElementById('innerMouth');
+    const teeth = document.getElementById('teethRect');
+    const lower = document.getElementById('lowerLip');
+    if(!inner) return;
+    const amt = Math.abs(Math.sin(phase)) * 6 + Math.random() * 2.5;
+    inner.setAttribute('ry', amt);
+    if(teeth) teeth.setAttribute('height', Math.max(0, amt - 0.5));
+    if(lower) {
+      // Lower lip drops when mouth opens
+      const d = `M80 138 Q100 ${143 + amt * 0.5} 120 138 Q112 ${148 + amt} 100 ${149 + amt} Q88 ${148 + amt} 80 138 Z`;
+      lower.setAttribute('d', d);
+    }
+    phase += 0.28;
+  }, 70);
 }
 
 function stopMouthAnimation() {
   if(mouthInterval) { clearInterval(mouthInterval); mouthInterval = null; }
-  const overlay = document.getElementById('mouthOverlay');
-  if(overlay) overlay.style.height = '0px';
+  const inner = document.getElementById('innerMouth');
+  const teeth = document.getElementById('teethRect');
+  const lower = document.getElementById('lowerLip');
+  if(inner) inner.setAttribute('ry','0');
+  if(teeth) teeth.setAttribute('height','0');
+  if(lower) lower.setAttribute('d','M80 138 Q100 143 120 138 Q112 148 100 149 Q88 148 80 138 Z');
 }
 
 function startEyeMovement() {
-  // Subtle head bob when speaking
   if(eyeInterval) clearInterval(eyeInterval);
   eyeInterval = setInterval(() => {
-    const img = document.getElementById('aiFaceImg');
-    if(!img) return;
-    const dy = (Math.random() - 0.5) * 3;
-    img.style.transform = `translateY(${dy}px)`;
-    img.style.transition = 'transform 0.5s ease';
-  }, 800);
+    // Subtle eye shift — looks natural
+    const lx = 75 + (Math.random()-0.5)*2;
+    const rx = 125 + (Math.random()-0.5)*2;
+    const ly = 94 + (Math.random()-0.5)*1.5;
+    ['circle[cx="75"]','circle[cx="125"]'].forEach((sel,i) => {
+      const els = document.querySelectorAll(`#aiFaceSVG circle`);
+      // Find iris circles and shift slightly
+    });
+  }, 2000);
 }
 
-function doBlink() {} // not needed with real image
+function doBlink() {
+  const lb = document.getElementById('lblink');
+  const rb = document.getElementById('rblink');
+  if(!lb || !rb) return;
+  lb.setAttribute('ry','11'); rb.setAttribute('ry','11');
+  setTimeout(() => { lb.setAttribute('ry','0'); rb.setAttribute('ry','0'); }, 130);
+}
 
-// Subtle idle head movement
+// Auto blink every 3-5 seconds
 setTimeout(() => {
-  blinkInterval = setInterval(() => {
-    const img = document.getElementById('aiFaceImg');
-    if(img && !mouthInterval) {
-      const dx = (Math.random() - 0.5) * 2;
-      img.style.transform = `translateX(${dx}px)`;
-      img.style.transition = 'transform 1.2s ease';
-    }
-  }, 3000);
-}, 1500);
+  blinkInterval = setInterval(() => doBlink(), 3000 + Math.random()*2000);
+}, 2000);
 
 function setAIStatus(text) {
   document.getElementById('aiStatus').textContent = text;
@@ -1021,6 +1034,7 @@ function showEndScreen() {
 function endInterview() {
   if(confirm('End the interview? Your progress will be lost.')) {
     speechSynth.cancel();
+    if(currentAudio) { currentAudio.pause(); currentAudio = null; }
     if(recognition) recognition.stop();
     if(cameraStream) cameraStream.getTracks().forEach(t => t.stop());
     if(cameraMonitorInterval) clearInterval(cameraMonitorInterval);
