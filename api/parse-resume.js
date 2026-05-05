@@ -3,16 +3,8 @@ export const config = { runtime: 'edge' };
 export default async function handler(req) {
   if (req.method === 'OPTIONS') {
     return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      }
+      headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' }
     });
-  }
-
-  if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
   }
 
   try {
@@ -21,8 +13,7 @@ export default async function handler(req) {
 
     if (!apiKey) {
       return new Response(JSON.stringify({ error: 'API key not configured' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+        status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
 
@@ -34,20 +25,21 @@ export default async function handler(req) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1000,
+        model: 'claude-haiku-4-5-20251001', // Fast + cheap for parsing
+        max_tokens: 1200,
+        system: `You are an expert resume parser for Nepal healthcare jobs. 
+Extract ALL available information accurately.
+ALWAYS return valid JSON only — no markdown, no explanation.
+If a field is not found, use empty string "".
+For missing_fields, list field names not found.`,
         messages: body.messages || []
       })
     });
 
     const data = await response.json();
-
     return new Response(JSON.stringify(data), {
       status: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      }
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
 
   } catch (err) {

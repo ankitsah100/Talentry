@@ -220,12 +220,19 @@ window._sb = supabase;
 
 // Check if already logged in
 const { data: { session } } = await supabase.auth.getSession();
-if (session) { window.location.href = 'browse-jobs.html'; }
+if (session) {
+  const redirect = sessionStorage.getItem('redirectAfterLogin');
+  sessionStorage.removeItem('redirectAfterLogin');
+  window.location.href = redirect || 'browse-jobs.html';
+}
 
 // Handle OAuth redirect - detect sign in event
 supabase.auth.onAuthStateChange((event, session) => {
   if (event === 'SIGNED_IN' && session) {
-    window.location.href = 'browse-jobs.html';
+    // Redirect back to where user was trying to go
+    const redirect = sessionStorage.getItem('redirectAfterLogin');
+    sessionStorage.removeItem('redirectAfterLogin');
+    window.location.href = redirect || 'browse-jobs.html';
   }
 });
 </script>

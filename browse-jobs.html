@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const _sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co','sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
+const { data: { session } } = await _sb.auth.getSession();
+if (!session) {
+  // Save current page so we can redirect back after login
+  sessionStorage.setItem('redirectAfterLogin', window.location.href);
+  window.location.href = 'auth.html';
+}
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Browse Jobs — Talentry</title>
