@@ -8,63 +8,66 @@ export default async function handler(req) {
   }
 
   try {
-    const { text, lang, gender } = await req.json();
+    const { text, gender, lang } = await req.json();
     const apiKey = process.env.ELEVENLABS_API_KEY;
 
-    // If no ElevenLabs key, return null so browser TTS is used as fallback
-    if (!apiKey) {
-      return new Response(JSON.stringify({ fallback: true }), {
+    if (!apiKey || !text) {
+      return new Response(JSON.stringify({ error: 'missing' }), {
+        status: 400,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
 
-    // Choose voice based on lang + gender
-    // ElevenLabs voice IDs for natural voices
-    const voiceMap = {
-      'ne_female': 'XB0fDUnXU5powFXDhCwa', // Charlotte — works well for Nepali
-      'ne_male':   'TX3LPaxmHKxFdv7VOQHJ', // Liam
-      'en_female': 'EXAVITQu4vr4xnSDxMaL', // Sarah — natural
-      'en_male':   'onwK4e9ZLuTAKqWW03F9', // Daniel
+    // Voice IDs — eleven_multilingual_v2 supports Nepali natively
+    const voices = {
+      female: 'EXAVITQu4vr4xnSDxMaL', // Sarah
+      male:   'TX3LPaxmHKxFdv7VOQHJ', // Liam
     };
+    const voiceId = voices[gender] || voices.female;
 
-    const key = `${lang || 'en'}_${gender || 'female'}`;
-    const voiceId = voiceMap[key] || voiceMap['en_female'];
-
-    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': apiKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        text,
-        model_id: 'eleven_multilingual_v2', // Supports Nepali + English
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.8,
-          style: 0.2,
-          use_speaker_boost: true
-        }
-      })
-    });
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}/stream`,
+      {
+        method: 'POST',
+        headers: {
+          'xi-api-key': apiKey,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: {
+            stability: 0.45,
+            similarity_boost: 0.82,
+            style: 0.15,
+            use_speaker_boost: true
+          }
+        })
+      }
+    );
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ fallback: true }), {
+      const err = await response.text();
+      console.error('ElevenLabs error:', err);
+      return new Response(JSON.stringify({ error: err }), {
+        status: response.status,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
 
-    // Stream audio back
+    // Stream audio directly back to browser
     return new Response(response.body, {
+      status: 200,
       headers: {
         'Content-Type': 'audio/mpeg',
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'no-cache',
       }
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ fallback: true }), {
-      status: 200,
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
     });
   }

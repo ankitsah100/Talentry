@@ -384,8 +384,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 
 <script>
 // ── STATE ────────────────────────────────────
-let interviewerGender = 'female'; // 'male' or 'female' — set from setup
+
 let cameraStream = null;
+let interviewerGender = "female";
+// ElevenLabs routed via /api/tts backend — no client key needed
 let recognition = null;
 let isRecording = false;
 let isMuted = false;
@@ -1208,13 +1210,73 @@ function getBestVoice(lang) {
 }
 
 // ── NATURAL SPEECH ENGINE ─────────────────────
-function speakSlowly(text, onDone) {
+// ElevenLabs voices handled server-side in /api/tts
+let currentAudio = null;
+
+async function speakSlowly(text, onDone) {
+  // Stop any current speech
   speechSynth.cancel();
+  if(currentAudio){ currentAudio.pause(); currentAudio = null; }
   setAISpeaking(true);
   setAIStatus('Speaking...');
 
-  // Add natural SSML-like pauses using commas and breaks
-  // Split on sentence boundaries
+  // Try ElevenLabs API first
+  const success = await tryElevenLabs(text, onDone);
+  if(!success) browserSpeak(text, onDone); // fallback
+}
+
+async function tryElevenLabs(text, onDone) {
+  try {
+    // Call our Vercel proxy — avoids CORS, keeps API key secure
+    const res = await fetch('/api/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        gender: interviewerGender,
+        lang: currentLang
+      })
+    });
+
+    if(!res.ok) return false;
+
+    const contentType = res.headers.get('content-type') || '';
+    if(!contentType.includes('audio')) return false;
+
+    const blob = await res.blob();
+    if(blob.size < 100) return false; // empty response
+
+    const url = URL.createObjectURL(blob);
+    currentAudio = new Audio(url);
+    currentAudio.playbackRate = currentLang === 'ne' ? 0.93 : 1.0;
+
+    return new Promise((resolve) => {
+      currentAudio.oncanplaythrough = () => {
+        currentAudio.play().catch(() => resolve(false));
+      };
+      currentAudio.onended = () => {
+        URL.revokeObjectURL(url);
+        currentAudio = null;
+        setAISpeaking(false);
+        setAIStatus('Waiting for your answer... 🎤');
+        if(onDone) onDone();
+        resolve(true);
+      };
+      currentAudio.onerror = () => {
+        URL.revokeObjectURL(url);
+        currentAudio = null;
+        resolve(false);
+      };
+      currentAudio.load();
+    });
+
+  } catch(e) {
+    console.error('ElevenLabs error:', e);
+    return false;
+  }
+}
+
+function browserSpeak(text, onDone) {
   const sentences = text.match(/[^.!?…]+[.!?…]+/g) || [text];
   let idx = 0;
   const voice = getBestVoice(currentLang);
@@ -1226,34 +1288,17 @@ function speakSlowly(text, onDone) {
       if(onDone) onDone();
       return;
     }
-
     const raw = sentences[idx].trim();
-    if(!raw) { idx++; speakNext(); return; }
+    if(!raw){ idx++; speakNext(); return; }
 
     const utter = new SpeechSynthesisUtterance(raw);
     if(voice) utter.voice = voice;
-
-    // Natural rate — tuned per language for ChatGPT-like smoothness
     const isNepali = currentLang === 'ne';
-    // Slightly slower for Nepali so Devanagari words are clear
-    const baseRate = isNepali ? 0.85 : 0.92;
-    // Very small variation — too much makes it sound uneven
-    const variation = (Math.random() * 0.04) - 0.02;
-    utter.rate = baseRate + variation;
-    // Nepali: slightly higher pitch sounds more natural on Hindi voices
-    utter.pitch = isNepali ? 1.1 : 1.0;
+    utter.rate  = isNepali ? 0.86 : 0.91;
+    utter.pitch = isNepali ? 1.08 : 1.0;
     utter.volume = 1.0;
-
-    // Natural pause based on punctuation
-    let pause = 280;
-    if(raw.endsWith('?')) pause = 420;
-    if(raw.endsWith('!')) pause = 350;
-    if(raw.endsWith('...') || raw.endsWith('…')) pause = 500;
-
-    utter.onend = () => {
-      idx++;
-      setTimeout(speakNext, pause);
-    };
+    const pause = raw.endsWith('?') ? 420 : raw.endsWith('!') ? 330 : 270;
+    utter.onend  = () => { idx++; setTimeout(speakNext, pause); };
     utter.onerror = () => { idx++; speakNext(); };
     speechSynth.speak(utter);
   }
