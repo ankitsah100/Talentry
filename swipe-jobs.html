@@ -9,593 +9,439 @@
 <style>
 :root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);min-height:100vh;overflow-x:hidden;}
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);min-height:100vh;}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(255,255,255,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
 .logo{font-family:'Fraunces',serif;font-size:22px;color:var(--text);text-decoration:none;}.logo em{color:var(--g);font-style:italic;}
 .nav-r{display:flex;gap:10px;align-items:center;}
+.swipe-layout{display:grid;grid-template-columns:240px 1fr 240px;gap:16px;max-width:1000px;margin:0 auto;padding:80px 16px 40px;}
 
-/* LAYOUT */
-.swipe-layout{display:grid;grid-template-columns:280px 1fr 280px;gap:20px;max-width:1100px;margin:0 auto;padding:84px 20px 40px;}
-
-/* LEFT PANEL */
-.left-panel{position:sticky;top:84px;height:fit-content;}
-.filter-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:20px;}
-.filter-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:16px;}
-.filter-group{margin-bottom:16px;}
-.filter-label{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:block;}
-.filter-select,.filter-input{width:100%;padding:9px 13px;border:1.5px solid var(--border2);border-radius:10px;font-size:13px;font-family:inherit;color:var(--text);background:#fff;outline:none;}
-.filter-select:focus,.filter-input:focus{border-color:var(--g);}
-.filter-chips{display:flex;flex-wrap:wrap;gap:6px;}
+/* LEFT */
+.side-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:18px;position:sticky;top:80px;}
+.side-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:14px;}
+.fchips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
 .fchip{font-size:12px;padding:5px 12px;border-radius:100px;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .2s;}
 .fchip.on{background:var(--gl);color:var(--gd);border-color:var(--gm);}
-.stats-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:18px;margin-top:14px;}
-.stat-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.stat-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
 .stat-row:last-child{border:none;}
-.stat-lbl{font-size:13px;color:var(--muted);}
-.stat-val{font-family:'Fraunces',serif;font-size:20px;color:var(--text);}
+.stat-n{font-family:'Fraunces',serif;font-size:18px;color:var(--text);}
 
-/* CENTER — SWIPE AREA */
+/* CENTER */
 .swipe-center{display:flex;flex-direction:column;align-items:center;}
-.swipe-header{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
-.swipe-title{font-family:'Fraunces',serif;font-size:22px;color:var(--text);letter-spacing:-0.5px;}
-.swipe-count{font-size:13px;color:var(--muted);}
+.deck-wrap{position:relative;width:100%;max-width:380px;height:520px;margin:0 auto 20px;}
 
-/* CARD DECK */
-.deck{position:relative;width:100%;max-width:400px;height:540px;margin:0 auto;}
-.job-card{position:absolute;width:100%;height:100%;background:#fff;border-radius:24px;box-shadow:0 8px 40px rgba(0,0,0,0.12);overflow:hidden;cursor:grab;user-select:none;transition:transform .08s ease;will-change:transform;}
-.job-card:active{cursor:grabbing;}
-.job-card.back-1{transform:scale(0.95) translateY(12px);z-index:1;}
-.job-card.back-2{transform:scale(0.90) translateY(22px);z-index:0;}
-.job-card.top{z-index:10;}
+/* CARDS */
+.jcard{position:absolute;inset:0;background:#fff;border-radius:22px;box-shadow:0 8px 32px rgba(0,0,0,.12);display:flex;flex-direction:column;overflow:hidden;touch-action:none;cursor:grab;transition:box-shadow .2s;}
+.jcard:active{cursor:grabbing;}
+.jcard.c1{z-index:3;}
+.jcard.c2{z-index:2;transform:scale(.96) translateY(10px);pointer-events:none;}
+.jcard.c3{z-index:1;transform:scale(.92) translateY(20px);pointer-events:none;}
 
-/* SWIPE OVERLAYS */
-.swipe-overlay-apply{position:absolute;top:28px;left:20px;background:var(--g);color:#fff;font-size:18px;font-weight:700;padding:8px 18px;border-radius:100px;border:3px solid #fff;transform:rotate(-12deg);opacity:0;transition:opacity .15s;z-index:20;letter-spacing:.06em;}
-.swipe-overlay-skip{position:absolute;top:28px;right:20px;background:#ef4444;color:#fff;font-size:18px;font-weight:700;padding:8px 18px;border-radius:100px;border:3px solid #fff;transform:rotate(12deg);opacity:0;transition:opacity .15s;z-index:20;letter-spacing:.06em;}
-.swipe-overlay-save{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#fff;font-size:16px;font-weight:700;padding:6px 18px;border-radius:100px;border:3px solid #fff;opacity:0;transition:opacity .15s;z-index:20;}
+/* OVERLAYS */
+.ov{position:absolute;top:24px;font-size:17px;font-weight:800;padding:7px 16px;border-radius:100px;border:3px solid;opacity:0;z-index:10;letter-spacing:.05em;pointer-events:none;}
+.ov-apply{left:16px;background:var(--g);color:#fff;border-color:#fff;transform:rotate(-12deg);}
+.ov-skip{right:16px;background:#ef4444;color:#fff;border-color:#fff;transform:rotate(12deg);}
+.ov-save{top:auto;bottom:70px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#fff;border-color:#fff;}
 
 /* CARD CONTENT */
-.card-header{padding:24px 24px 16px;border-bottom:1px solid var(--border);}
-.card-match{position:absolute;top:16px;right:16px;background:var(--gl);color:var(--gd);font-size:12px;font-weight:700;padding:4px 12px;border-radius:100px;}
-.card-ico{width:52px;height:52px;border-radius:14px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;}
-.card-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px;line-height:1.2;}
-.card-org{font-size:13.5px;color:var(--muted);margin-bottom:10px;}
-.card-tags{display:flex;gap:7px;flex-wrap:wrap;}
-.ctag{font-size:11.5px;padding:3px 11px;border-radius:100px;}
-.ctag-g{background:var(--gl);color:var(--gd);}
-.ctag-b{background:#dbeeff;color:#1a5fa8;}
-.ctag-a{background:#fff3d6;color:#7a4e00;}
-.ctag-p{background:#ede9ff;color:#4a30b0;}
-.card-body{padding:18px 24px;flex:1;overflow-y:auto;}
-.card-salary{font-family:'Fraunces',serif;font-size:24px;color:var(--g);margin-bottom:14px;}
-.card-section{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;margin-top:14px;}
-.card-desc{font-size:13px;color:var(--muted);line-height:1.7;}
-.card-skills{display:flex;flex-wrap:wrap;gap:6px;}
-.cskill{font-size:11.5px;background:var(--bg2);color:var(--text);padding:3px 10px;border-radius:6px;}
-.card-footer{padding:16px 24px 20px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.card-posted{font-size:12px;color:var(--muted);}
-.card-location{font-size:12.5px;color:var(--text);display:flex;align-items:center;gap:5px;}
+.card-top{padding:20px 20px 14px;border-bottom:1px solid var(--border);}
+.match-badge{position:absolute;top:14px;right:14px;background:var(--gl);color:var(--gd);font-size:11.5px;font-weight:700;padding:3px 11px;border-radius:100px;}
+.card-ico{font-size:28px;margin-bottom:10px;}
+.card-title{font-size:19px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:4px;}
+.card-org{font-size:13px;color:var(--muted);margin-bottom:10px;}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tag{font-size:11px;padding:3px 10px;border-radius:100px;}
+.tg{background:var(--gl);color:var(--gd);}
+.tb{background:#dbeeff;color:#1a5fa8;}
+.ta{background:#fff3d6;color:#7a4e00;}
+.card-mid{padding:16px 20px;flex:1;overflow:hidden;}
+.salary{font-family:'Fraunces',serif;font-size:22px;color:var(--g);margin-bottom:10px;}
+.desc{font-size:12.5px;color:var(--muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+.skills{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+.sk{font-size:11px;background:var(--bg2);color:var(--text);padding:3px 9px;border-radius:6px;}
+.card-bot{padding:12px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:12px;color:var(--muted);}
 
-/* ACTION BUTTONS */
-.action-btns{display:flex;gap:16px;justify-content:center;margin-top:24px;align-items:center;}
-.abt{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:none;transition:all .25s;box-shadow:0 4px 16px rgba(0,0,0,0.1);}
-.abt:hover{transform:scale(1.12);}
-.abt-skip{background:#fff;border:2px solid #ef4444;color:#ef4444;}
-.abt-save{background:#fff;border:2px solid #f59e0b;color:#f59e0b;width:46px;height:46px;font-size:18px;}
-.abt-apply{background:var(--g);color:#fff;width:68px;height:68px;font-size:26px;box-shadow:0 6px 24px rgba(14,162,113,0.4);}
-.abt-undo{background:#fff;border:2px solid var(--border2);color:var(--muted);width:42px;height:42px;font-size:16px;}
-.swipe-hint{font-size:12px;color:var(--muted);text-align:center;margin-top:12px;}
+/* BUTTONS */
+.btns{display:flex;gap:14px;justify-content:center;align-items:center;}
+.b{border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;transition:all .2s;box-shadow:0 3px 12px rgba(0,0,0,.1);}
+.b:hover{transform:scale(1.1);}
+.b-undo{width:42px;height:42px;font-size:15px;background:#fff;border:2px solid var(--border2);color:var(--muted);}
+.b-skip{width:54px;height:54px;font-size:20px;background:#fff;border:2px solid #ef4444;color:#ef4444;}
+.b-apply{width:66px;height:66px;font-size:24px;background:var(--g);color:#fff;box-shadow:0 4px 20px rgba(14,162,113,.4);}
+.b-save{width:44px;height:44px;font-size:16px;background:#fff;border:2px solid #f59e0b;color:#f59e0b;}
+.hint{font-size:11.5px;color:var(--muted);text-align:center;margin-top:10px;}
 
-/* EMPTY STATE */
-.empty-state{text-align:center;padding:60px 20px;}
-.empty-ico{font-size:64px;margin-bottom:16px;}
-.empty-title{font-family:'Fraunces',serif;font-size:24px;color:var(--text);letter-spacing:-0.5px;margin-bottom:8px;}
-.empty-sub{font-size:14px;color:var(--muted);margin-bottom:24px;}
-.reload-btn{background:var(--g);color:#fff;border:none;padding:12px 28px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;}
+/* EMPTY */
+.empty{text-align:center;padding:40px 20px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.empty h3{font-family:'Fraunces',serif;font-size:22px;margin-bottom:8px;}
+.empty p{font-size:13px;color:var(--muted);margin-bottom:18px;}
+.empty button{background:var(--g);color:#fff;border:none;padding:11px 26px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:600;}
 
-/* RIGHT PANEL */
-.right-panel{position:sticky;top:84px;height:fit-content;}
-.applied-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:18px;}
-.applied-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
-.applied-count{background:var(--g);color:#fff;font-size:11px;padding:2px 9px;border-radius:100px;}
-.applied-list{display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto;}
-.applied-item{display:flex;gap:10px;align-items:center;padding:10px;background:var(--bg2);border-radius:12px;animation:slideIn .3s ease;}
-@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
-.applied-ico{width:36px;height:36px;border-radius:10px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.applied-role{font-size:13px;font-weight:600;color:var(--text);}
-.applied-org{font-size:11.5px;color:var(--muted);}
-.applied-status{font-size:10.5px;background:var(--gl);color:var(--gd);padding:2px 8px;border-radius:100px;margin-top:3px;display:inline-block;}
-.saved-card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:18px;margin-top:14px;}
+/* RIGHT */
+.applied-item{display:flex;gap:9px;align-items:center;padding:9px;background:var(--bg2);border-radius:10px;margin-bottom:8px;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.ai-ico{width:32px;height:32px;border-radius:9px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.ai-role{font-size:12.5px;font-weight:600;color:var(--text);}
+.ai-org{font-size:11px;color:var(--muted);}
+.ai-badge{font-size:10px;background:var(--gl);color:var(--gd);padding:1px 7px;border-radius:100px;display:inline-block;margin-top:2px;}
+.count-badge{background:var(--g);color:#fff;font-size:10px;font-weight:700;padding:1px 8px;border-radius:100px;margin-left:6px;}
 
-/* CONFETTI */
-.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;}
-.conf{position:absolute;width:10px;height:10px;border-radius:2px;animation:confFall linear forwards;}
-@keyframes confFall{0%{opacity:1;transform:translateY(-20px) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
-
-/* TOAST */
-.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#0a1a12;color:#fff;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:500;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:8px;}
+/* TOAST & CONFETTI */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#0a1a12;color:#fff;padding:11px 22px;border-radius:100px;font-size:13.5px;font-weight:500;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.conf-wrap{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;}
+.conf{position:absolute;border-radius:2px;animation:fall linear forwards;}
+@keyframes fall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(100vh) rotate(720deg)}}
 </style>
 </head>
 <body>
 
 <nav>
   <a class="logo" href="index.html">Tal<em>entry</em></a>
-  <div style="font-size:13px;font-weight:600;color:var(--text);">💼 Swipe Jobs</div>
+  <div style="font-size:13px;font-weight:600;">💼 Swipe Jobs</div>
   <div class="nav-r" id="navR">
     <a href="browse-jobs.html" style="font-size:13px;color:var(--muted);text-decoration:none;">List view</a>
   </div>
-  <button class="hamburger" onclick="toggleMenu()" id="hamburger"><span></span><span></span><span></span></button>
 </nav>
 
 <div class="swipe-layout">
 
-  <!-- LEFT: FILTERS -->
-  <div class="left-panel">
-    <div class="filter-card">
-      <div class="filter-title">🔍 Filter jobs</div>
-      <div class="filter-group">
-        <span class="filter-label">Category</span>
-        <div class="filter-chips">
-          <button class="fchip on" onclick="toggleChip(this,'All')">All</button>
-          <button class="fchip" onclick="toggleChip(this,'Biomedical')">Biomedical</button>
-          <button class="fchip" onclick="toggleChip(this,'Nursing')">Nursing</button>
-          <button class="fchip" onclick="toggleChip(this,'Lab')">Lab</button>
-          <button class="fchip" onclick="toggleChip(this,'Pharmacy')">Pharmacy</button>
-          <button class="fchip" onclick="toggleChip(this,'INGO')">INGO</button>
-        </div>
-      </div>
-      <div class="filter-group">
-        <span class="filter-label">Location</span>
-        <select class="filter-select" id="filterLocation" onchange="reloadCards()">
-          <option value="">All Nepal</option>
-          <option>Kathmandu</option>
-          <option>Pokhara</option>
-          <option>Lalitpur</option>
-          <option>Bharatpur</option>
-        </select>
-      </div>
-      <div class="filter-group">
-        <span class="filter-label">Job type</span>
-        <select class="filter-select" id="filterType" onchange="reloadCards()">
-          <option value="">All types</option>
-          <option>Full time</option>
-          <option>Part time</option>
-          <option>Contract</option>
-        </select>
+  <!-- LEFT -->
+  <div>
+    <div class="side-card" style="margin-bottom:14px;">
+      <div class="side-title">🔍 Filter</div>
+      <div class="fchips" id="catChips">
+        <button class="fchip on" data-cat="">All</button>
+        <button class="fchip" data-cat="Biomedical Engineering">Biomedical</button>
+        <button class="fchip" data-cat="Nursing">Nursing</button>
+        <button class="fchip" data-cat="Laboratory">Lab</button>
+        <button class="fchip" data-cat="Pharmacy">Pharmacy</button>
+        <button class="fchip" data-cat="Public Health">INGO</button>
       </div>
     </div>
-
-    <div class="stats-card">
-      <div class="stat-row"><span class="stat-lbl">Applied</span><span class="stat-val" id="statApplied">0</span></div>
-      <div class="stat-row"><span class="stat-lbl">Skipped</span><span class="stat-val" id="statSkipped">0</span></div>
-      <div class="stat-row"><span class="stat-lbl">Saved</span><span class="stat-val" id="statSaved">0</span></div>
-      <div class="stat-row"><span class="stat-lbl">Remaining</span><span class="stat-val" id="statRemaining">0</span></div>
+    <div class="side-card">
+      <div class="side-title">📊 Session stats</div>
+      <div class="stat-row"><span>Applied</span><span class="stat-n" id="nApplied">0</span></div>
+      <div class="stat-row"><span>Skipped</span><span class="stat-n" id="nSkipped">0</span></div>
+      <div class="stat-row"><span>Saved</span><span class="stat-n" id="nSaved">0</span></div>
+      <div class="stat-row"><span>Left</span><span class="stat-n" id="nLeft">—</span></div>
     </div>
   </div>
 
-  <!-- CENTER: SWIPE DECK -->
+  <!-- CENTER -->
   <div class="swipe-center">
-    <div class="swipe-header">
-      <div class="swipe-title">Find your next role</div>
-      <div class="swipe-count" id="swipeCount">Loading...</div>
-    </div>
-
-    <div class="deck" id="deck">
-      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);">
-        <div style="text-align:center">
-          <div style="font-size:40px;margin-bottom:12px">⏳</div>
-          <div>Loading jobs...</div>
-        </div>
+    <div class="deck-wrap" id="deckWrap">
+      <div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);">
+        <div style="text-align:center"><div style="font-size:36px;margin-bottom:8px">⏳</div>Loading jobs...</div>
       </div>
     </div>
-
-    <div class="action-btns">
-      <button class="abt abt-undo" onclick="undoSwipe()" title="Undo">↩</button>
-      <button class="abt abt-skip" onclick="swipeCard('skip')" title="Skip">✕</button>
-      <button class="abt abt-apply" onclick="swipeCard('apply')" title="Apply now">✓</button>
-      <button class="abt abt-save" onclick="swipeCard('save')" title="Save for later">🔖</button>
+    <div class="btns">
+      <button class="b b-undo"    onclick="undo()"          title="Undo (Z)">↩</button>
+      <button class="b b-skip"    onclick="action('skip')"  title="Skip (←)">✕</button>
+      <button class="b b-apply"   onclick="action('apply')" title="Apply (→)">✓</button>
+      <button class="b b-save"    onclick="action('save')"  title="Save (↑)">🔖</button>
     </div>
-    <div class="swipe-hint">← Swipe left to skip · Swipe right to apply · ↑ Save for later</div>
+    <div class="hint">← Skip · → Apply · ↑ Save · Z Undo</div>
   </div>
 
-  <!-- RIGHT: APPLIED LIST -->
-  <div class="right-panel">
-    <div class="applied-card">
-      <div class="applied-title">
-        Applied jobs
-        <span class="applied-count" id="appliedCount">0</span>
-      </div>
-      <div class="applied-list" id="appliedList">
-        <div style="font-size:13px;color:var(--muted);text-align:center;padding:16px;">Swipe right to apply!</div>
-      </div>
+  <!-- RIGHT -->
+  <div>
+    <div class="side-card" style="margin-bottom:14px;">
+      <div class="side-title">✅ Applied <span class="count-badge" id="cApplied">0</span></div>
+      <div id="appliedList"><div style="font-size:12px;color:var(--muted);">Swipe right to apply!</div></div>
     </div>
-    <div class="saved-card">
-      <div class="applied-title">
-        Saved jobs
-        <span class="applied-count" id="savedCount" style="background:#f59e0b">0</span>
-      </div>
-      <div class="applied-list" id="savedList">
-        <div style="font-size:13px;color:var(--muted);text-align:center;padding:16px;">Swipe up to save!</div>
-      </div>
+    <div class="side-card">
+      <div class="side-title">🔖 Saved <span class="count-badge" id="cSaved" style="background:#f59e0b;">0</span></div>
+      <div id="savedList"><div style="font-size:12px;color:var(--muted);">Swipe up to save!</div></div>
     </div>
   </div>
 
 </div>
 
-<!-- CONFETTI -->
-<div class="confetti-wrap" id="confetti"></div>
-<!-- TOAST -->
+<div class="conf-wrap" id="confWrap"></div>
 <div class="toast" id="toast"></div>
 
-<script type="module" src="navbar.js"></script>
-<script>
-// ── SWIPE STATE ────────────────────────────
-let jobQueue = [];
-let currentIdx = 0;
-let appliedJobs = [];
-let savedJobs = [];
-let skippedJobs = [];
-let history = [];
-let statsApplied = 0, statsSkipped = 0, statsSaved = 0;
+<!-- ALL LOGIC IN ONE MODULE SCRIPT -->
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co','sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
 
-// ── DRAG STATE ─────────────────────────────
-let isDragging = false;
-let startX = 0, startY = 0, currentX = 0, currentY = 0;
-let topCard = null;
-
-// Sample fallback jobs (if Supabase is empty)
-const sampleJobs = [
-  { id:'1', title:'Biomedical Engineer', company:'Bir Hospital', location:'Kathmandu', job_type:'Full time', category:'Biomedical Engineering', salary_min:40000, salary_max:60000, description:'Maintain and calibrate ICU ventilators, imaging systems and patient monitoring devices. Ensure all equipment meets international standards.', skills:['Medical devices','ICU equipment','Ventilator','Calibration'], exp_level:'Mid level (3–5 yrs)', created_at: new Date().toISOString() },
-  { id:'2', title:'Clinical Lab Technician', company:'Grande Hospital', location:'Kathmandu', job_type:'Full time', category:'Laboratory', salary_min:28000, salary_max:42000, description:'Perform routine and complex laboratory tests. Operate automated analyzers and maintain quality control standards.', skills:['Hematology','Microbiology','PCR','Quality control'], exp_level:'Junior (1–3 yrs)', created_at: new Date().toISOString() },
-  { id:'3', title:'Staff Nurse (ICU)', company:'Norvic Hospital', location:'Lalitpur', job_type:'Full time', category:'Nursing', salary_min:32000, salary_max:50000, description:'Provide high-quality nursing care in ICU setting. Monitor critically ill patients and assist with procedures.', skills:['ICU care','Patient monitoring','IV therapy','Critical care'], exp_level:'Mid level (3–5 yrs)', created_at: new Date().toISOString() },
-  { id:'4', title:'Radiographer', company:'Patan Hospital', location:'Lalitpur', job_type:'Full time', category:'Radiology', salary_min:28000, salary_max:45000, description:'Perform X-ray, CT scan, and MRI procedures. Maintain imaging equipment and ensure radiation safety protocols.', skills:['X-ray','CT scan','MRI','Radiation safety'], exp_level:'Junior (1–3 yrs)', created_at: new Date().toISOString() },
-  { id:'5', title:'Health Program Officer', company:'WHO Nepal', location:'Kathmandu', job_type:'Contract', category:'Public Health', salary_min:80000, salary_max:120000, description:'Lead public health programs in Nepal. Coordinate with government ministries and implement WHO health initiatives.', skills:['Public health','Program management','M&E','Report writing'], exp_level:'Senior (5+ yrs)', created_at: new Date().toISOString() },
-  { id:'6', title:'Pharmacist', company:'KIST Medical College', location:'Kathmandu', job_type:'Full time', category:'Pharmacy', salary_min:30000, salary_max:50000, description:'Dispense medications, provide patient counseling, and ensure drug safety protocols are followed.', skills:['Drug dispensing','Patient counseling','Pharmacy management'], exp_level:'Junior (1–3 yrs)', created_at: new Date().toISOString() },
-  { id:'7', title:'Physiotherapist', company:'B&B Hospital', location:'Kathmandu', job_type:'Full time', category:'Physiotherapy', salary_min:28000, salary_max:45000, description:'Assess and treat patients with physical disabilities. Design and implement rehabilitation programs.', skills:['Rehabilitation','Manual therapy','Exercise therapy','Assessment'], exp_level:'Junior (1–3 yrs)', created_at: new Date().toISOString() },
-  { id:'8', title:'Biomedical Engineer (Senior)', company:'Nepal Medical College', location:'Kathmandu', job_type:'Full time', category:'Biomedical Engineering', salary_min:65000, salary_max:100000, description:'Lead biomedical engineering department. Manage equipment procurement, maintenance teams, and technology upgrades.', skills:['Team management','Equipment procurement','Medical devices','Budgeting'], exp_level:'Senior (5+ yrs)', created_at: new Date().toISOString() },
+// ── SAMPLE JOBS FALLBACK ──
+const SAMPLES = [
+  {id:'s1',title:'Biomedical Engineer',company:'Bir Hospital',location:'Kathmandu',job_type:'Full time',category:'Biomedical Engineering',salary_min:40000,salary_max:60000,description:'Maintain and calibrate ICU ventilators, imaging systems and patient monitoring devices. Reduce equipment downtime and ensure compliance with international standards.',skills:['ICU equipment','Ventilator','Medical devices','Calibration'],created_at:new Date().toISOString()},
+  {id:'s2',title:'Clinical Lab Technician',company:'Grande Hospital',location:'Kathmandu',job_type:'Full time',category:'Laboratory',salary_min:28000,salary_max:42000,description:'Perform routine and complex laboratory tests including hematology, biochemistry, and microbiology. Operate automated analyzers and maintain quality control.',skills:['Hematology','Microbiology','PCR','Quality control'],created_at:new Date().toISOString()},
+  {id:'s3',title:'Staff Nurse (ICU)',company:'Norvic Hospital',location:'Lalitpur',job_type:'Full time',category:'Nursing',salary_min:32000,salary_max:50000,description:'Provide high quality nursing care in ICU. Monitor critically ill patients, administer medications, and assist physicians with procedures.',skills:['ICU care','Patient monitoring','IV therapy','Critical care'],created_at:new Date().toISOString()},
+  {id:'s4',title:'Radiographer',company:'Patan Hospital',location:'Lalitpur',job_type:'Full time',category:'Radiology',salary_min:28000,salary_max:45000,description:'Perform X-ray, CT scan, and ultrasound procedures. Maintain imaging equipment and ensure radiation safety protocols are followed.',skills:['X-ray','CT scan','Ultrasound','Radiation safety'],created_at:new Date().toISOString()},
+  {id:'s5',title:'Health Program Officer',company:'WHO Nepal',location:'Kathmandu',job_type:'Contract',category:'Public Health',salary_min:80000,salary_max:120000,description:'Lead public health initiatives across Nepal. Coordinate with MoHP and implement WHO programs. Prepare reports and manage field teams.',skills:['Public health','Program management','M&E','Reporting'],created_at:new Date().toISOString()},
+  {id:'s6',title:'Pharmacist',company:'KIST Medical',location:'Kathmandu',job_type:'Full time',category:'Pharmacy',salary_min:30000,salary_max:50000,description:'Dispense medications and provide patient counseling. Ensure drug safety protocols and maintain pharmacy records.',skills:['Drug dispensing','Patient counseling','Inventory'],created_at:new Date().toISOString()},
+  {id:'s7',title:'Physiotherapist',company:'B&B Hospital',location:'Kathmandu',job_type:'Full time',category:'Physiotherapy',salary_min:28000,salary_max:45000,description:'Assess and treat patients with physical disabilities. Design rehabilitation programs and guide recovery exercises.',skills:['Rehabilitation','Manual therapy','Exercise therapy'],created_at:new Date().toISOString()},
+  {id:'s8',title:'Senior Biomedical Engineer',company:'Nepal Medical College',location:'Bhaktapur',job_type:'Full time',category:'Biomedical Engineering',salary_min:65000,salary_max:100000,description:'Lead the biomedical engineering department. Manage equipment procurement, maintenance staff, and annual technology upgrades.',skills:['Team management','Equipment procurement','Budgeting'],created_at:new Date().toISOString()},
 ];
 
-const catIcons = { 'Biomedical Engineering':'🔧', 'Laboratory':'🧬', 'Nursing':'🏥', 'Radiology':'🔬', 'Public Health':'🌍', 'Pharmacy':'💊', 'Physiotherapy':'🦾', 'default':'🏥' };
+const ICONS = {'Biomedical Engineering':'🔧','Laboratory':'🧬','Nursing':'🏥','Radiology':'🔬','Public Health':'🌍','Pharmacy':'💊','Physiotherapy':'🦾'};
 
-function getMatchScore(job) {
-  return Math.floor(65 + Math.random() * 30);
-}
+// ── STATE ──
+let allJobs = [];
+let queue = [];
+let idx = 0;
+let hist = [];
+let nApplied=0,nSkipped=0,nSaved=0;
+let activeCat = '';
+let dragging=false, sx=0, sy=0, lx=0, ly=0;
 
-function initDeck(jobs) {
-  jobQueue = (jobs && jobs.length > 0) ? [...jobs] : [...sampleJobs];
-  currentIdx = 0;
-  renderDeck();
-  updateStats();
-}
-
-// ── LOAD JOBS FROM SUPABASE ──────────────
-async function loadJobs() {
+// ── LOAD FROM SUPABASE ──
+async function loadFromDB() {
   try {
-    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
-    const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co','sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
-    window._sb = sb;
-    const { data: jobs } = await sb.from('jobs').select('*').eq('status','active').order('created_at',{ascending:false});
-    if(jobs && jobs.length > 0) {
-      initDeck(jobs);
-    } else {
-      initDeck(null); // use sample jobs
+    const {data} = await sb.from('jobs').select('*').eq('status','active').order('created_at',{ascending:false});
+    if(data && data.length > 0) {
+      allJobs = data;
+      buildQueue();
     }
-  } catch(e) {
-    console.error('Supabase error:', e);
-    initDeck(null); // use sample jobs as fallback
-  }
+  } catch(e) { console.log('DB error, using samples'); }
 }
 
-// Start with sample jobs immediately, then replace with real jobs
-initDeck(null);
-loadJobs();
+function buildQueue() {
+  const src = allJobs.length > 0 ? allJobs : SAMPLES;
+  queue = activeCat ? src.filter(j => j.category === activeCat) : [...src];
+  idx = 0;
+  hist = [];
+  render();
+}
 
-function renderDeck() {
-  const deck = document.getElementById('deck');
-  const remaining = jobQueue.slice(currentIdx, currentIdx + 3);
+function render() {
+  const wrap = document.getElementById('deckWrap');
+  const visible = queue.slice(idx, idx+3);
 
-  if(remaining.length === 0) {
-    deck.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-ico">🎉</div>
-        <div class="empty-title">You've seen them all!</div>
-        <div class="empty-sub">You went through all ${jobQueue.length} jobs. Want to start over?</div>
-        <button class="reload-btn" onclick="reloadCards()">🔄 Start over</button>
-      </div>`;
-    document.getElementById('swipeCount').textContent = 'All done!';
+  document.getElementById('nLeft').textContent = Math.max(0, queue.length - idx);
+
+  if(visible.length === 0) {
+    wrap.innerHTML = `<div class="empty"><div style="font-size:48px;margin-bottom:12px">🎉</div><h3>You've seen them all!</h3><p>You went through all ${queue.length} jobs!</p><button onclick="window.restartSwipe()">🔄 Start over</button></div>`;
     return;
   }
 
-  deck.innerHTML = '';
-  remaining.reverse().forEach((job, i) => {
-    const card = createCard(job, i === remaining.length - 1);
-    deck.appendChild(card);
+  // Remove old cards
+  wrap.querySelectorAll('.jcard').forEach(c => c.remove());
+
+  // Render back cards first (no interaction)
+  visible.slice(1).reverse().forEach((job, i) => {
+    const pos = visible.length - 1 - i; // 2 or 1
+    wrap.appendChild(makeCard(job, pos === 1 ? 'c2' : 'c3'));
   });
 
-  const count = jobQueue.length - currentIdx;
-  document.getElementById('swipeCount').textContent = `${count} job${count !== 1 ? 's' : ''} remaining`;
-  updateStats();
-
-  // Attach drag to top card
-  topCard = deck.querySelector('.job-card.top');
-  if(topCard) attachDrag(topCard, jobQueue[currentIdx]);
+  // Render top card
+  const top = makeCard(visible[0], 'c1');
+  wrap.appendChild(top);
+  attachDrag(top, visible[0]);
 }
 
-function createCard(job, isTop) {
-  const card = document.createElement('div');
-  const posClass = isTop ? 'top' : '';
-  const idx = jobQueue.indexOf(job) - currentIdx;
-  const backClass = idx === 1 ? 'back-1' : idx === 2 ? 'back-2' : '';
-  card.className = `job-card ${posClass} ${backClass}`;
+function makeCard(job, cls) {
+  const el = document.createElement('div');
+  el.className = `jcard ${cls}`;
+  const icon = ICONS[job.category] || '🏥';
+  const sal = job.salary_min ? `Rs. ${Number(job.salary_min).toLocaleString()}${job.salary_max?'–'+Number(job.salary_max).toLocaleString():'+'}/mo` : 'Negotiable';
+  const skills = Array.isArray(job.skills) ? job.skills.slice(0,4) : [];
+  const match = 65 + Math.floor(Math.random()*30);
+  const date = new Date(job.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 
-  const match = getMatchScore(job);
-  const icon = catIcons[job.category] || catIcons.default;
-  const sal = job.salary_min
-    ? `Rs. ${Number(job.salary_min).toLocaleString()}${job.salary_max ? '–'+Number(job.salary_max).toLocaleString() : '+'}/mo`
-    : 'Salary negotiable';
-  const skills = (job.skills || ['Healthcare','Clinical','Patient care']).slice(0,4);
-  const posted = new Date(job.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric'});
-
-  card.innerHTML = `
-    <div class="swipe-overlay-apply" id="overlay-apply-${job.id}">✓ APPLY</div>
-    <div class="swipe-overlay-skip" id="overlay-skip-${job.id}">✕ SKIP</div>
-    <div class="swipe-overlay-save" id="overlay-save-${job.id}">🔖 SAVE</div>
-    <div class="card-header">
-      <div class="card-match">${match}% match</div>
+  el.innerHTML = `
+    <div class="ov ov-apply">✓ APPLY</div>
+    <div class="ov ov-skip">✕ SKIP</div>
+    <div class="ov ov-save">🔖 SAVE</div>
+    <div class="card-top">
+      <div class="match-badge">${match}% match</div>
       <div class="card-ico">${icon}</div>
       <div class="card-title">${job.title}</div>
-      <div class="card-org">🏥 ${job.company} · 📍 ${job.location || 'Nepal'}</div>
+      <div class="card-org">🏥 ${job.company} · 📍 ${job.location||'Nepal'}</div>
       <div class="card-tags">
-        ${job.job_type ? `<span class="ctag ctag-g">${job.job_type}</span>` : ''}
-        ${job.exp_level ? `<span class="ctag ctag-b">${job.exp_level}</span>` : ''}
-        ${job.category ? `<span class="ctag ctag-a">${job.category}</span>` : ''}
+        ${job.job_type?`<span class="tag tg">${job.job_type}</span>`:''}
+        ${job.category?`<span class="tag ta">${job.category}</span>`:''}
       </div>
     </div>
-    <div class="card-body">
-      <div class="card-salary">${sal}</div>
-      <div class="card-section">About the role</div>
-      <div class="card-desc">${(job.description || '').substring(0, 160)}${job.description && job.description.length > 160 ? '...' : ''}</div>
-      <div class="card-section" style="margin-top:14px">Skills needed</div>
-      <div class="card-skills">${skills.map(s=>`<span class="cskill">${s}</span>`).join('')}</div>
+    <div class="card-mid">
+      <div class="salary">${sal}</div>
+      <div class="desc">${job.description||''}</div>
+      ${skills.length?`<div class="skills">${skills.map(s=>`<span class="sk">${s}</span>`).join('')}</div>`:''}
     </div>
-    <div class="card-footer">
-      <span class="card-posted">Posted ${posted}</span>
-      <span class="card-location">📍 ${job.location || 'Nepal'}</span>
+    <div class="card-bot">
+      <span>Posted ${date}</span>
+      <span>📍 ${job.location||'Nepal'}</span>
     </div>
   `;
-  return card;
+  return el;
 }
 
-// ── DRAG TO SWIPE ──────────────────────────
+// ── DRAG ──
 function attachDrag(card, job) {
-  let startX, startY, lastX, lastY;
-
-  const onStart = (e) => {
-    if(e.target.closest('.card-body')) return; // allow scrolling
-    isDragging = true;
-    const pt = e.touches ? e.touches[0] : e;
-    startX = pt.clientX;
-    startY = pt.clientY;
-    lastX = startX; lastY = startY;
+  const start = (e) => {
+    if(e.target.closest('.card-mid')) return;
+    dragging = true;
+    const p = e.touches?e.touches[0]:e;
+    sx = lx = p.clientX;
+    sy = ly = p.clientY;
     card.style.transition = 'none';
   };
-
-  const onMove = (e) => {
-    if(!isDragging) return;
+  const move = (e) => {
+    if(!dragging) return;
     e.preventDefault();
-    const pt = e.touches ? e.touches[0] : e;
-    lastX = pt.clientX; lastY = pt.clientY;
-    const dx = lastX - startX;
-    const dy = lastY - startY;
-    const rot = dx * 0.08;
-    card.style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg)`;
-
-    // Show overlays
-    const applyOverlay = card.querySelector('[id^="overlay-apply"]');
-    const skipOverlay = card.querySelector('[id^="overlay-skip"]');
-    const saveOverlay = card.querySelector('[id^="overlay-save"]');
-
-    if(dx > 60) { applyOverlay.style.opacity = Math.min(1, (dx-60)/80); skipOverlay.style.opacity = 0; }
-    else if(dx < -60) { skipOverlay.style.opacity = Math.min(1, (-dx-60)/80); applyOverlay.style.opacity = 0; }
-    else { applyOverlay.style.opacity = 0; skipOverlay.style.opacity = 0; }
-
-    if(dy < -80) { saveOverlay.style.opacity = Math.min(1, (-dy-80)/80); }
-    else { saveOverlay.style.opacity = 0; }
+    const p = e.touches?e.touches[0]:e;
+    lx = p.clientX; ly = p.clientY;
+    const dx = lx-sx, dy = ly-sy;
+    card.style.transform = `translate(${dx}px,${dy}px) rotate(${dx*.07}deg)`;
+    const aApply = card.querySelector('.ov-apply');
+    const aSkip  = card.querySelector('.ov-skip');
+    const aSave  = card.querySelector('.ov-save');
+    aApply.style.opacity = dx>50 ? Math.min(1,(dx-50)/70) : 0;
+    aSkip.style.opacity  = dx<-50 ? Math.min(1,(-dx-50)/70) : 0;
+    aSave.style.opacity  = dy<-80 ? Math.min(1,(-dy-80)/70) : 0;
   };
-
-  const onEnd = () => {
-    if(!isDragging) return;
-    isDragging = false;
-    const dx = lastX - startX;
-    const dy = lastY - startY;
-    card.style.transition = 'transform 0.3s ease';
-
-    if(dx > 100) {
-      flyCard(card, 'right', () => processSwipe('apply', job));
-    } else if(dx < -100) {
-      flyCard(card, 'left', () => processSwipe('skip', job));
-    } else if(dy < -100) {
-      flyCard(card, 'up', () => processSwipe('save', job));
-    } else {
-      card.style.transform = '';
-    }
-    // Hide overlays
-    card.querySelectorAll('[id^="overlay-"]').forEach(o => o.style.opacity = 0);
+  const end = () => {
+    if(!dragging) return;
+    dragging = false;
+    const dx = lx-sx, dy = ly-sy;
+    card.style.transition = 'transform .3s ease';
+    if(dx>100)       fly(card,'right',()=>doAction('apply',job));
+    else if(dx<-100) fly(card,'left', ()=>doAction('skip',job));
+    else if(dy<-100) fly(card,'up',   ()=>doAction('save',job));
+    else             card.style.transform = '';
+    card.querySelectorAll('.ov').forEach(o=>o.style.opacity=0);
   };
-
-  card.addEventListener('mousedown', onStart);
-  card.addEventListener('touchstart', onStart, {passive:true});
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('touchmove', onMove, {passive:false});
-  document.addEventListener('mouseup', onEnd);
-  document.addEventListener('touchend', onEnd);
+  card.addEventListener('mousedown',start);
+  card.addEventListener('touchstart',start,{passive:true});
+  window.addEventListener('mousemove',move);
+  window.addEventListener('touchmove',move,{passive:false});
+  window.addEventListener('mouseup',end);
+  window.addEventListener('touchend',end);
 }
 
-function flyCard(card, dir, cb) {
-  const dist = window.innerWidth + 200;
-  let tx = 0, ty = 0, rot = 0;
-  if(dir === 'right') { tx = dist; rot = 30; }
-  else if(dir === 'left') { tx = -dist; rot = -30; }
-  else if(dir === 'up') { ty = -dist; }
-  card.style.transition = 'transform 0.45s cubic-bezier(0.25,0.46,0.45,0.94)';
+function fly(card, dir, cb) {
+  const w = window.innerWidth+300;
+  const tx = dir==='right'?w:dir==='left'?-w:0;
+  const ty = dir==='up'?-(window.innerHeight+200):0;
+  const rot = dir==='right'?25:dir==='left'?-25:0;
+  card.style.transition = 'transform .4s cubic-bezier(.25,.46,.45,.94)';
   card.style.transform = `translate(${tx}px,${ty}px) rotate(${rot}deg)`;
-  setTimeout(() => { card.remove(); cb(); }, 400);
+  setTimeout(()=>{card.remove();cb();},380);
 }
 
-function swipeCard(action) {
-  const deck = document.getElementById('deck');
-  const card = deck.querySelector('.job-card.top');
-  if(!card) return;
-  const job = jobQueue[currentIdx];
-  const dir = action === 'apply' ? 'right' : action === 'skip' ? 'left' : 'up';
-
-  // Show overlay briefly
-  const overlay = card.querySelector(`[id^="overlay-${action}"]`);
-  if(overlay) overlay.style.opacity = '1';
-
-  setTimeout(() => flyCard(card, dir, () => processSwipe(action, job)), 80);
-}
-
-function processSwipe(action, job) {
-  history.push({ action, job, idx: currentIdx });
-  currentIdx++;
-
-  if(action === 'apply') {
-    appliedJobs.unshift(job);
-    statsApplied++;
-    addToApplied(job);
-    saveApplication(job);
-    showConfetti();
-    showToast(`✅ Applied to ${job.title}!`, '#0ea271');
-  } else if(action === 'skip') {
-    skippedJobs.push(job);
-    statsSkipped++;
-    showToast(`Skipped ${job.title}`, '#666');
-  } else if(action === 'save') {
-    savedJobs.unshift(job);
-    statsSaved++;
-    addToSaved(job);
-    showToast(`🔖 Saved ${job.title}`, '#f59e0b');
+function doAction(act, job) {
+  hist.push({act,job,idx});
+  idx++;
+  if(act==='apply'){
+    nApplied++;
+    addToList('appliedList','cApplied',job,'var(--gl)','Applied ✓','var(--gd)');
+    saveApp(job);
+    confetti();
+    toast(`✅ Applied to ${job.title}!`,'#0ea271');
+  } else if(act==='skip'){
+    nSkipped++;
+    toast(`Skipped ${job.title}`,'#666');
+  } else {
+    nSaved++;
+    addToList('savedList','cSaved',job,'#fff3d6','Saved 🔖','#7a4e00');
+    toast(`🔖 Saved ${job.title}`,'#f59e0b');
   }
-
-  renderDeck();
+  document.getElementById('nApplied').textContent=nApplied;
+  document.getElementById('nSkipped').textContent=nSkipped;
+  document.getElementById('nSaved').textContent=nSaved;
+  render();
 }
 
-function undoSwipe() {
-  if(history.length === 0) { showToast('Nothing to undo!', '#666'); return; }
-  const last = history.pop();
-  currentIdx = last.idx;
-  if(last.action === 'apply') { appliedJobs.shift(); statsApplied--; document.getElementById('appliedList').firstChild && document.getElementById('appliedList').removeChild(document.getElementById('appliedList').firstChild); }
-  if(last.action === 'save') { savedJobs.shift(); statsSaved--; }
-  if(last.action === 'skip') { statsSkipped--; }
-  renderDeck();
-  showToast('↩ Undone!', '#4a6b58');
-}
+// Expose to buttons (outside module scope)
+window.swipeAction = (act) => {
+  const top = document.querySelector('.jcard.c1');
+  if(!top) return;
+  const job = queue[idx];
+  const dir = act==='apply'?'right':act==='skip'?'left':'up';
+  const ov = top.querySelector(`.ov-${act}`);
+  if(ov) ov.style.opacity='1';
+  setTimeout(()=>fly(top,dir,()=>doAction(act,job)),60);
+};
 
-async function saveApplication(job) {
-  if(!window._sb) return;
+window.undoSwipe = () => {
+  if(!hist.length){ toast('Nothing to undo','#666'); return; }
+  const last = hist.pop();
+  idx = last.idx;
+  if(last.act==='apply'){ nApplied=Math.max(0,nApplied-1); document.getElementById('nApplied').textContent=nApplied; const l=document.getElementById('appliedList'); if(l.firstElementChild?.classList.contains('applied-item')) l.removeChild(l.firstElementChild); document.getElementById('cApplied').textContent=nApplied; }
+  if(last.act==='save'){  nSaved=Math.max(0,nSaved-1);   document.getElementById('nSaved').textContent=nSaved; const l=document.getElementById('savedList');  if(l.firstElementChild?.classList.contains('applied-item')) l.removeChild(l.firstElementChild); document.getElementById('cSaved').textContent=nSaved; }
+  if(last.act==='skip')   nSkipped=Math.max(0,nSkipped-1); document.getElementById('nSkipped').textContent=nSkipped;
+  render();
+  toast('↩ Undone!','#4a6b58');
+};
+
+window.restartSwipe = () => { buildQueue(); };
+
+async function saveApp(job) {
   try {
-    const { data: { session } } = await window._sb.auth.getSession();
-    if(!session) return; // not logged in — still show UI feedback
-    await window._sb.from('applications').insert([{
-      job_id: job.id,
-      applicant_id: session.user.id,
-      status: 'applied',
-      cover_letter: 'Applied via Swipe'
-    }]);
-    showToast('✅ Saved to your applications!', '#064e38');
-  } catch(e) { console.log('Save error:', e); }
+    const {data:{session}} = await sb.auth.getSession();
+    if(!session) return;
+    await sb.from('applications').insert([{job_id:job.id,applicant_id:session.user.id,status:'applied',cover_letter:'Applied via Swipe'}]);
+  } catch(e){}
 }
 
-function addToApplied(job) {
-  const list = document.getElementById('appliedList');
-  const empty = list.querySelector('div');
-  if(empty && empty.style.textAlign === 'center') list.innerHTML = '';
-  const icon = catIcons[job.category] || '🏥';
+function addToList(listId, countId, job, bg, label, color) {
+  const list = document.getElementById(listId);
+  const empty = list.querySelector('div:not(.applied-item)');
+  if(empty) list.innerHTML='';
+  const icon = ICONS[job.category]||'🏥';
   const item = document.createElement('div');
-  item.className = 'applied-item';
-  item.innerHTML = `
-    <div class="applied-ico">${icon}</div>
-    <div>
-      <div class="applied-role">${job.title}</div>
-      <div class="applied-org">${job.company}</div>
-      <span class="applied-status">Applied ✓</span>
-    </div>`;
-  list.insertBefore(item, list.firstChild);
-  document.getElementById('appliedCount').textContent = appliedJobs.length;
+  item.className='applied-item';
+  item.innerHTML=`<div class="ai-ico" style="background:${bg}">${icon}</div><div><div class="ai-role">${job.title}</div><div class="ai-org">${job.company}</div><span class="ai-badge" style="background:${bg};color:${color}">${label}</span></div>`;
+  list.insertBefore(item,list.firstChild);
+  document.getElementById(countId).textContent = listId==='appliedList'?nApplied:nSaved;
 }
 
-function addToSaved(job) {
-  const list = document.getElementById('savedList');
-  const empty = list.querySelector('div');
-  if(empty && empty.style.textAlign === 'center') list.innerHTML = '';
-  const icon = catIcons[job.category] || '🏥';
-  const item = document.createElement('div');
-  item.className = 'applied-item';
-  item.innerHTML = `
-    <div class="applied-ico" style="background:#fff3d6">${icon}</div>
-    <div>
-      <div class="applied-role">${job.title}</div>
-      <div class="applied-org">${job.company}</div>
-      <span class="applied-status" style="background:#fff3d6;color:#7a4e00;">Saved 🔖</span>
-    </div>`;
-  list.insertBefore(item, list.firstChild);
-  document.getElementById('savedCount').textContent = savedJobs.length;
-}
-
-function updateStats() {
-  document.getElementById('statApplied').textContent = statsApplied;
-  document.getElementById('statSkipped').textContent = statsSkipped;
-  document.getElementById('statSaved').textContent = statsSaved;
-  document.getElementById('statRemaining').textContent = Math.max(0, jobQueue.length - currentIdx);
-}
-
-function reloadCards() {
-  currentIdx = 0;
-  history = [];
-  initDeck(window._allJobs && window._allJobs.length > 0 ? window._allJobs : null);
-}
-
-function toggleChip(btn, val) {
-  document.querySelectorAll('.fchip').forEach(b => b.classList.remove('on'));
-  btn.classList.add('on');
-  reloadCards();
-}
-
-// ── CONFETTI ──────────────────────────────
-function showConfetti() {
-  const wrap = document.getElementById('confetti');
-  const colors = ['#0ea271','#4ecda4','#d6f5eb','#fff3d6','#dbeeff','#ede9ff'];
-  for(let i = 0; i < 28; i++) {
-    const c = document.createElement('div');
-    c.className = 'conf';
-    c.style.cssText = `left:${Math.random()*100}%;top:-10px;background:${colors[Math.floor(Math.random()*colors.length)]};animation-duration:${0.9+Math.random()*0.8}s;animation-delay:${Math.random()*0.3}s;transform:rotate(${Math.random()*360}deg);width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;`;
+function confetti() {
+  const wrap = document.getElementById('confWrap');
+  const cols = ['#0ea271','#4ecda4','#d6f5eb','#dbeeff','#fff3d6'];
+  for(let i=0;i<30;i++){
+    const c=document.createElement('div');
+    c.className='conf';
+    const size = 6+Math.random()*8;
+    c.style.cssText=`left:${Math.random()*100}%;top:-10px;width:${size}px;height:${size}px;background:${cols[Math.floor(Math.random()*cols.length)]};animation-duration:${.8+Math.random()*.8}s;animation-delay:${Math.random()*.3}s;`;
     wrap.appendChild(c);
-    setTimeout(() => c.remove(), 1800);
+    setTimeout(()=>c.remove(),2000);
   }
 }
 
-// ── TOAST ─────────────────────────────────
-function showToast(msg, bg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.background = bg || '#0a1a12';
+function toast(msg, bg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.style.background=bg||'#0a1a12';
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+  setTimeout(()=>t.classList.remove('show'),2200);
 }
 
-// ── KEYBOARD SHORTCUTS ────────────────────
-document.addEventListener('keydown', e => {
-  if(e.key === 'ArrowRight' || e.key === 'l') swipeCard('apply');
-  else if(e.key === 'ArrowLeft' || e.key === 'j') swipeCard('skip');
-  else if(e.key === 'ArrowUp' || e.key === 'k') swipeCard('save');
-  else if(e.key === 'z') undoSwipe();
+// ── CATEGORY FILTER ──
+document.getElementById('catChips').addEventListener('click', e=>{
+  const btn = e.target.closest('.fchip');
+  if(!btn) return;
+  document.querySelectorAll('.fchip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  activeCat = btn.dataset.cat;
+  buildQueue();
 });
 
-function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('open');
-  document.getElementById('hamburger').classList.toggle('open');
-}
+// ── KEYBOARD ──
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight') window.swipeAction('apply');
+  else if(e.key==='ArrowLeft') window.swipeAction('skip');
+  else if(e.key==='ArrowUp') window.swipeAction('save');
+  else if(e.key==='z'||e.key==='Z') window.undoSwipe();
+});
+
+// ── INIT ──
+buildQueue(); // show samples immediately
+loadFromDB(); // then load real jobs
+
+</script>
+
+<!-- Navbar module separately -->
+<script type="module" src="navbar.js"></script>
+
+<script>
+// Button onclick handlers (need to call module functions via window)
+function action(a){ window.swipeAction(a); }
+function undo(){ window.undoSwipe(); }
+function toggleMenu(){ document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('hamburger').classList.toggle('open'); }
 </script>
 
 <div class="mobile-menu" id="mobileMenu">
@@ -603,7 +449,6 @@ function toggleMenu() {
   <a href="swipe-jobs.html">💼 Swipe jobs</a>
   <a href="resume-builder.html">📄 Resume builder</a>
   <a href="interview-prep.html">🎙 Interview prep</a>
-  <a href="auth.html">🔐 Log in</a>
 </div>
 </body>
 </html>
