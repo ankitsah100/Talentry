@@ -196,7 +196,7 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;pa
         </div>
         <div class="terms-cb">
           <input type="checkbox" id="termsCheck"/>
-          <span>I agree to Talentry's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
+          <span>I agree to Talentry's <a href="terms.html" target="_blank">Terms of Service</a> and <a href="privacy.html" target="_blank">Privacy Policy</a>.</span>
         </div>
         <button class="submit-btn" id="signupBtn" onclick="handleSignup()">Create free account</button>
         <p class="form-note">Already have an account? <a onclick="switchTab('login')">Log in</a></p>
@@ -217,6 +217,20 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;pa
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const supabase = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
 window._sb = supabase;
+
+async function resendConfirmation() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if(!email) { alert('Please enter your email address first'); return; }
+  const { error } = await supabase.auth.resend({ type: 'signup', email });
+  if(!error) {
+    document.getElementById('errorMsg').textContent = '✅ Confirmation email resent! Check your inbox.';
+    document.getElementById('errorMsg').style.background = '#d6f5eb';
+    document.getElementById('errorMsg').style.color = '#064e38';
+    document.getElementById('resendWrap').style.display = 'none';
+  } else {
+    alert('Could not resend: ' + error.message);
+  }
+}
 
 // Check if already logged in
 const { data: { session } } = await supabase.auth.getSession();
@@ -280,6 +294,24 @@ function checkStrength(val){
 
 function showError(msg){
   const el=document.getElementById('errorMsg');
+  const resend=document.getElementById('resendWrap');
+  // User-friendly messages
+  if(msg.includes('Invalid login credentials') || msg.includes('invalid_credentials')){
+    msg='❌ Wrong email or password. Did you confirm your email after signing up?';
+    if(resend) resend.style.display='block';
+  } else if(msg.includes('Email not confirmed') || msg.includes('email_not_confirmed')){
+    msg='📧 Please confirm your email first. Check your inbox for the confirmation link.';
+    el.style.background='#fff3d6'; el.style.color='#7a4e00'; el.style.border='1.5px solid #f59e0b';
+    if(resend) resend.style.display='block';
+  } else if(msg.includes('User already registered')){
+    msg='⚠️ This email is already registered. Please log in instead.';
+  } else if(msg.includes('Password should be at least')){
+    msg='❌ Password must be at least 6 characters.';
+  } else if(msg.includes('Unable to validate email')){
+    msg='❌ Please enter a valid email address.';
+  } else if(msg.includes('Too many requests')){
+    msg='⏳ Too many attempts. Please wait a few minutes.';
+  }
   el.textContent=msg;
   el.classList.add('show');
 }
@@ -295,8 +327,13 @@ async function handleLogin(){
   if(error){showError(error.message);btn.textContent='Log in to Talentry';btn.disabled=false;return;}
   document.getElementById('loginForm').classList.add('hidden');
   document.getElementById('successScreen').classList.add('show');
-  document.getElementById('successMsg').textContent='Welcome back! Redirecting you to jobs...';
-  setTimeout(()=>location.href='browse-jobs.html',1500);
+  document.getElementById('successMsg').textContent='Welcome back! Taking you there...';
+  setTimeout(()=>{
+    const redirect = sessionStorage.getItem('redirectAfterLogin');
+    sessionStorage.removeItem('redirectAfterLogin');
+    const safePage = redirect && redirect.indexOf('auth.html') === -1 ? redirect : 'browse-jobs.html';
+    location.href = safePage;
+  }, 1200);
 }
 
 async function handleSignup(){
@@ -315,10 +352,36 @@ async function handleSignup(){
   const extraData={full_name:fullName,phone,role:currentRole};
   if(currentRole==='jobseeker') extraData.job_title=document.getElementById('jobTitle').value.trim();
   if(currentRole==='employer') extraData.company_name=document.getElementById('companyName').value.trim();
-  const {error}=await window._sb.auth.signUp({email,password,options:{data:extraData}});
+  const {data:signupData, error}=await window._sb.auth.signUp({email,password,options:{data:extraData}});
   if(error){showError(error.message);btn.textContent='Create free account';btn.disabled=false;return;}
+  
+  // Manually upsert profile to ensure role is saved correctly
+  if(signupData?.user){
+    try {
+      await window._sb.from('profiles').upsert({
+        id: signupData.user.id,
+        full_name: fullName,
+        email: email,
+        phone: phone,
+        role: currentRole,
+        job_title: currentRole==='jobseeker' ? document.getElementById('jobTitle').value.trim() : null,
+        company_name: currentRole==='employer' ? document.getElementById('companyName').value.trim() : null,
+        created_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+    } catch(e) { console.log('Profile save error:', e); }
+  }
+  
   document.getElementById('signupForm').classList.add('hidden');
   document.getElementById('successScreen').classList.add('show');
+  // Show appropriate message based on whether email confirmation is needed
+  const msgEl = document.getElementById('successMsg');
+  if(msgEl) {
+    if(currentRole === 'employer') {
+      msgEl.textContent = '🏥 Employer account created! Check your email to confirm, then log in.';
+    } else {
+      msgEl.textContent = '👤 Account created! Check your email to confirm, then log in.';
+    }
+  }
 }
 
 async function handleForgot(){
