@@ -102,6 +102,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
   .b-undo{width:38px;height:38px}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
 </head>
 <body>
 <nav>
@@ -263,78 +264,44 @@ function makeCard(j,cls){
 }
 
 function dragify(card,job){
-  let active=false,sx=0,sy=0,cx=0,cy=0;
+  // Use Hammer.js for rock-solid mobile + desktop touch/drag
+  var H = new Hammer(card, {
+    recognizers:[
+      [Hammer.Pan, {direction: Hammer.DIRECTION_ALL, threshold: 5}],
+      [Hammer.Swipe, {direction: Hammer.DIRECTION_ALL, threshold: 10, velocity: 0.3}]
+    ]
+  });
+  H.get('pan').requireFailure(H.get('swipe'));
 
-  // ── TOUCH HANDLER ────────────────────────
-  // All three touch events on card, touchstart MUST be non-passive
-  // so we can call preventDefault in touchmove
-  card.addEventListener('touchstart', function(e){
-    if(e.target.closest('.cb')) return; // allow scroll in desc
-    active=true;
-    sx=cx=e.touches[0].clientX;
-    sy=cy=e.touches[0].clientY;
-    card.style.transition='none';
-  }, {passive:true}); // passive ok for start — we dont prevent here
+  var startX=0, startY=0;
 
-  card.addEventListener('touchmove', function(e){
-    if(!active) return;
-    cx=e.touches[0].clientX;
-    cy=e.touches[0].clientY;
-    const dx=cx-sx, dy=cy-sy;
-    // Only prevent default if moving more horizontally (swiping card)
-    if(Math.abs(dx) > Math.abs(dy)) e.preventDefault();
-    const rot=Math.min(Math.max(dx*0.08,-20),20);
-    card.style.transform='translate('+dx+'px,'+dy+'px) rotate('+rot+'deg)';
-    card.querySelector('.ov-a').style.opacity=dx>40?Math.min(1,(dx-40)/80):0;
-    card.querySelector('.ov-s').style.opacity=dx<-40?Math.min(1,(-dx-40)/80):0;
-    card.querySelector('.ov-v').style.opacity=dy<-70?Math.min(1,(-dy-70)/80):0;
-  }, {passive:false}); // MUST be non-passive to call preventDefault
-
-  card.addEventListener('touchend', function(e){
-    if(!active) return;
-    active=false;
-    const dx=cx-sx, dy=cy-sy;
-    card.style.transition='transform .35s ease';
-    if(dx>90)       fly(card,'r',function(){act('a',job);});
-    else if(dx<-90) fly(card,'l',function(){act('s',job);});
-    else if(dy<-90) fly(card,'u',function(){act('v',job);});
-    else            card.style.transform='';
-    card.querySelectorAll('.ov').forEach(function(o){o.style.opacity=0;});
+  H.on('panstart', function(e){
+    card.style.transition = 'none';
+    startX = 0; startY = 0;
   });
 
-  // ── MOUSE HANDLER ────────────────────────
-  card.addEventListener('mousedown', function(e){
-    if(e.target.closest('.cb')) return;
-    active=true;
-    sx=cx=e.clientX; sy=cy=e.clientY;
-    card.style.transition='none';
-
-    function mm(e){
-      if(!active) return;
-      cx=e.clientX; cy=e.clientY;
-      const dx=cx-sx,dy=cy-sy;
-      const rot=Math.min(Math.max(dx*0.08,-20),20);
-      card.style.transform='translate('+dx+'px,'+dy+'px) rotate('+rot+'deg)';
-      card.querySelector('.ov-a').style.opacity=dx>40?Math.min(1,(dx-40)/80):0;
-      card.querySelector('.ov-s').style.opacity=dx<-40?Math.min(1,(-dx-40)/80):0;
-      card.querySelector('.ov-v').style.opacity=dy<-70?Math.min(1,(-dy-70)/80):0;
-    }
-    function mu(){
-      if(!active) return;
-      active=false;
-      const dx=cx-sx,dy=cy-sy;
-      card.style.transition='transform .35s ease';
-      if(dx>90)       fly(card,'r',function(){act('a',job);});
-      else if(dx<-90) fly(card,'l',function(){act('s',job);});
-      else if(dy<-90) fly(card,'u',function(){act('v',job);});
-      else            card.style.transform='';
-      card.querySelectorAll('.ov').forEach(function(o){o.style.opacity=0;});
-      document.removeEventListener('mousemove',mm);
-      document.removeEventListener('mouseup',mu);
-    }
-    document.addEventListener('mousemove',mm);
-    document.addEventListener('mouseup',mu);
+  H.on('panmove', function(e){
+    var dx = e.deltaX, dy = e.deltaY;
+    var rot = Math.min(Math.max(dx * 0.08, -20), 20);
+    card.style.transform = 'translate('+dx+'px,'+dy+'px) rotate('+rot+'deg)';
+    card.querySelector('.ov-a').style.opacity = dx>40 ? Math.min(1,(dx-40)/80) : 0;
+    card.querySelector('.ov-s').style.opacity = dx<-40 ? Math.min(1,(-dx-40)/80) : 0;
+    card.querySelector('.ov-v').style.opacity = dy<-70 ? Math.min(1,(-dy-70)/80) : 0;
   });
+
+  H.on('panend pancancel', function(e){
+    var dx = e.deltaX, dy = e.deltaY;
+    card.style.transition = 'transform .35s ease';
+    if(dx > 90)       fly(card,'r', function(){ act('a',job); });
+    else if(dx < -90) fly(card,'l', function(){ act('s',job); });
+    else if(dy < -90) fly(card,'u', function(){ act('v',job); });
+    else              card.style.transform = '';
+    card.querySelectorAll('.ov').forEach(function(o){ o.style.opacity=0; });
+  });
+
+  H.on('swipeleft',  function(){ fly(card,'l', function(){ act('s',job); }); });
+  H.on('swiperight', function(){ fly(card,'r', function(){ act('a',job); }); });
+  H.on('swipeup',    function(){ fly(card,'u', function(){ act('v',job); }); });
 }
 
 function fly(card,dir,cb){
