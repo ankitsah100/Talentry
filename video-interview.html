@@ -450,13 +450,13 @@ async function startInterview() {
   let greetings;
   if(currentLang === 'ne') {
     greetings = [
-      `नमस्ते! ${camOpener}मेरो नाम प्रिया हो, र म तपाईंको अन्तर्वार्ताकार हुँ। आज हामी ${currentRole} पदको लागि अभ्यास गर्दैछौं। म तपाईंलाई ${questions.length} प्रश्नहरू सोध्नेछु। आराम गर्नुहोस् र स्वाभाविक रूपमा उत्तर दिनुहोस्। ठीक छ? सुरु गरौं!`,
-      `नमस्कार! ${camOpener}म प्रिया हुँ, तपाईंको AI अन्तर्वार्ताकार। ${currentRole} को लागि ${questions.length} प्रश्नहरू छन्। आफ्नो अनुभव र ज्ञान सहजतासाथ साझा गर्नुहोस्। तयार हुनुभयो? सुरु गरौं!`,
+      `Hey, namaste! ${camOpener}My name is Priya, and I'll be your interviewer today. Aaja hami ${currentRole} ko lagi practice garxa. Ma timilai ${questions.length} vota questions sodhne xu — just relax and naturally answer gara. Kei tension lina paraina, okay? Let's go!`,
+      `Hey hey! ${camOpener}Priya here, timro AI interviewer. Aaja ${currentRole} position ko lagi ${questions.length} questions cha.आफूलाई natural rakhnu, like you're just talking to a friend. Ready cha? Suru garau!`,
     ];
   } else if(currentLang === 'hi') {
     greetings = [
-      `नमस्ते! ${camOpener}मेरा नाम प्रिया है, और मैं आपका इंटरव्यूअर हूँ। आज हम ${currentRole} पद के लिए अभ्यास करेंगे। मैं आपसे ${questions.length} प्रश्न पूछूंगी। आराम से रहें और स्वाभाविक रूप से उत्तर दें। ठीक है? चलिए शुरू करते हैं!`,
-      `नमस्कार! ${camOpener}मैं प्रिया हूँ, आपकी AI इंटरव्यूअर। ${currentRole} के लिए ${questions.length} सवाल हैं। बिल्कुल नेचुरल तरीके से जवाब दीजिए — कोई ट्रिक नहीं है! तैयार हैं? शुरू करते हैं!`,
+      `Hey, hi! ${camOpener}Main Priya hoon, aur main aaj tumhari interviewer hoon. Aaj hum ${currentRole} ke liye practice karenge. Main tumse ${questions.length} questions puchungi — bas relax karo aur naturally answer do. Koi tension nahi, okay? Let's go!`,
+      `Hey hey! ${camOpener}Priya here, tumhari AI interviewer. Aaj ${currentRole} position ke liye ${questions.length} questions hain. Apne aap ko natural rakho, jaise kisi dost se baat kar rahe ho. Ready ho? Shuru karte hain!`,
     ];
   } else {
     greetings = [
@@ -527,7 +527,7 @@ async function generateQuestions() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         system: `You are an expert HR interviewer for Nepal healthcare sector. Generate exactly 6 interview questions for the given role. Return ONLY a JSON array of 6 strings. No other text. Mix behavioral, technical and situational questions. Keep questions concise (max 25 words each).`,
-        messages: [{ role: 'user', content: `Role: ${currentRole}\nDifficulty: ${currentDiff}\nType: ${currentType}\nLanguage: ${currentLang === 'ne' ? 'Nepali' : currentLang === 'hi' ? 'Hindi' : 'English'}\n\nGenerate 6 interview questions in ${currentLang === 'ne' ? 'Nepali language (नेपाली)' : currentLang === 'hi' ? 'Hindi language (हिन्दी)' : 'English'}. IMPORTANT: Write the questions ONLY in the specified language, not English.` }]
+        messages: [{ role: 'user', content: `Role: ${currentRole}\nDifficulty: ${currentDiff}\nType: ${currentType}\nLanguage: ${currentLang === 'ne' ? 'Nepali' : currentLang === 'hi' ? 'Hindi' : 'English'}\n\nGenerate 6 interview questions. Language style: ${currentLang === 'ne' ? 'Nepali-English mix (GenZ style) — write mostly in English but mix in natural Nepali words like yaar, cha, garnu, ramro, sahi, etc. Like how young Nepalis actually talk. Example: Hey, tell me about your experience as a Biomedical Engineer — ke ramro lagcha timile yo field ma?' : currentLang === 'hi' ? 'Hinglish mix (GenZ style) — write mostly in English but mix in natural Hindi words like yaar, hai, kya, accha, bata, etc. Like how young Indians actually talk. Example: Hey, tell me about your experience as a Biomedical Engineer — kya achha lagta hai tumhe is field mein?' : 'Natural conversational English'}. Keep questions concise, friendly and GenZ-relatable.` }]
       })
     });
     const data = await res.json();
@@ -550,22 +550,101 @@ async function generateQuestions() {
 // ── HUMAN-LIKE FILLERS ────────────────────────
 const fillers = {
   en: {
-    opening: ["Alright, let's get started! ","Perfect, okay. So... ","Great! So my first question for you is... ","Wonderful! Let me begin by asking you... "],
-    transition: ["Hmm, okay. Thank you for that. Now, ","That's interesting! Alright, moving on... ","I see, I see. Good. So... ","Okay, noted. Let me ask you now... ","Right, thank you. So my next question is... ","Mmm, that's a good point. Okay, so... ","Good, good. Alright, let's talk about... ","I appreciate that answer. Now... "],
-    positive: ["Hmm, that's a great answer! ","Wow, very impressive! ","I like that response. ","That's exactly what we look for! ","Excellent point! ","Very good, I appreciate that. "],
-    encourage: ["Take your time, there's no rush. ","Feel free to give me as much detail as you'd like. ","Just speak naturally, like you would in a real conversation. "],
+    opening: [
+      "Alright, let's get started! ",
+      "Okay so, my first question for you is... ",
+      "Great! Let me kick things off with... ",
+      "Perfect! So here's what I want to ask you first... ",
+    ],
+    transition: [
+      "Hmm, okay. That's actually a solid answer. Now, ",
+      "Ooh interesting! Alright, moving on... ",
+      "I see what you mean. Good stuff. So... ",
+      "Okay noted, I like that. Let me ask you now... ",
+      "Right, thank you for sharing that. So my next one is... ",
+      "Mmm, that's a valid point. Okay so... ",
+      "Nice, I appreciate that. Let's talk about... ",
+      "That was good! Alright, next up... ",
+    ],
+    positive: [
+      "Hmm, that's actually a really great answer! ",
+      "Wow okay, very impressive! ",
+      "Oh I love that response! ",
+      "That's exactly the kind of thing we look for! ",
+      "Yes! That was a solid point! ",
+      "Nice, really good answer! ",
+    ],
+    encourage: [
+      "Take your time, no rush at all. ",
+      "Feel free to give me as much detail as you want. ",
+      "Just be yourself, speak naturally! ",
+    ],
   },
+
+  // 🇳🇵 NEPALI-ENGLISH MIX (GenZ Nepali style)
   ne: {
-    opening: ["ठीक छ, सुरु गरौं! ","राम्रो! त्यसोभए... ","उत्तम! मेरो पहिलो प्रश्न छ... ","बढिया! मलाई तपाईंलाई सोध्न दिनुहोस्... "],
-    transition: ["हम्म, ठीक छ। धन्यवाद। अब, ","रोचक! ठीक छ, अगाडि बढौं... ","म देख्दैछु। राम्रो। त्यसोभए... ","ठीक छ, अर्को प्रश्न... ","धन्यवाद। मेरो अर्को प्रश्न छ... ","हम्म, राम्रो कुरा। त्यसोभए... "],
-    positive: ["हम्म, राम्रो जवाफ! ","वाह, धेरै राम्रो! ","मलाई त्यो जवाफ मन पर्यो। ","हामीले यही खोज्दछौं! ","उत्कृष्ट! ","धेरै राम्रो, म प्रशंसा गर्छु। "],
-    encourage: ["समय लिनुहोस्, हतार छैन। ","जति चाहनुहुन्छ विस्तारमा भन्नुहोस्। ","स्वाभाविक रूपमा बोल्नुहोस्। "],
+    opening: [
+      "Okay, let's start garau! ",
+      "Cool! So mero first question chai... ",
+      "Alright yaar, suru garau! Mero pehilo question... ",
+      "Perfect! So here we go — mero question... ",
+    ],
+    transition: [
+      "Hmm, okay. That was actually ramro answer! Aba, ",
+      "Interesting cha! Alright, next question tira jaau... ",
+      "Okay bujhein. Good stuff. So aba... ",
+      "Nice, I liked that answer! Aba next question... ",
+      "Right, thank you for sharing! Aba mero next question chai... ",
+      "Mmm, solid point cha! Okay so... ",
+      "Wah, that was good! Aba arko question... ",
+      "Appreciate that answer! Chalau, aba... ",
+    ],
+    positive: [
+      "Wah yaar, that was actually a solid answer! ",
+      "Wow, really ramro cha! ",
+      "Oh I love that! Very thoughtful answer! ",
+      "Exactly yaar, that's what we're looking for! ",
+      "Sahi cha! That was a great point! ",
+      "Nice, really good! Proud of you! ",
+    ],
+    encourage: [
+      "Time leu, no rush at all! ",
+      "Jati detail dinu cha, deu! ",
+      "Just be yourself, naturally bola! ",
+    ],
   },
+
+  // 🇮🇳 HINGLISH MIX (GenZ Hindi style)
   hi: {
-    opening: ["चलिए शुरू करते हैं! ","बढ़िया! तो... ","अच्छा! मेरा पहला सवाल है... ","शानदार! मैं आपसे पूछना चाहती हूँ... "],
-    transition: ["हम्म, ठीक है। शुक्रिया। अब, ","दिलचस्प! चलिए आगे बढ़ते हैं... ","समझ गई। अच्छा। तो... ","ठीक है, अगला सवाल... ","शुक्रिया। मेरा अगला सवाल है... ","हम्म, अच्छी बात है। तो... "],
-    positive: ["हम्म, बहुत अच्छा जवाब! ","वाह, बहुत शानदार! ","मुझे यह जवाब पसंद आया। ","हम यही देखना चाहते थे! ","बेहतरीन! ","बहुत अच्छा, मैं सराहना करती हूँ। "],
-    encourage: ["समय लीजिए, कोई जल्दी नहीं। ","जितना चाहें उतना विस्तार से बताइए। ","बिल्कुल स्वाभाविक तरीके से बोलिए। "],
+    opening: [
+      "Okay, let's start karte hain! ",
+      "Cool! So mera pehla question hai... ",
+      "Alright yaar, shuru karte hain! Mera first question... ",
+      "Perfect! So here we go — mera question... ",
+    ],
+    transition: [
+      "Hmm, okay. That was actually achha answer! Ab, ",
+      "Interesting hai! Alright, next question pe chalte hain... ",
+      "Okay samajh gayi. Good stuff. So ab... ",
+      "Nice, I liked that answer! Ab next question... ",
+      "Right, thank you for sharing! Ab mera next question hai... ",
+      "Mmm, solid point hai! Okay so... ",
+      "Wah yaar, that was good! Ab agle question pe... ",
+      "Appreciate karta hoon! Chalo, ab... ",
+    ],
+    positive: [
+      "Wah yaar, that was actually a solid answer! ",
+      "Wow, really achha tha! ",
+      "Oh I love that! Very thoughtful answer! ",
+      "Exactly yaar, yehi toh hum dhundh rahe hain! ",
+      "Sahi baat hai! That was a great point! ",
+      "Nice, really good! Keep it up! ",
+    ],
+    encourage: [
+      "Time lo, koi rush nahi! ",
+      "Jitna detail dena ho, do! ",
+      "Just be yourself, naturally bolo! ",
+    ],
   }
 };
 
@@ -762,22 +841,24 @@ function showFeedback(result) {
   let fbPhrases, endPhrase;
   if(currentLang === 'ne') {
     fbPhrases = [
-      `हम्म, ठीक छ। मेरो प्रतिक्रिया: ${result.feedback}`,
-      `राम्रो प्रयास। ${result.feedback}`,
-      `रोचक जवाफ। ${result.feedback}`,
+      `Okay, so here's my feedback yaar. ${result.feedback}`,
+      `Hmm, not bad! Aba sunau — ${result.feedback}`,
+      `Interesting answer cha! But ${result.feedback}`,
+      `Wah, solid try! Okay so, ${result.feedback}`,
     ];
     endPhrase = isLast2
-      ? "यो तपाईंको अन्तिम प्रश्न थियो! धेरै राम्रो गर्नुभयो। अन्तिम परिणाम हेर्नुहोस्।"
-      : "ठीक छ! अर्को प्रश्नको लागि तयार हुनुहुन्छ?";
+      ? "That was your last question yaar! Wah, ramro garyo! Let me show you your final results!"
+      : "Okay, ready cha next question ko lagi? Let's go!";
   } else if(currentLang === 'hi') {
     fbPhrases = [
-      `हम्म, ठीक है। मेरी प्रतिक्रिया: ${result.feedback}`,
-      `अच्छा प्रयास। ${result.feedback}`,
-      `दिलचस्प जवाब। ${result.feedback}`,
+      `Okay, so here's my feedback yaar. ${result.feedback}`,
+      `Hmm, not bad! Ab suno — ${result.feedback}`,
+      `Interesting answer tha! But ${result.feedback}`,
+      `Wah, solid try! Okay so, ${result.feedback}`,
     ];
     endPhrase = isLast2
-      ? "यह आपका आखिरी सवाल था! बहुत अच्छे! अंतिम परिणाम देखिए।"
-      : "ठीक है! अगले सवाल के लिए तैयार हैं?";
+      ? "That was your last question yaar! Wah, bahut achha kiya! Let me show you your final results!"
+      : "Okay, ready ho next question ke liye? Let's go!";
   } else {
     fbPhrases = [
       `Hmm, okay. Let me share some feedback. ${result.feedback}`,
