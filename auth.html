@@ -156,8 +156,9 @@ nav{height:64px;display:flex;align-items:center;justify-content:space-between;pa
           <button class="social-btn" onclick="signInWithGoogle()"><div class="social-icon" style="background:#4285F4;color:#fff;width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">G</div>Sign up with Google</button>
         </div>
         <div class="divider"><div class="divider-line"></div><span class="divider-text">or sign up with email</span><div class="divider-line"></div></div>
+        <div style="font-size:13px;font-weight:600;color:#0a1a12;margin-bottom:10px;">Choose your role <span style="color:#ef4444">*</span></div>
         <div class="role-select">
-          <div class="role-card on" id="roleJobseeker" onclick="selectRole('jobseeker')">
+          <div class="role-card" id="roleJobseeker" onclick="selectRole('jobseeker')">
             <div class="role-ico">👤</div>
             <div class="role-name">Job seeker</div>
             <div class="role-desc">Find healthcare jobs</div>
@@ -242,21 +243,25 @@ if (session) {
   window.location.href = safePage;
 }
 
-// Handle OAuth redirect - detect sign in event
+// Handle OAuth redirect (Google sign in)
 supabase.auth.onAuthStateChange((event, session) => {
+  // Only handle OAuth callback — not initial page load
   if (event === 'SIGNED_IN' && session) {
-    // Redirect back to where user was trying to go
-    const redirect = sessionStorage.getItem('redirectAfterLogin');
-    sessionStorage.removeItem('redirectAfterLogin');
-    // Never redirect back to auth page — prevents loop
-    const safePage = redirect && redirect.indexOf('auth.html') === -1 ? redirect : 'browse-jobs.html';
-    window.location.href = safePage;
+    // Check if this was triggered by OAuth (URL has #access_token or code param)
+    const isOAuth = window.location.hash.includes('access_token') || 
+                    window.location.search.includes('code=');
+    if (isOAuth) {
+      const redirect = sessionStorage.getItem('redirectAfterLogin');
+      sessionStorage.removeItem('redirectAfterLogin');
+      const safePage = redirect && !redirect.includes('auth.html') ? redirect : 'browse-jobs.html';
+      window.location.href = safePage;
+    }
   }
 });
 </script>
 
 <script>
-let currentRole = 'jobseeker';
+let currentRole = '';
 
 function switchTab(tab){
   document.querySelectorAll('.atab').forEach((t,i)=>t.classList.toggle('on',(tab==='login'&&i===0)||(tab==='signup'&&i===1)));
@@ -271,6 +276,9 @@ function selectRole(role){
   document.getElementById('roleEmployer').classList.toggle('on',role==='employer');
   document.getElementById('jobseekerFields').classList.toggle('hidden',role!=='jobseeker');
   document.getElementById('employerFields').classList.toggle('hidden',role!=='employer');
+  // Clear error border
+  document.getElementById('roleJobseeker').style.border='';
+  document.getElementById('roleEmployer').style.border='';
 }
 
 function togglePass(id,btn){
@@ -327,13 +335,17 @@ async function handleLogin(){
   if(error){showError(error.message);btn.textContent='Log in to Talentry';btn.disabled=false;return;}
   document.getElementById('loginForm').classList.add('hidden');
   document.getElementById('successScreen').classList.add('show');
-  document.getElementById('successMsg').textContent='Welcome back! Taking you there...';
-  setTimeout(()=>{
-    const redirect = sessionStorage.getItem('redirectAfterLogin');
-    sessionStorage.removeItem('redirectAfterLogin');
-    const safePage = redirect && redirect.indexOf('auth.html') === -1 ? redirect : 'browse-jobs.html';
-    location.href = safePage;
-  }, 1200);
+  // Get role from profile to show correct redirect
+  let landingPage = 'browse-jobs.html';
+  try {
+    const { data: profile } = await window._sb.from('profiles').select('role').eq('id', (await window._sb.auth.getUser()).data.user.id).single();
+    if(profile?.role === 'employer') landingPage = 'employer-dashboard.html';
+  } catch(e) {}
+  const redirect = sessionStorage.getItem('redirectAfterLogin');
+  sessionStorage.removeItem('redirectAfterLogin');
+  const safePage = redirect && !redirect.includes('auth.html') ? redirect : landingPage;
+  document.getElementById('successMsg').textContent = landingPage === 'employer-dashboard.html' ? '🏥 Welcome! Taking you to your dashboard...' : '👋 Welcome back! Taking you to jobs...';
+  setTimeout(() => { location.href = safePage; }, 1200);
 }
 
 async function handleSignup(){
@@ -343,6 +355,7 @@ async function handleSignup(){
   const firstName=document.getElementById('firstName').value.trim();
   const lastName=document.getElementById('lastName').value.trim();
   const phone=document.getElementById('signupPhone').value.trim();
+  if(!currentRole){showError('⚠️ Please select your role — Job Seeker or Employer.');document.getElementById('roleJobseeker').style.border='2px solid #ef4444';document.getElementById('roleEmployer').style.border='2px solid #ef4444';return;}
   if(!email||!password||!firstName){showError('Please fill in all required fields.');return;}
   if(password.length<6){showError('Password must be at least 6 characters.');return;}
   const btn=document.getElementById('signupBtn');
@@ -373,15 +386,27 @@ async function handleSignup(){
   
   document.getElementById('signupForm').classList.add('hidden');
   document.getElementById('successScreen').classList.add('show');
-  // Show appropriate message based on whether email confirmation is needed
   const msgEl = document.getElementById('successMsg');
   if(msgEl) {
-    if(currentRole === 'employer') {
-      msgEl.textContent = '🏥 Employer account created! Check your email to confirm, then log in.';
-    } else {
-      msgEl.textContent = '👤 Account created! Check your email to confirm, then log in.';
-    }
+    msgEl.textContent = currentRole === 'employer'
+      ? '🏥 Employer account created! Check your email inbox and click the confirmation link, then log in.'
+      : '👤 Account created! Check your email inbox and click the confirmation link, then log in.';
   }
+  // Show login tab button after 3 seconds
+  setTimeout(() => {
+    const ss = document.getElementById('successScreen');
+    if(ss) {
+      const btn = document.createElement('button');
+      btn.textContent = '→ Go to login';
+      btn.style.cssText = 'margin-top:16px;background:#0ea271;color:#fff;border:none;padding:11px 24px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;';
+      btn.onclick = () => { 
+        ss.classList.remove('show');
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.querySelectorAll('.atab').forEach((t,i)=>t.classList.toggle('on',i===0));
+      };
+      ss.appendChild(btn);
+    }
+  }, 2000);
 }
 
 async function handleForgot(){
