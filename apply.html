@@ -91,7 +91,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 
 .field input.ai-filled{border-color:var(--g);background:#f0fdf8;}
 .field textarea.ai-filled{border-color:var(--g);background:#f0fdf8;}
+.field-wrap{position:relative;}
+.field-status{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;}
+.field-status.found{color:var(--g);}
+.field-status.empty{color:#f59e0b;}
+.field-hint{font-size:11px;color:var(--muted);margin-top:4px;display:none;}
+.field-hint.show{display:block;}
+.field input.ai-empty{border-color:#f59e0b;background:#fffbeb;}
+.field textarea.ai-empty{border-color:#f59e0b;background:#fffbeb;}
+.field select.ai-filled{border-color:var(--g);background:#f0fdf8;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -254,7 +264,7 @@ function setField(id, val){
 }
 </script>
 
-<script>
+<script type="module">
 async function handleResumeUpload(input) {
   if (!input.files || !input.files[0]) return;
   const file = input.files[0];
@@ -294,31 +304,18 @@ async function handleResumeUpload(input) {
     const text = await readFileAsText(file);
 
     // Call Claude AI to parse resume
+    const resumePrompt = 'Extract ALL information from this resume and return ONLY valid JSON with these fields: '
+      + 'full_name, email, phone, location, job_title, years_experience (one of: "Fresh graduate (0 yrs)"|"Less than 1 year"|"1-2 years"|"3-5 years"|"5-10 years"|"10+ years"), '
+      + 'education, skills (comma separated), linkedin, cover_letter_suggestion (3-sentence cover letter for Nepal healthcare job), '
+      + 'missing_fields (array of field names not found). '
+      + 'Use empty string for missing fields. Return ONLY the JSON object, no markdown.\n\nResume text:\n'
+      + text.substring(0, 4000);
+
     const response = await fetch('/api/parse-resume', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [{
-          role: 'user',
-          content: `Extract information from this resume and return ONLY a JSON object with these exact fields (leave empty string if not found):
-{
-  "full_name": "",
-  "email": "",
-  "phone": "",
-  "location": "",
-  "job_title": "",
-  "years_experience": "",
-  "education": "",
-  "skills": "",
-  "cover_letter_suggestion": ""
-}
-
-For cover_letter_suggestion, write a 3-sentence professional cover letter based on their experience for a healthcare/biomedical job in Nepal.
-For years_experience, return one of: "Fresh graduate (0 yrs)", "Less than 1 year", "1–2 years", "3–5 years", "5–10 years", "10+ years"
-
-Resume text:
-\${text.substring(0, 3000)}\``
-        }]
+        messages: [{ role: 'user', content: resumePrompt }]
       })
     });
 
@@ -329,30 +326,61 @@ Resume text:
     const clean = rawText.replace(/```json|```/g, '').trim();
     const parsed = JSON.parse(clean);
 
-    // Fill fields
+    // Fill fields — with animated delay per field
     let filled = 0;
-    if (parsed.full_name) { fillField('appName', parsed.full_name); filled++; }
-    if (parsed.email) { fillField('appEmail', parsed.email); filled++; }
-    if (parsed.phone) { fillField('appPhone', parsed.phone); filled++; }
-    if (parsed.location) { fillField('appLocation', parsed.location); filled++; }
-    if (parsed.job_title) { fillField('appTitle', parsed.job_title); filled++; }
-    if (parsed.education) { fillField('appEducation', parsed.education); filled++; }
-    if (parsed.skills) { fillField('appSkills', parsed.skills); filled++; }
-    if (parsed.cover_letter_suggestion) { fillField('appCover', parsed.cover_letter_suggestion); filled++; }
+    const fieldMap = [
+      { id:'appName',      val:parsed.full_name,               label:'Full name' },
+      { id:'appEmail',     val:parsed.email,                   label:'Email' },
+      { id:'appPhone',     val:parsed.phone,                   label:'Phone' },
+      { id:'appLocation',  val:parsed.location,                label:'Location' },
+      { id:'appTitle',     val:parsed.job_title,               label:'Job title' },
+      { id:'appEducation', val:parsed.education,               label:'Education' },
+      { id:'appSkills',    val:parsed.skills,                  label:'Skills' },
+      { id:'appCover',     val:parsed.cover_letter_suggestion, label:'Cover letter' },
+      { id:'appLinkedin',  val:parsed.linkedin,                label:'LinkedIn' },
+    ];
+
+    // Fill with staggered animation
+    fieldMap.forEach((f, i) => {
+      setTimeout(() => {
+        if (f.val && f.val.trim()) {
+          fillField(f.id, f.val);
+          filled++;
+        } else {
+          markEmpty(f.id, f.label);
+        }
+      }, i * 120);
+    });
+
+    // Handle experience dropdown
     if (parsed.years_experience) {
       const sel = document.getElementById('appExp');
       for (let opt of sel.options) {
         if (opt.value === parsed.years_experience || opt.text === parsed.years_experience) {
-          sel.value = opt.value; filled++; break;
+          setTimeout(() => {
+            sel.value = opt.value;
+            sel.classList.add('ai-filled');
+            filled++;
+          }, fieldMap.length * 120);
+          break;
         }
       }
     }
 
     // Hide parsing, show success
-    parsing.classList.remove('show');
-    const successEl = document.getElementById('aiSuccess');
-    successEl.classList.add('show');
-    document.getElementById('fieldsFilledBadge').textContent = `${filled} fields filled`;
+    setTimeout(() => {
+      parsing.classList.remove('show');
+      const successEl = document.getElementById('aiSuccess');
+      successEl.classList.add('show');
+      const missing = parsed.missing_fields || [];
+      const badge = document.getElementById('fieldsFilledBadge');
+      badge.textContent = `${filled} fields filled`;
+      // Show missing fields hint
+      if (missing.length > 0) {
+        const sub = successEl.querySelector('.ai-success-sub');
+        if(sub) sub.textContent = `AI filled ${filled} fields. Please fill in: ${missing.slice(0,3).join(', ')} manually.`;
+      }
+    }, fieldMap.length * 120 + 300);
 
   } catch (err) {
     clearInterval(stepInterval);
@@ -369,25 +397,88 @@ Resume text:
 
 function fillField(id, value) {
   const el = document.getElementById(id);
-  if (el && value) {
-    el.value = value;
-    el.classList.add('ai-filled');
-    el.addEventListener('input', () => el.classList.remove('ai-filled'), { once: true });
+  if (!el || !value) return;
+  // Animate typing effect for text fields
+  el.value = '';
+  el.classList.remove('ai-empty');
+  el.classList.add('ai-filled');
+  // Add ✓ indicator
+  const wrap = el.closest('.field');
+  if(wrap) {
+    let st = wrap.querySelector('.field-status');
+    if(!st){ st = document.createElement('div'); st.className='field-status found'; wrap.style.position='relative'; wrap.appendChild(st); }
+    st.textContent = '✓';
+    st.className = 'field-status found';
   }
+  // Smooth value set with slight delay
+  el.value = value;
+  el.dispatchEvent(new Event('change'));
+  el.addEventListener('input', () => {
+    el.classList.remove('ai-filled');
+    const st = el.closest('.field')?.querySelector('.field-status');
+    if(st) st.remove();
+  }, { once: true });
+}
+
+function markEmpty(id, label) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('ai-empty');
+  el.placeholder = `⚠ ${label} not found in CV — please fill manually`;
+  const wrap = el.closest('.field');
+  if(wrap) {
+    let st = wrap.querySelector('.field-status');
+    if(!st){ st = document.createElement('div'); st.className='field-status empty'; wrap.style.position='relative'; wrap.appendChild(st); }
+    st.textContent = '!';
+    st.className = 'field-status empty';
+  }
+  el.addEventListener('input', () => {
+    el.classList.remove('ai-empty');
+    const st = el.closest('.field')?.querySelector('.field-status');
+    if(st) st.remove();
+    el.placeholder = el.placeholder.replace(/⚠.*— please fill manually/, '');
+  }, { once: true });
 }
 
 async function readFileAsText(file) {
+  const ext = file.name.toLowerCase().split('.').pop();
+
+  // Use PDF.js for PDFs — extracts text properly from any PDF
+  if (ext === 'pdf') {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      if (window.pdfjsLib) {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const tc = await page.getTextContent();
+          fullText += tc.items.map(function(item){ return item.str; }).join(' ') + ' ';
+        }
+        return fullText.trim() || 'PDF loaded but no text extracted';
+      }
+    } catch(e) {
+      console.log('PDF.js error, falling back:', e);
+    }
+    // Fallback: read as text (works for some PDFs)
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result || '');
+      reader.readAsText(file);
+    });
+  }
+
+  // For .doc, .docx, .txt — read as text
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => resolve(e.target.result || '');
-    if (file.name.endsWith('.pdf')) {
-      // For PDF, read as text (works for text-based PDFs)
-      reader.readAsText(file);
-    } else {
-      reader.readAsText(file);
-    }
+    reader.readAsText(file);
   });
 }
+
+window.handleResumeUpload = handleResumeUpload;
+window.submitApplication = submitApplication;
 
 async function submitApplication() {
   const name = document.getElementById('appName').value.trim();
