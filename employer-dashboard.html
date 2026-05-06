@@ -234,50 +234,63 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // ── LOAD APPLICATIONS ─────────────────────
 async function loadApplications() {
-  // Get all jobs by this employer
-  const { data: jobs } = await sb.from('jobs').select('id,title,company').eq('employer_id', currentUser.id);
-  if (!jobs || jobs.length === 0) {
-    document.getElementById('appsList').innerHTML = `
-      <div class="empty">
-        <div class="empty-ico">📭</div>
-        <div class="empty-title">No applications yet</div>
-        <div class="empty-sub">Post a job to start receiving applications from healthcare professionals.</div>
-        <button class="empty-btn" onclick="location.href='post-job.html'">+ Post your first job</button>
-      </div>`;
-    return;
-  }
+  try {
+    // Get all jobs by this employer
+    const { data: jobs, error: jobErr } = await sb.from('jobs')
+      .select('id,title,company')
+      .eq('employer_id', currentUser.id);
 
-  const jobIds = jobs.map(j => j.id);
-  const jobMap = {};
-  jobs.forEach(j => jobMap[j.id] = j);
+    if (!jobs || jobs.length === 0) {
+      document.getElementById('appsList').innerHTML = `
+        <div class="empty">
+          <div class="empty-ico">📭</div>
+          <div class="empty-title">No applications yet</div>
+          <div class="empty-sub">Post a job to start receiving applications.</div>
+          <button class="empty-btn" onclick="location.href='post-job.html'">+ Post your first job</button>
+        </div>`;
+      return;
+    }
 
-  // Get applications - use simple select first (most reliable)
-  const { data: apps, error } = await sb
-    .from('applications')
-    .select('*')
-    .in('job_id', jobIds)
-    .order('created_at', { ascending: false });
+    const jobIds = jobs.map(j => j.id);
+    const jobMap = {};
+    jobs.forEach(j => jobMap[j.id] = j);
 
-  if (error) {
-    console.error('Applications load error:', error);
-    document.getElementById('appsList').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading applications</div><div class="empty-sub">${error.message}</div></div>`;
-    return;
-  }
-  
-  allApplications = apps || [];
-
-  // Try to enrich with profile data where applicant_id exists
-  const appsWithProfile = allApplications.filter(a => a.applicant_id);
-  if (appsWithProfile.length > 0) {
-    const userIds = [...new Set(appsWithProfile.map(a => a.applicant_id))];
-    const { data: profiles } = await sb
-      .from('profiles')
-      .select('id, full_name, email, phone, location, job_title')
-      .in('id', userIds);
+    // Use a Supabase RPC or direct query with employer_id join
+    // This is more reliable than .in() with many IDs
+    let apps = [];
+    let appsError = null;
     
-    if (profiles) {
-      const profileMap = {};
-      profiles.forEach(p => profileMap[p.id] = p);
+    // Batch in groups of 5 to avoid limits
+    const batchSize = 5;
+    for (let i = 0; i < jobIds.length; i += batchSize) {
+      const batch = jobIds.slice(i, i + batchSize);
+      const { data: batchApps, error: batchErr } = await sb
+        .from('applications')
+        .select('*')
+        .in('job_id', batch)
+        .order('created_at', { ascending: false });
+      if (batchApps) apps = [...apps, ...batchApps];
+      if (batchErr) appsError = batchErr;
+    }
+
+    if (appsError) {
+      console.error('Applications load error:', appsError);
+    }
+
+    allApplications = apps || [];
+
+    // Enrich with profile data
+    const appsWithProfile = allApplications.filter(a => a.applicant_id);
+    if (appsWithProfile.length > 0) {
+      const userIds = [...new Set(appsWithProfile.map(a => a.applicant_id))];
+      const { data: profiles } = await sb
+        .from('profiles')
+        .select('id, full_name, email, phone, location, job_title')
+        .in('id', userIds);
+      
+      if (profiles) {
+        const profileMap = {};
+        profiles.forEach(p => profileMap[p.id] = p);
       allApplications = allApplications.map(app => ({
         ...app,
         profiles: app.applicant_id ? profileMap[app.applicant_id] : null
@@ -286,7 +299,11 @@ async function loadApplications() {
   }
 
   updateStats(jobs.length, allApplications);
-  renderApplications(allApplications, jobMap);
+    renderApplications(allApplications, jobMap);
+  } catch(e) {
+    console.error('loadApplications error:', e);
+    document.getElementById('appsList').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading</div><div class="empty-sub">${e.message}</div></div>`;
+  }
 }
 
 function updateStats(jobCount, apps) {
