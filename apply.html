@@ -542,6 +542,27 @@ async function submitApplication() {
     if (window._sb && jobId) {
       const { data: { session } } = await window._sb.auth.getSession();
 
+      // Upload CV to Supabase Storage if file exists
+      let cvUrl = '';
+      let cvFilename = window._cvFileName || '';
+      const cvFile = document.getElementById('cvFile').files[0];
+      if (cvFile && session?.user?.id) {
+        try {
+          const ext = cvFile.name.split('.').pop();
+          const path = `${session.user.id}/${Date.now()}.${ext}`;
+          const { data: uploadData, error: uploadError } = await window._sb.storage
+            .from('cvs')
+            .upload(path, cvFile, { upsert: true });
+          if (!uploadError && uploadData) {
+            const { data: { publicUrl } } = window._sb.storage.from('cvs').getPublicUrl(path);
+            cvUrl = publicUrl;
+            cvFilename = cvFile.name;
+          }
+        } catch(uploadErr) {
+          console.log('CV upload error (non-critical):', uploadErr);
+        }
+      }
+
       // Collect all form fields
       const appData = {
         job_id: jobId,
@@ -556,12 +577,33 @@ async function submitApplication() {
         applicant_education: document.getElementById('appEducation').value || '',
         applicant_skills: document.getElementById('appSkills').value || '',
         applicant_linkedin: document.getElementById('appLinkedin') ? document.getElementById('appLinkedin').value || '' : '',
-        resume_filename: window._cvFileName || '',
+        resume_filename: cvFilename,
+        resume_url: cvUrl,
         created_at: new Date().toISOString()
       };
 
-      const { error: insertError } = await window._sb.from('applications').insert([appData]);
-      if (insertError) console.log('Application save error:', insertError);
+      const { data: inserted, error: insertError } = await window._sb.from('applications').insert([appData]).select().single();
+      if (insertError) {
+        console.log('Application save error:', insertError);
+      } else if (inserted) {
+        // Notify employer via email using our API
+        try {
+          await fetch('/api/notify-employer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              applicationId: inserted.id,
+              jobId: jobId,
+              applicantName: appData.applicant_name,
+              applicantEmail: appData.applicant_email,
+              applicantPhone: appData.applicant_phone,
+              skills: appData.applicant_skills,
+              coverLetter: appData.cover_letter,
+              cvUrl: cvUrl
+            })
+          });
+        } catch(e) { /* email notification is non-critical */ }
+      }
     }
   } catch(e) { console.log('DB save error:', e); }
 

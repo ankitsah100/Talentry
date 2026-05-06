@@ -317,6 +317,19 @@ document.addEventListener("click",function(e){
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
 
+// Load user role to hide apply button for employers
+let _userRole = '';
+(async function(){
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
+      _userRole = p?.role || '';
+    }
+  } catch(e) {}
+  loadJobs();
+})();
+
 async function loadJobs(){
   const { data: jobs, error } = await sb.from('jobs').select('*').eq('status','active').order('created_at',{ascending:false});
   if(error || !jobs || jobs.length === 0) return;
@@ -340,7 +353,7 @@ async function loadJobs(){
         </div>
         <div class="j-footer">
           <span class="j-time">Just posted</span>
-          <button class="apply-btn" onclick="location.href='apply.html?job=${job.id}'">Apply now</button>
+          ${_userRole !== 'employer' ? `<button class="apply-btn" onclick="location.href='apply.html?job=${job.id}'">Apply now</button>` : ''}
         </div>
       </div>
       <div class="j-right">
@@ -350,7 +363,6 @@ async function loadJobs(){
     </div>`; 
   });
 }
-loadJobs();
 </script>
 
 <script src="ai-match.js"></script>
@@ -390,7 +402,7 @@ async function loadJobsWithMatching(){
         </div>
         <div class="j-footer">
           <span class="j-time">Recently posted</span>
-          <button class="apply-btn" onclick="location.href='apply.html?job=${job.id}'">Apply now</button>
+          ${_userRole !== 'employer' ? `<button class="apply-btn" onclick="location.href='apply.html?job=${job.id}'">Apply now</button>` : ''}
         </div>
       </div>
       <div class="j-right">
