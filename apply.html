@@ -259,52 +259,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co','sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
 window._sb = sb;
 
-// Load job from URL param
-const params = new URLSearchParams(window.location.search);
-const jobId = params.get('job');
-if(jobId){
-  const { data: job } = await sb.from('jobs').select('*').eq('id', jobId).single();
-  if(job){
-    document.getElementById('jobTitle').textContent = job.title;
-    document.getElementById('jobOrg').textContent = job.company + (job.location ? ' · '+job.location : '');
-    const tags = document.getElementById('jobTags');
-    if(job.job_type) tags.innerHTML += `<span class="jt jtg">${job.job_type}</span>`;
-    if(job.salary_min) tags.innerHTML += `<span class="jt jtb">Rs. ${Number(job.salary_min).toLocaleString()}${job.salary_max?'–'+Number(job.salary_max).toLocaleString():'+'}/mo</span>`;
-    if(job.category) tags.innerHTML += `<span class="jt jta">${job.category}</span>`;
-    document.title = `Apply — ${job.title} at ${job.company} | Talentry`;
-  }
-}
-
-// Auto-fill if logged in
-const { data: { session } } = await sb.auth.getSession();
-if(session){
-  // Logged in — auto-fill from profile
-  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-  if(profile){
-    if(profile.full_name) setField('appName', profile.full_name);
-    if(session.user.email) setField('appEmail', session.user.email);
-    if(profile.phone) setField('appPhone', profile.phone);
-    if(profile.location) setField('appLocation', profile.location);
-    if(profile.job_title) setField('appTitle', profile.job_title);
-  }
-} else {
-  // Guest — show a soft nudge (not a block)
-  const nudge = document.createElement('div');
-  nudge.style.cssText = 'background:linear-gradient(135deg,#d6f5eb,#e8f8f2);border:1.5px solid rgba(14,162,113,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;';
-  nudge.innerHTML = '<div><div style="font-size:13.5px;font-weight:600;color:#064e38;">💡 Log in to apply faster</div>'
-    + '<div style="font-size:12.5px;color:#4a6b58;margin-top:2px;">Your details auto-fill and you can track your application status.</div></div>'
-    + '<a href="auth.html" style="background:#0ea271;color:#fff;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;">Log in</a>';
-  const formCard = document.querySelector('.form-card');
-  if(formCard) formCard.insertBefore(nudge, formCard.firstChild);
-}
-
-function setField(id, val){
-  const el = document.getElementById(id);
-  if(el && val) { el.value = val; }
-}
-</script>
-
-<script type="module">
 async function handleResumeUpload(input) {
   if (!input.files || !input.files[0]) return;
   const file = input.files[0];
@@ -349,7 +303,10 @@ async function handleResumeUpload(input) {
       + 'full_name, email, phone, location, job_title, years_experience (one of: "Fresh graduate (0 yrs)"|"Less than 1 year"|"1-2 years"|"3-5 years"|"5-10 years"|"10+ years"), '
       + 'education, skills (comma separated), linkedin, cover_letter_suggestion (3-sentence cover letter for Nepal healthcare job), '
       + 'missing_fields (array of field names not found). '
-      + 'Use empty string for missing fields. Return ONLY the JSON object, no markdown.\n\nResume text:\n'
+      + 'Use empty string for missing fields. Return ONLY the JSON object, no markdown.
+
+Resume text:
+'
       + text.substring(0, 4000);
 
     const response = await fetch('/api/parse-resume', {
@@ -542,24 +499,40 @@ async function submitApplication() {
     if (window._sb && jobId) {
       const { data: { session } } = await window._sb.auth.getSession();
 
-      // Upload CV to Supabase Storage if file exists
+      // Upload CV to Supabase Storage
       let cvUrl = '';
       let cvFilename = window._cvFileName || '';
       const cvFile = document.getElementById('cvFile').files[0];
-      if (cvFile && session?.user?.id) {
+      if (cvFile) {
+        cvFilename = cvFile.name;
         try {
-          const ext = cvFile.name.split('.').pop();
-          const path = `${session.user.id}/${Date.now()}.${ext}`;
+          const ext = cvFile.name.split('.').pop().toLowerCase();
+          const timestamp = Date.now();
+          const userId = session?.user?.id || 'guest';
+          const path = `${userId}/${timestamp}_${cvFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+          
           const { data: uploadData, error: uploadError } = await window._sb.storage
             .from('cvs')
-            .upload(path, cvFile, { upsert: true });
+            .upload(path, cvFile, { upsert: true, contentType: cvFile.type });
+          
           if (!uploadError && uploadData) {
-            const { data: { publicUrl } } = window._sb.storage.from('cvs').getPublicUrl(path);
-            cvUrl = publicUrl;
-            cvFilename = cvFile.name;
+            // Get public URL
+            const { data: urlData } = window._sb.storage.from('cvs').getPublicUrl(path);
+            cvUrl = urlData?.publicUrl || '';
+            console.log('✅ CV uploaded:', cvUrl);
+          } else {
+            console.log('CV upload error:', uploadError?.message);
+            // Fallback: store as base64 data URL (works without storage bucket)
+            cvUrl = await new Promise(resolve => {
+              const reader = new FileReader();
+              reader.onload = e => resolve(e.target.result);
+              reader.onerror = () => resolve('');
+              reader.readAsDataURL(cvFile);
+            });
+            if (cvUrl) console.log('✅ CV saved as base64 fallback');
           }
         } catch(uploadErr) {
-          console.log('CV upload error (non-critical):', uploadErr);
+          console.log('CV upload exception:', uploadErr);
         }
       }
 
@@ -582,10 +555,13 @@ async function submitApplication() {
         created_at: new Date().toISOString()
       };
 
+      console.log('Submitting application:', appData);
       const { data: inserted, error: insertError } = await window._sb.from('applications').insert([appData]).select().single();
       if (insertError) {
-        console.log('Application save error:', insertError);
+        console.error('❌ Application save error:', insertError.message, insertError);
+        alert('Error saving application: ' + insertError.message);
       } else if (inserted) {
+        console.log('✅ Application saved:', inserted);
         // Notify employer via email using our API
         try {
           await fetch('/api/notify-employer', {
@@ -634,6 +610,51 @@ if (wrap) {
       handleResumeUpload(document.getElementById('cvFile'));
     }
   });
+}
+
+// ── JOB LOADER (from script 1) ──────────────
+// Load job from URL param
+const params = new URLSearchParams(window.location.search);
+const jobId = params.get('job');
+if(jobId){
+  const { data: job } = await sb.from('jobs').select('*').eq('id', jobId).single();
+  if(job){
+    document.getElementById('jobTitle').textContent = job.title;
+    document.getElementById('jobOrg').textContent = job.company + (job.location ? ' · '+job.location : '');
+    const tags = document.getElementById('jobTags');
+    if(job.job_type) tags.innerHTML += `<span class="jt jtg">${job.job_type}</span>`;
+    if(job.salary_min) tags.innerHTML += `<span class="jt jtb">Rs. ${Number(job.salary_min).toLocaleString()}${job.salary_max?'–'+Number(job.salary_max).toLocaleString():'+'}/mo</span>`;
+    if(job.category) tags.innerHTML += `<span class="jt jta">${job.category}</span>`;
+    document.title = `Apply — ${job.title} at ${job.company} | Talentry`;
+  }
+}
+
+// Auto-fill if logged in
+const { data: { session } } = await sb.auth.getSession();
+if(session){
+  // Logged in — auto-fill from profile
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if(profile){
+    if(profile.full_name) setField('appName', profile.full_name);
+    if(session.user.email) setField('appEmail', session.user.email);
+    if(profile.phone) setField('appPhone', profile.phone);
+    if(profile.location) setField('appLocation', profile.location);
+    if(profile.job_title) setField('appTitle', profile.job_title);
+  }
+} else {
+  // Guest — show a soft nudge (not a block)
+  const nudge = document.createElement('div');
+  nudge.style.cssText = 'background:linear-gradient(135deg,#d6f5eb,#e8f8f2);border:1.5px solid rgba(14,162,113,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;';
+  nudge.innerHTML = '<div><div style="font-size:13.5px;font-weight:600;color:#064e38;">💡 Log in to apply faster</div>'
+    + '<div style="font-size:12.5px;color:#4a6b58;margin-top:2px;">Your details auto-fill and you can track your application status.</div></div>'
+    + '<a href="auth.html" style="background:#0ea271;color:#fff;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;">Log in</a>';
+  const formCard = document.querySelector('.form-card');
+  if(formCard) formCard.insertBefore(nudge, formCard.firstChild);
+}
+
+function setField(id, val){
+  const el = document.getElementById(id);
+  if(el && val) { el.value = val; }
 }
 </script>
 </body>

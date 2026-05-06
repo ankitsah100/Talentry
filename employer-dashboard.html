@@ -251,23 +251,38 @@ async function loadApplications() {
   const jobMap = {};
   jobs.forEach(j => jobMap[j.id] = j);
 
-  // Get applications for all employer jobs
+  // Get applications - use simple select first (most reliable)
   const { data: apps, error } = await sb
     .from('applications')
-    .select(`*, profiles!applicant_id(full_name, email, phone, location, job_title, avatar_url)`)
+    .select('*')
     .in('job_id', jobIds)
     .order('created_at', { ascending: false });
 
   if (error) {
-    // Try without join if profiles join fails
-    const { data: apps2 } = await sb
-      .from('applications')
-      .select('*')
-      .in('job_id', jobIds)
-      .order('created_at', { ascending: false });
-    allApplications = apps2 || [];
-  } else {
-    allApplications = apps || [];
+    console.error('Applications load error:', error);
+    document.getElementById('appsList').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading applications</div><div class="empty-sub">${error.message}</div></div>`;
+    return;
+  }
+  
+  allApplications = apps || [];
+
+  // Try to enrich with profile data where applicant_id exists
+  const appsWithProfile = allApplications.filter(a => a.applicant_id);
+  if (appsWithProfile.length > 0) {
+    const userIds = [...new Set(appsWithProfile.map(a => a.applicant_id))];
+    const { data: profiles } = await sb
+      .from('profiles')
+      .select('id, full_name, email, phone, location, job_title')
+      .in('id', userIds);
+    
+    if (profiles) {
+      const profileMap = {};
+      profiles.forEach(p => profileMap[p.id] = p);
+      allApplications = allApplications.map(app => ({
+        ...app,
+        profiles: app.applicant_id ? profileMap[app.applicant_id] : null
+      }));
+    }
   }
 
   updateStats(jobs.length, allApplications);
@@ -338,7 +353,13 @@ function renderApplications(apps, jobMap) {
         ${education ? `<div class="app-field"><div class="app-field-label">🎓 Education</div><div class="app-field-val">${education}</div></div>` : ''}
         ${skills ? `<div class="app-field"><div class="app-field-label">⚡ Skills</div><div class="app-field-val">${skills}</div></div>` : ''}
         ${linkedin ? `<div class="app-field"><div class="app-field-label">🔗 LinkedIn</div><div class="app-field-val"><a href="${linkedin.startsWith('http')?linkedin:'https://'+linkedin}" target="_blank" style="color:var(--g)">${linkedin}</a></div></div>` : ''}
-        ${resumeFile || app.resume_url ? `<div class="app-field"><div class="app-field-label">📄 CV</div><div class="app-field-val">${app.resume_url ? `<a href="${app.resume_url}" target="_blank" download style="color:var(--g);font-weight:600;">⬇ Download CV (${resumeFile || 'file'})</a>` : resumeFile}</div></div>` : ''}
+        ${(resumeFile || app.resume_url) ? `<div class="app-field"><div class="app-field-label">📄 CV / Resume</div><div class="app-field-val">${
+          app.resume_url && app.resume_url.startsWith('data:') 
+            ? `<a href="${app.resume_url}" download="${resumeFile || 'cv.pdf'}" style="color:var(--g);font-weight:600;">⬇ Download CV (${resumeFile || 'file'})</a>`
+            : app.resume_url 
+            ? `<a href="${app.resume_url}" target="_blank" download style="color:var(--g);font-weight:600;">⬇ Download CV (${resumeFile || 'file'})</a>`
+            : `<span style="color:var(--muted)">${resumeFile}</span>`
+        }</div></div>` : ''}
       </div>
       ${app.cover_letter ? `
       <div class="app-cover">
@@ -361,12 +382,14 @@ function renderApplications(apps, jobMap) {
 
 // ── LOAD JOBS ──────────────────────────────
 async function loadJobs() {
+  console.log('Loading jobs for employer:', currentUser.id);
   const { data: jobs, error } = await sb
     .from('jobs')
     .select('*')
     .eq('employer_id', currentUser.id)
     .order('created_at', { ascending: false });
 
+  console.log('Jobs loaded:', jobs?.length, 'Error:', error?.message);
   allJobs = jobs || [];
 
   if (!allJobs.length) {
@@ -430,7 +453,13 @@ function viewFullApp(appId) {
       ${education ? `<p style="margin-bottom:8px;font-size:14px;">🎓 ${education}</p>` : ''}
       ${skills ? `<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:#4a6b58;margin-bottom:6px;">SKILLS</div><div style="font-size:13px;">${skills}</div></div>` : ''}
       ${cover ? `<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:#4a6b58;margin-bottom:6px;">COVER LETTER</div><div style="font-size:13px;line-height:1.7;background:#f4faf7;padding:14px;border-radius:10px;">${cover}</div></div>` : ''}
-      ${app.resume_url ? `<div style="margin-bottom:12px;"><a href="${app.resume_url}" target="_blank" download style="display:inline-flex;align-items:center;gap:8px;background:#d6f5eb;color:#064e38;padding:10px 18px;border-radius:100px;text-decoration:none;font-size:13px;font-weight:600;">📄 Download CV</a></div>` : ''}
+      ${app.resume_url ? `<div style="margin-bottom:12px;">
+        <a href="${app.resume_url}" 
+           ${app.resume_url.startsWith('data:') ? `download="${app.resume_filename || 'cv.pdf'}"` : 'target="_blank" download'}
+           style="display:inline-flex;align-items:center;gap:8px;background:#d6f5eb;color:#064e38;padding:10px 18px;border-radius:100px;text-decoration:none;font-size:13px;font-weight:600;">
+          📄 Download CV${app.resume_filename ? ' ('+app.resume_filename+')' : ''}
+        </a>
+      </div>` : app.resume_filename ? `<div style="margin-bottom:12px;color:var(--muted);font-size:13px;">📄 ${app.resume_filename} (not uploaded)</div>` : ''}
       <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
         ${email ? `<a href="mailto:${email}?subject=Re: Your application" style="background:#0ea271;color:#fff;padding:10px 18px;border-radius:100px;text-decoration:none;font-size:13px;font-weight:600;">✉️ Send email</a>` : ''}
         ${phone ? `<a href="tel:${phone}" style="background:#f4faf7;color:#0a1a12;border:1.5px solid rgba(14,162,113,.28);padding:10px 18px;border-radius:100px;text-decoration:none;font-size:13px;font-weight:600;">📱 Call</a>` : ''}
