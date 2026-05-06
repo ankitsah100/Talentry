@@ -131,7 +131,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var
       <div class="form-title">Welcome back</div>
       <div class="form-sub">Log in to your Talentry account</div>
 
-      <button class="social-btn" onclick="googleLogin()">
+      <button class="social-btn" onclick="googleLoginDirect()">
         <div class="google-ico">G</div>
         Continue with Google
       </button>
@@ -237,6 +237,22 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Handle OAuth callback (Google)
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session && window.location.hash.includes('access_token')) {
+      // Save pending role from before OAuth redirect
+      const pendingRole = localStorage.getItem('pendingRole');
+      const pendingCompany = localStorage.getItem('pendingCompany') || '';
+      if (pendingRole) {
+        localStorage.removeItem('pendingRole');
+        localStorage.removeItem('pendingCompany');
+        try {
+          await sb.from('profiles').upsert({
+            id: session.user.id,
+            email: session.user.email,
+            full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || '',
+            role: pendingRole,
+            company_name: pendingCompany
+          }, { onConflict: 'id' });
+        } catch(e) { console.log('Profile role save error:', e); }
+      }
       goHome(sb, session.user.id);
     }
   });
@@ -385,6 +401,17 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
 
   async function googleLogin() {
+    if (!currentRole) {
+      showErr('⚠️ Please select your role first — Job Seeker or Employer.');
+      document.getElementById('roleJobseeker').style.borderColor = '#ef4444';
+      document.getElementById('roleEmployer').style.borderColor = '#ef4444';
+      // Switch to signup tab if on login tab
+      switchTab('signup');
+      return;
+    }
+    // Save role before OAuth redirect — will be read after callback
+    localStorage.setItem('pendingRole', currentRole);
+    localStorage.setItem('pendingCompany', document.getElementById('companyName')?.value || '');
     const { error } = await sb.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: 'https://talentry-nu.vercel.app/auth.html' }
@@ -417,8 +444,20 @@ document.addEventListener('DOMContentLoaded', async function() {
   }
   window.showLogin = showLogin;
 
+  // Direct Google login (for existing users - no role needed)
+  async function googleLoginDirect() {
+    // Check if user has existing session or account
+    localStorage.removeItem('pendingRole'); // clear any pending role
+    const { error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: 'https://talentry-nu.vercel.app/auth.html' }
+    });
+    if (error) showErr('Google sign in failed: ' + error.message);
+  }
+
   // Expose ALL functions to global scope (must be after definitions)
   window._sb = sb;
+  window.googleLoginDirect = googleLoginDirect;
   window.doLogin = doLogin;
   window.doSignup = doSignup;
   window.doForgot = doForgot;
