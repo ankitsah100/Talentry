@@ -502,8 +502,9 @@ async function submitApplication() {
   const jobId = params.get('job');
 
   try {
-    if (window._sb && jobId) {
-      const { data: { session } } = await window._sb.auth.getSession();
+    const sb = window._sb;
+    if (sb && jobId) {
+      const { data: { session } } = await sb.auth.getSession();
 
       // Upload CV to Supabase Storage
       let cvUrl = '';
@@ -517,13 +518,13 @@ async function submitApplication() {
           const userId = session?.user?.id || 'guest';
           const path = `${userId}/${timestamp}_${cvFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
           
-          const { data: uploadData, error: uploadError } = await window._sb.storage
+          const { data: uploadData, error: uploadError } = await sb.storage
             .from('cvs')
             .upload(path, cvFile, { upsert: true, contentType: cvFile.type });
           
           if (!uploadError && uploadData) {
             // Get public URL
-            const { data: urlData } = window._sb.storage.from('cvs').getPublicUrl(path);
+            const { data: urlData } = sb.storage.from('cvs').getPublicUrl(path);
             cvUrl = urlData?.publicUrl || '';
             console.log('✅ CV uploaded:', cvUrl);
           } else {
@@ -562,7 +563,7 @@ async function submitApplication() {
       };
 
       console.log('Submitting application:', appData);
-      const { data: inserted, error: insertError } = await window._sb.from('applications').insert([appData]).select().single();
+      const { data: inserted, error: insertError } = await sb.from('applications').insert([appData]).select().single();
       if (insertError) {
         console.error('❌ Application save error:', insertError.message, insertError);
         alert('Error saving application: ' + insertError.message);
@@ -620,6 +621,8 @@ if (wrap) {
 
 // ── JOB LOADER ──────────────────────────────
 (async function initPage() {
+const sb = window._sb; // Use the initialized Supabase client
+if(!sb){ console.error('Supabase not ready'); return; }
 // Load job from URL param
 const params = new URLSearchParams(window.location.search);
 const jobId = params.get('job');
