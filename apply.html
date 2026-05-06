@@ -254,10 +254,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 
 <script type="module" src="navbar.js"></script>
 
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co','sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
-window._sb = sb;
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// Init Supabase with UMD
+window.addEventListener('load', function() {
+  try {
+    const sb = window.supabase.createClient(
+      'https://eteyskwaqjtcybaolnto.supabase.co',
+      'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe'
+    );
+    window._sb = sb;
+    console.log('Supabase ready');
+  } catch(e) { console.error('Supabase init failed:', e); }
+});
+
 
 async function handleResumeUpload(input) {
   if (!input.files || !input.files[0]) return;
@@ -303,10 +313,7 @@ async function handleResumeUpload(input) {
       + 'full_name, email, phone, location, job_title, years_experience (one of: "Fresh graduate (0 yrs)"|"Less than 1 year"|"1-2 years"|"3-5 years"|"5-10 years"|"10+ years"), '
       + 'education, skills (comma separated), linkedin, cover_letter_suggestion (3-sentence cover letter for Nepal healthcare job), '
       + 'missing_fields (array of field names not found). '
-      + 'Use empty string for missing fields. Return ONLY the JSON object, no markdown.
-
-Resume text:
-'
+      + 'Use empty string for missing fields. Return ONLY JSON. Resume text: '
       + text.substring(0, 4000);
 
     const response = await fetch('/api/parse-resume', {
@@ -658,6 +665,7 @@ function setField(id, val){
   if(el && val) { el.value = val; }
 }
 })(); // end initPage
+
 </script>
 </body>
 </html>
