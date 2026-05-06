@@ -248,19 +248,22 @@ async function loadApplications() {
     jobs.forEach(j => jobMap[j.id] = j);
     const jobIds = jobs.map(j => j.id);
 
-    // Step 2: Get applications using simple .in() query - split into batches of 10
-    let allApps = [];
-    for (let i = 0; i < jobIds.length; i += 10) {
-      const batch = jobIds.slice(i, i + 10);
-      const { data } = await sb.from('applications').select('*').in('job_id', batch).order('created_at', { ascending: false });
-      if (data) allApps = allApps.concat(data);
-    }
+    // Step 2: Single query with all job IDs (Supabase supports up to 100)
+    const { data: allApps, error: appErr } = await sb
+      .from('applications')
+      .select('*')
+      .in('job_id', jobIds)
+      .order('created_at', { ascending: false })
+      .limit(100);
 
-    allApplications = allApps;
+    if (appErr) console.error('Apps error:', appErr.message);
+    allApplications = allApps || [];
 
     // Update stats
-    document.getElementById('statApps').textContent = allApplications.length;
-    document.getElementById('statNew').textContent = allApplications.filter(a => a.status === 'applied').length;
+    const statApps = document.getElementById('statApps');
+    const statNew = document.getElementById('statNew');
+    if(statApps) statApps.textContent = allApplications.length;
+    if(statNew) statNew.textContent = allApplications.filter(a => a.status === 'applied').length;
 
     renderApplications(allApplications, jobMap);
   } catch(e) {
