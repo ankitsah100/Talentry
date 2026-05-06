@@ -237,22 +237,37 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Handle OAuth callback (Google)
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session && window.location.hash.includes('access_token')) {
-      // Save pending role from before OAuth redirect
-      const pendingRole = localStorage.getItem('pendingRole');
+      const pendingRole = localStorage.getItem('pendingRole') || '';
       const pendingCompany = localStorage.getItem('pendingCompany') || '';
-      if (pendingRole) {
-        localStorage.removeItem('pendingRole');
-        localStorage.removeItem('pendingCompany');
-        try {
-          await sb.from('profiles').upsert({
-            id: session.user.id,
-            email: session.user.email,
-            full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || '',
-            role: pendingRole,
-            company_name: pendingCompany
-          }, { onConflict: 'id' });
-        } catch(e) { console.log('Profile role save error:', e); }
-      }
+      localStorage.removeItem('pendingRole');
+      localStorage.removeItem('pendingCompany');
+      
+      // ALWAYS create/update profile for Google OAuth users
+      try {
+        const profileData = {
+          id: session.user.id,
+          email: session.user.email,
+          full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email.split('@')[0],
+        };
+        // Only set role if we have a pending one (new signup) or profile doesn't exist
+        if (pendingRole) {
+          profileData.role = pendingRole;
+          profileData.company_name = pendingCompany;
+        }
+        
+        // Check if profile exists first
+        const { data: existing } = await sb.from('profiles').select('id, role').eq('id', session.user.id).single();
+        
+        if (!existing) {
+          // New Google user - create profile
+          profileData.role = pendingRole || 'jobseeker';
+          await sb.from('profiles').insert(profileData);
+        } else if (pendingRole) {
+          // Existing user updating role
+          await sb.from('profiles').update({ role: pendingRole, company_name: pendingCompany }).eq('id', session.user.id);
+        }
+      } catch(e) { console.log('Profile save error:', e); }
+      
       goHome(sb, session.user.id);
     }
   });

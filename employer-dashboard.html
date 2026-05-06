@@ -255,29 +255,29 @@ async function loadApplications() {
     const jobMap = {};
     jobs.forEach(j => jobMap[j.id] = j);
 
-    // Use a Supabase RPC or direct query with employer_id join
-    // This is more reliable than .in() with many IDs
-    let apps = [];
-    let appsError = null;
-    
-    // Batch in groups of 5 to avoid limits
-    const batchSize = 5;
-    for (let i = 0; i < jobIds.length; i += batchSize) {
-      const batch = jobIds.slice(i, i + batchSize);
-      const { data: batchApps, error: batchErr } = await sb
-        .from('applications')
-        .select('*')
-        .in('job_id', batch)
-        .order('created_at', { ascending: false });
-      if (batchApps) apps = [...apps, ...batchApps];
-      if (batchErr) appsError = batchErr;
-    }
+    // Simple direct query - get applications where job belongs to this employer
+    // Use employer_id directly via jobs join
+    const { data: apps, error: appsError } = await sb
+      .from('applications')
+      .select('*, jobs!inner(employer_id)')
+      .eq('jobs.employer_id', currentUser.id)
+      .order('created_at', { ascending: false });
 
     if (appsError) {
       console.error('Applications load error:', appsError);
+      // Fallback: batch query
+      let fallbackApps = [];
+      const batchSize = 10;
+      for (let i = 0; i < jobIds.length; i += batchSize) {
+        const batch = jobIds.slice(i, i + batchSize);
+        const { data: b } = await sb.from('applications').select('*').in('job_id', batch).order('created_at', {ascending:false});
+        if (b) fallbackApps = [...fallbackApps, ...b];
+      }
+      allApplications = fallbackApps;
+    } else {
+      // Remove the jobs join data from results
+      allApplications = (apps || []).map(a => { const {jobs, ...rest} = a; return rest; });
     }
-
-    allApplications = apps || [];
 
     // Enrich with profile data
     const appsWithProfile = allApplications.filter(a => a.applicant_id);
