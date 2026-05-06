@@ -612,7 +612,8 @@ if (wrap) {
   });
 }
 
-// ── JOB LOADER (from script 1) ──────────────
+// ── JOB LOADER ──────────────────────────────
+(async function initPage() {
 // Load job from URL param
 const params = new URLSearchParams(window.location.search);
 const jobId = params.get('job');
@@ -656,6 +657,7 @@ function setField(id, val){
   const el = document.getElementById(id);
   if(el && val) { el.value = val; }
 }
+})(); // end initPage
 </script>
 </body>
 </html>
