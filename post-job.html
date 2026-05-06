@@ -448,9 +448,13 @@ async function submitJob(){
   const benefits=[];
   document.querySelectorAll('.benefit-cb input:checked').forEach(c=>benefits.push(c.value));
 
+  // Get current session to save employer_id
+  const { data: { session: jobSession } } = await window._sb.auth.getSession();
+  
   const jobData={
     title,
     company,
+    employer_id: jobSession?.user?.id || null,
     location: document.getElementById('location').value||null,
     job_type: document.getElementById('jobType').value||null,
     category: document.getElementById('category').value||null,
