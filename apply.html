@@ -310,6 +310,7 @@ async function handleResumeUpload(input) {
   const file = input.files[0];
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) { alert('File too large. Please upload a file under 5MB.'); return; }
+  window._cvFileName = file.name; // Store filename for application
 
   // Show upload success on the drop zone
   document.getElementById('uploadWrap').innerHTML = `
@@ -540,12 +541,27 @@ async function submitApplication() {
   try {
     if (window._sb && jobId) {
       const { data: { session } } = await window._sb.auth.getSession();
-      await window._sb.from('applications').insert([{
+
+      // Collect all form fields
+      const appData = {
         job_id: jobId,
         applicant_id: session?.user?.id || null,
-        cover_letter: document.getElementById('appCover').value,
-        status: 'applied'
-      }]);
+        status: 'applied',
+        cover_letter: document.getElementById('appCover').value || '',
+        applicant_name: document.getElementById('appName').value || '',
+        applicant_email: document.getElementById('appEmail').value || '',
+        applicant_phone: document.getElementById('appPhone').value || '',
+        applicant_location: document.getElementById('appLocation').value || '',
+        applicant_title: document.getElementById('appTitle').value || '',
+        applicant_education: document.getElementById('appEducation').value || '',
+        applicant_skills: document.getElementById('appSkills').value || '',
+        applicant_linkedin: document.getElementById('appLinkedin') ? document.getElementById('appLinkedin').value || '' : '',
+        resume_filename: window._cvFileName || '',
+        created_at: new Date().toISOString()
+      };
+
+      const { error: insertError } = await window._sb.from('applications').insert([appData]);
+      if (insertError) console.log('Application save error:', insertError);
     }
   } catch(e) { console.log('DB save error:', e); }
 

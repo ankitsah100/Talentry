@@ -4,387 +4,518 @@
 <style id="authGuardStyle">body{visibility:hidden!important;}</style>
 <script>
 (function(){
-  try {
-    // Supabase v2 stores session under: sb-{project-ref}-auth-token
-    var key = 'sb-eteyskwaqjtcybaolnto-auth-token';
-    var raw = localStorage.getItem(key);
-    if(raw){
-      var data = JSON.parse(raw);
-      // Check access_token exists and not expired
-      if(data && data.access_token){
-        var exp = data.expires_at || 0;
-        if(exp === 0 || (Date.now() / 1000) < exp){
-          // Valid session — show page
-          document.getElementById('authGuardStyle').textContent = '';
-          return;
-        }
-      }
-    }
-  } catch(e){}
-  // No valid session — redirect to login
-  var current = window.location.href;
-  // Never save auth.html as redirect target (prevents loop)
-  if(current.indexOf('auth.html') === -1){
-    sessionStorage.setItem('redirectAfterLogin', current);
-  }
+  try{
+    var key='sb-eteyskwaqjtcybaolnto-auth-token';
+    var raw=localStorage.getItem(key);
+    if(raw){var d=JSON.parse(raw);if(d&&d.access_token){var exp=d.expires_at||0;if(exp===0||(Date.now()/1000)<exp){document.getElementById('authGuardStyle').textContent='';return;}}}
+  }catch(e){}
+  sessionStorage.setItem('redirectAfterLogin',window.location.href);
   window.location.replace('auth.html');
 })();
 </script>
-
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Employer Dashboard — Talentry</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
+:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--mu:#4a6b58;--bg:#fff;--b2:#f4faf7;--br:rgba(14,162,113,.14);--br2:rgba(14,162,113,.28);}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);display:flex;}
-
+body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--b2);display:flex;min-height:100vh;}
 /* SIDEBAR */
-.sidebar{width:240px;min-height:100vh;background:var(--gd);padding:0;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;}
-.sb-logo{padding:22px 24px;border-bottom:1px solid rgba(255,255,255,0.08);}
-.sb-logo a{font-family:'Fraunces',serif;font-size:22px;color:#fff;text-decoration:none;}
+.sidebar{width:230px;min-height:100vh;background:var(--gd);padding:0;flex-shrink:0;position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;z-index:50;}
+.sb-logo{padding:20px 22px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sb-logo a{font-family:'Fraunces',serif;font-size:21px;color:#fff;text-decoration:none;}
 .sb-logo a em{color:var(--gm);font-style:italic;}
-.sb-org{padding:16px 24px;border-bottom:1px solid rgba(255,255,255,0.08);}
-.sb-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;margin-bottom:8px;}
-.sb-name{font-size:13px;font-weight:600;color:#fff;}
-.sb-role{font-size:11.5px;color:rgba(255,255,255,0.5);}
-.sb-nav{flex:1;padding:16px 0;}
-.sb-nav a{display:flex;align-items:center;gap:11px;padding:11px 24px;font-size:13.5px;color:rgba(255,255,255,0.65);text-decoration:none;transition:all .2s;cursor:pointer;}
-.sb-nav a:hover,.sb-nav a.active{background:rgba(255,255,255,0.08);color:#fff;}
-.sb-nav a.active{border-right:3px solid var(--gm);}
-.sb-nav-icon{font-size:16px;width:20px;text-align:center;}
-.sb-section{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:12px 24px 6px;}
-.sb-post-btn{margin:16px;background:var(--g);color:#fff;border:none;padding:12px;border-radius:12px;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;width:calc(100% - 32px);transition:all .2s;}
-.sb-post-btn:hover{background:#0cb87f;}
-
+.sb-user{padding:16px 22px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sb-av{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:8px;}
+.sb-name{font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;}
+.sb-role{font-size:11px;color:rgba(255,255,255,.5);}
+.sb-nav{padding:16px 12px;flex:1;}
+.sb-nav a,.sb-nav button{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;color:rgba(255,255,255,.65);text-decoration:none;background:none;border:none;font-family:inherit;cursor:pointer;width:100%;transition:all .2s;margin-bottom:2px;}
+.sb-nav a:hover,.sb-nav button:hover{background:rgba(255,255,255,.08);color:#fff;}
+.sb-nav a.on{background:rgba(255,255,255,.12);color:#fff;}
+.sb-nav .section{font-size:10.5px;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em;padding:14px 12px 6px;}
+.sb-post{margin:12px;background:var(--gm);color:var(--gd)!important;font-weight:700!important;border-radius:12px!important;}
+.sb-post:hover{background:#fff!important;color:var(--gd)!important;}
 /* MAIN */
-.main{margin-left:240px;flex:1;padding:28px 32px;min-height:100vh;}
-.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
-.top-greeting{font-family:'Fraunces',serif;font-size:26px;color:var(--text);letter-spacing:-0.5px;}
-.top-greeting span{color:var(--g);font-style:italic;}
-.top-actions{display:flex;gap:10px;}
-.btn-outline{background:none;border:1.5px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;}
-.btn-solid{background:var(--g);color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
-
+.main{margin-left:230px;flex:1;padding:28px 32px;max-width:1100px;}
+/* TOP BAR */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;}
+.page-title{font-family:'Fraunces',serif;font-size:26px;color:var(--text);letter-spacing:-0.5px;}
 /* STATS */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
-.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:20px;}
-.stat-label{font-size:12px;color:var(--muted);margin-bottom:6px;}
-.stat-num{font-family:'Fraunces',serif;font-size:30px;color:var(--text);font-weight:500;line-height:1;}
-.stat-change{font-size:12px;margin-top:6px;}
-.up{color:var(--g);}
-.down{color:#e24b4a;}
-
-/* GRID */
-.dash-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;}
-
-.card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:22px;margin-bottom:16px;}
-.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
-.card-title{font-size:15px;font-weight:600;color:var(--text);}
-.card-action{font-size:12.5px;color:var(--g);cursor:pointer;text-decoration:none;}
-
-/* JOB LISTINGS */
-.job-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1.5px solid var(--border);}
-.job-row:last-child{border:none;padding-bottom:0;}
-.jr-ico{width:40px;height:40px;border-radius:11px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
-.jr-info{flex:1;}
-.jr-title{font-size:14px;font-weight:600;color:var(--text);}
-.jr-meta{font-size:12px;color:var(--muted);margin-top:2px;}
-.jr-stats{display:flex;gap:14px;align-items:center;}
-.jr-stat{text-align:center;}
-.jr-stat-num{font-size:15px;font-weight:600;color:var(--text);}
-.jr-stat-lbl{font-size:10px;color:var(--muted);}
-.status-pill{font-size:11px;padding:3px 11px;border-radius:100px;font-weight:500;}
-.active-pill{background:var(--gl);color:var(--gd);}
-.paused-pill{background:#f0f0f0;color:#666;}
-
-/* KANBAN */
-.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-.kcol{background:var(--bg2);border-radius:12px;padding:12px;}
-.khead{font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-.kdot{width:8px;height:8px;border-radius:50%;}
-.kitem{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:11px;margin-bottom:7px;cursor:pointer;transition:all .2s;}
-.kitem:hover{border-color:var(--gm);}
-.ki-name{font-size:12.5px;font-weight:600;color:var(--text);}
-.ki-role{font-size:11px;color:var(--muted);margin-top:1px;}
-.ki-score{font-size:11px;color:var(--g);margin-top:4px;font-weight:500;}
-
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat{background:var(--bg);border:1.5px solid var(--br);border-radius:16px;padding:18px 20px;}
+.stat-n{font-family:'Fraunces',serif;font-size:32px;color:var(--text);margin-bottom:4px;}
+.stat-l{font-size:13px;color:var(--mu);}
+.stat-delta{font-size:12px;color:var(--g);margin-top:4px;}
+/* TABS */
+.tabs{display:flex;gap:8px;margin-bottom:20px;border-bottom:1.5px solid var(--br);padding-bottom:0;}
+.tab{padding:10px 18px;border:none;background:none;font-size:13.5px;font-weight:500;font-family:inherit;color:var(--mu);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1.5px;transition:all .2s;}
+.tab.on{color:var(--g);border-bottom-color:var(--g);}
+.tab-content{display:none;}.tab-content.on{display:block;}
 /* APPLICANTS */
-.applicant-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1.5px solid var(--border);}
-.applicant-row:last-child{border:none;}
-.app-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
-.app-name{font-size:13.5px;font-weight:600;color:var(--text);}
-.app-role{font-size:12px;color:var(--muted);}
-.app-match{font-size:12px;font-weight:600;color:var(--g);margin-left:auto;white-space:nowrap;}
-.app-actions{display:flex;gap:6px;margin-left:8px;}
-.app-btn{padding:5px 12px;border-radius:100px;font-size:11.5px;font-family:inherit;cursor:pointer;}
-.app-view{background:var(--gl);color:var(--gd);border:none;}
-.app-reject{background:#ffe8e8;color:#9b1c1c;border:none;}
-
-/* SOCIAL POSTS */
-.post-item{padding:12px 0;border-bottom:1.5px solid var(--border);display:flex;gap:12px;align-items:flex-start;}
-.post-item:last-child{border:none;}
-.post-platform{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
-.post-info{flex:1;}
-.post-text{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:4px;}
-.post-stats{font-size:11.5px;color:var(--muted);}
-.post-time{font-size:11px;color:var(--muted);white-space:nowrap;}
-
-/* ANALYTICS MINI -->
-.analytics-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.anl-card{background:var(--bg2);border-radius:12px;padding:14px;text-align:center;}
-.anl-num{font-family:'Fraunces',serif;font-size:22px;color:var(--g);}
-.anl-lbl{font-size:11px;color:var(--muted);margin-top:3px;}
+.app-card{background:var(--bg);border:1.5px solid var(--br);border-radius:16px;overflow:hidden;margin-bottom:14px;}
+.app-header{padding:14px 20px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:12px;background:#fafffe;}
+.app-ico{width:40px;height:40px;border-radius:12px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.app-name{font-size:15px;font-weight:600;color:var(--text);}
+.app-role{font-size:12.5px;color:var(--mu);}
+.app-badge{font-size:11px;padding:3px 10px;border-radius:100px;margin-left:auto;}
+.badge-new{background:#dbeeff;color:#1a5fa8;}
+.badge-review{background:#fff3d6;color:#7a4e00;}
+.badge-interview{background:var(--gl);color:var(--gd);}
+.badge-rejected{background:#ffe8e8;color:#9b1c1c;}
+.badge-hired{background:var(--gl);color:var(--gd);font-weight:700;}
+.app-body{padding:16px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.app-field{font-size:12.5px;}
+.app-field-label{color:var(--mu);margin-bottom:3px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+.app-field-val{color:var(--text);font-weight:500;}
+.app-cover{padding:0 20px 14px;font-size:13px;color:var(--mu);line-height:1.7;border-top:1px solid var(--br);margin-top:0;padding-top:14px;}
+.app-cover-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mu);margin-bottom:6px;}
+.app-actions{padding:14px 20px;border-top:1px solid var(--br);display:flex;gap:8px;flex-wrap:wrap;}
+.app-btn{padding:8px 16px;border-radius:100px;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;border:none;transition:all .2s;}
+.app-btn:hover{opacity:.85;}
+.btn-interview{background:var(--gl);color:var(--gd);}
+.btn-hire{background:var(--g);color:#fff;}
+.btn-reject{background:#ffe8e8;color:#9b1c1c;}
+.btn-review{background:#fff3d6;color:#7a4e00;}
+.btn-email{background:var(--b2);color:var(--text);border:1.5px solid var(--br2);}
+/* JOBS TABLE */
+.jobs-table{background:var(--bg);border:1.5px solid var(--br);border-radius:16px;overflow:hidden;}
+.jt-head{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 120px;gap:12px;padding:12px 20px;background:var(--b2);border-bottom:1.5px solid var(--br);font-size:11.5px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;}
+.jt-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 120px;gap:12px;padding:14px 20px;border-bottom:1px solid var(--br);align-items:center;transition:background .2s;}
+.jt-row:last-child{border:none;}
+.jt-row:hover{background:var(--b2);}
+.jt-title{font-size:14px;font-weight:600;color:var(--text);}
+.jt-org{font-size:12px;color:var(--mu);}
+.jt-stat{font-size:12.5px;color:var(--mu);}
+.jt-apps{font-family:'Fraunces',serif;font-size:20px;color:var(--text);}
+.jt-status{font-size:11.5px;padding:3px 10px;border-radius:100px;text-align:center;}
+.st-active{background:var(--gl);color:var(--gd);}
+.st-closed{background:#ffe8e8;color:#9b1c1c;}
+.jt-actions{display:flex;gap:6px;}
+.jt-btn{font-size:12px;padding:5px 12px;border-radius:100px;border:1.5px solid var(--br2);background:var(--bg);color:var(--text);cursor:pointer;font-family:inherit;transition:all .2s;}
+.jt-btn:hover{background:var(--b2);}
+.jt-btn.danger{border-color:#ef4444;color:#ef4444;}
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--mu);}
+.empty-ico{font-size:48px;margin-bottom:12px;}
+.empty-title{font-family:'Fraunces',serif;font-size:20px;color:var(--text);margin-bottom:8px;}
+.empty-sub{font-size:14px;margin-bottom:20px;}
+.empty-btn{background:var(--g);color:#fff;border:none;padding:11px 24px;border-radius:100px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;}
+.modal-bg.show{display:flex;}
+.modal{background:#fff;border-radius:20px;padding:28px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-family:'Fraunces',serif;font-size:20px;margin-bottom:16px;}
+.modal-field{margin-bottom:14px;}
+.modal-field label{display:block;font-size:12px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.modal-field input,.modal-field textarea,.modal-field select{width:100%;padding:10px 13px;border:1.5px solid var(--br2);border-radius:10px;font-size:13.5px;font-family:inherit;color:var(--text);outline:none;resize:vertical;}
+.modal-field input:focus,.modal-field textarea:focus,.modal-field select:focus{border-color:var(--g);}
+.modal-btns{display:flex;gap:10px;margin-top:18px;justify-content:flex-end;}
+.modal-cancel{background:var(--b2);border:none;padding:10px 20px;border-radius:100px;font-size:13.5px;font-family:inherit;cursor:pointer;}
+.modal-send{background:var(--g);color:#fff;border:none;padding:10px 22px;border-radius:100px;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--gd);color:#fff;padding:12px 20px;border-radius:12px;font-size:13.5px;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+/* LOADING */
+.loading{text-align:center;padding:40px;color:var(--mu);font-size:14px;}
+@media(max-width:768px){.sidebar{display:none;}.main{margin-left:0;padding:16px;}.stats{grid-template-columns:1fr 1fr;}.app-body{grid-template-columns:1fr 1fr;}.jt-head,.jt-row{grid-template-columns:2fr 1fr 80px;}.jt-head>:nth-child(3),.jt-row>:nth-child(3),.jt-head>:nth-child(4),.jt-row>:nth-child(4){display:none;}}
 </style>
-<link rel="stylesheet" href="mobile.css"/>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
   <div class="sb-logo"><a href="index.html">Tal<em>entry</em></a></div>
-  <div class="sb-org">
-    <div class="sb-av">BH</div>
-    <div class="sb-name">Bir Hospital</div>
-    <div class="sb-role">Employer account</div>
+  <div class="sb-user">
+    <div class="sb-av" id="sbAv">🏥</div>
+    <div class="sb-name" id="sbName">Loading...</div>
+    <div class="sb-role">Employer Account</div>
   </div>
-  <nav class="sb-nav">
-    <div class="sb-section">Main</div>
-    <a class="active"><span class="sb-nav-icon">📊</span>Dashboard</a>
-    <a href="post-job.html"><span class="sb-nav-icon">➕</span>Post a job</a>
-    <a><span class="sb-nav-icon">💼</span>Active jobs</a>
-    <a><span class="sb-nav-icon">👥</span>Applicants</a>
-    <div class="sb-section">Tools</div>
-    <a><span class="sb-nav-icon">🤖</span>AI screening</a>
-    <a><span class="sb-nav-icon">📅</span>Interviews</a>
-    <a><span class="sb-nav-icon">📣</span>Social posts</a>
-    <a><span class="sb-nav-icon">📈</span>Analytics</a>
-    <div class="sb-section">Account</div>
-    <a><span class="sb-nav-icon">⚙</span>Settings</a>
-    <a href="auth.html"><span class="sb-nav-icon">🚪</span>Log out</a>
-  </nav>
-  <button class="sb-post-btn" onclick="location.href='post-job.html'">+ Post a new job</button>
+  <div class="sb-nav">
+    <a href="#" class="on" onclick="showTab('applications')">📋 Applications</a>
+    <a href="#" onclick="showTab('jobs')">💼 My Jobs</a>
+    <a href="post-job.html" class="sb-post">+ Post a Job</a>
+    <div class="section">Tools</div>
+    <a href="browse-jobs.html">🔍 Browse jobs</a>
+    <a href="salary-insights.html">💰 Salary insights</a>
+    <div class="section">Account</div>
+    <a href="profile.html">👤 My Profile</a>
+    <button onclick="doLogout()">🚪 Log out</button>
+  </div>
 </div>
 
 <!-- MAIN -->
 <div class="main">
-  <div class="top-bar">
-    <div class="top-greeting">Good morning, <span>Bir Hospital</span> 👋</div>
-    <div class="top-actions">
-      <button class="btn-outline">📥 Download report</button>
-      <button class="btn-solid" onclick="location.href='post-job.html'">+ Post a job</button>
-    </div>
+  <div class="topbar">
+    <div class="page-title" id="dashTitle">Employer Dashboard</div>
+    <button onclick="location.href='post-job.html'" style="background:var(--g);color:#fff;border:none;padding:10px 20px;border-radius:100px;font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;">+ Post a Job</button>
   </div>
 
   <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">Active jobs</div>
-      <div class="stat-num">4</div>
-      <div class="stat-change up">↑ 1 this week</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Total applicants</div>
-      <div class="stat-num">87</div>
-      <div class="stat-change up">↑ 12 today</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Interviews scheduled</div>
-      <div class="stat-num">6</div>
-      <div class="stat-change up">↑ 2 this week</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Avg. time to hire</div>
-      <div class="stat-num">8d</div>
-      <div class="stat-change down">↓ 3 days faster</div>
-    </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="statJobs">0</div><div class="stat-l">Active jobs</div></div>
+    <div class="stat"><div class="stat-n" id="statApps">0</div><div class="stat-l">Total applicants</div></div>
+    <div class="stat"><div class="stat-n" id="statNew">0</div><div class="stat-l">New today</div></div>
+    <div class="stat"><div class="stat-n" id="statHired">0</div><div class="stat-l">Hired</div></div>
   </div>
 
-  <div class="dash-grid">
-    <div>
-      <!-- ACTIVE JOBS -->
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Active job listings</div>
-          <a class="card-action" href="post-job.html">+ Post new job</a>
-        </div>
-        <div class="job-row">
-          <div class="jr-ico">🏥</div>
-          <div class="jr-info">
-            <div class="jr-title">Biomedical Engineer</div>
-            <div class="jr-meta">Posted 2 days ago · Kathmandu</div>
-          </div>
-          <div class="jr-stats">
-            <div class="jr-stat"><div class="jr-stat-num">34</div><div class="jr-stat-lbl">Applicants</div></div>
-            <div class="jr-stat"><div class="jr-stat-num">1.2k</div><div class="jr-stat-lbl">Views</div></div>
-          </div>
-          <span class="status-pill active-pill">Active</span>
-        </div>
-        <div class="job-row">
-          <div class="jr-ico">🧬</div>
-          <div class="jr-info">
-            <div class="jr-title">Lab Technician</div>
-            <div class="jr-meta">Posted 5 days ago · Kathmandu</div>
-          </div>
-          <div class="jr-stats">
-            <div class="jr-stat"><div class="jr-stat-num">28</div><div class="jr-stat-lbl">Applicants</div></div>
-            <div class="jr-stat"><div class="jr-stat-num">890</div><div class="jr-stat-lbl">Views</div></div>
-          </div>
-          <span class="status-pill active-pill">Active</span>
-        </div>
-        <div class="job-row">
-          <div class="jr-ico">🔬</div>
-          <div class="jr-info">
-            <div class="jr-title">Radiographer</div>
-            <div class="jr-meta">Posted 1 week ago · Kathmandu</div>
-          </div>
-          <div class="jr-stats">
-            <div class="jr-stat"><div class="jr-stat-num">18</div><div class="jr-stat-lbl">Applicants</div></div>
-            <div class="jr-stat"><div class="jr-stat-num">540</div><div class="jr-stat-lbl">Views</div></div>
-          </div>
-          <span class="status-pill paused-pill">Paused</span>
-        </div>
-      </div>
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab on" id="tabApps" onclick="showTab('applications')">📋 Applications</button>
+    <button class="tab" id="tabJobs" onclick="showTab('jobs')">💼 My Jobs</button>
+  </div>
 
-      <!-- HIRING PIPELINE -->
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Hiring pipeline</div>
-          <a class="card-action">View all</a>
-        </div>
-        <div class="kanban">
-          <div class="kcol">
-            <div class="khead"><div class="kdot" style="background:#888"></div>Applied (34)</div>
-            <div class="kitem"><div class="ki-name">Ram Shrestha</div><div class="ki-role">Biomedical Eng.</div><div class="ki-score">94% match</div></div>
-            <div class="kitem"><div class="ki-name">Sita Gurung</div><div class="ki-role">Biomedical Eng.</div><div class="ki-score">88% match</div></div>
-            <div class="kitem"><div class="ki-name">Bikash Rai</div><div class="ki-role">Lab Tech.</div><div class="ki-score">82% match</div></div>
-          </div>
-          <div class="kcol">
-            <div class="khead"><div class="kdot" style="background:#378ADD"></div>Screening (8)</div>
-            <div class="kitem"><div class="ki-name">Priya Thapa</div><div class="ki-role">Biomedical Eng.</div><div class="ki-score">91% match</div></div>
-            <div class="kitem"><div class="ki-name">Anish Karki</div><div class="ki-role">Lab Tech.</div><div class="ki-score">79% match</div></div>
-          </div>
-          <div class="kcol">
-            <div class="khead"><div class="kdot" style="background:#f0a500"></div>Interview (3)</div>
-            <div class="kitem"><div class="ki-name">Maya Tamang</div><div class="ki-role">Radiographer</div><div class="ki-score">May 2 · 10AM</div></div>
-          </div>
-          <div class="kcol">
-            <div class="khead"><div class="kdot" style="background:#0ea271"></div>Offered (1)</div>
-            <div class="kitem"><div class="ki-name">Rohan Pandey</div><div class="ki-role">Biomedical Eng.</div><div class="ki-score">Offer sent 🎉</div></div>
-          </div>
-        </div>
-      </div>
+  <!-- APPLICATIONS TAB -->
+  <div class="tab-content on" id="tab-applications">
+    <div id="appsList"><div class="loading">⏳ Loading applications...</div></div>
+  </div>
 
-      <!-- TOP APPLICANTS -->
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Top AI-matched applicants</div>
-          <a class="card-action">View all 87</a>
-        </div>
-        <div class="applicant-row">
-          <div class="app-av" style="background:#d6f5eb;color:#064e38">RS</div>
-          <div><div class="app-name">Ram Shrestha</div><div class="app-role">Biomedical Engineer · 4 yrs exp</div></div>
-          <div class="app-match">94% match</div>
-          <div class="app-actions"><button class="app-btn app-view">View</button><button class="app-btn app-reject">Skip</button></div>
-        </div>
-        <div class="applicant-row">
-          <div class="app-av" style="background:#dbeeff;color:#1a5fa8">PT</div>
-          <div><div class="app-name">Priya Thapa</div><div class="app-role">Biomedical Engineer · 3 yrs exp</div></div>
-          <div class="app-match">91% match</div>
-          <div class="app-actions"><button class="app-btn app-view">View</button><button class="app-btn app-reject">Skip</button></div>
-        </div>
-        <div class="applicant-row">
-          <div class="app-av" style="background:#ede9ff;color:#4a30b0">SG</div>
-          <div><div class="app-name">Sita Gurung</div><div class="app-role">Biomedical Engineer · 2 yrs exp</div></div>
-          <div class="app-match">88% match</div>
-          <div class="app-actions"><button class="app-btn app-view">View</button><button class="app-btn app-reject">Skip</button></div>
-        </div>
-      </div>
-    </div>
+  <!-- JOBS TAB -->
+  <div class="tab-content" id="tab-jobs">
+    <div id="jobsList"><div class="loading">⏳ Loading jobs...</div></div>
+  </div>
+</div>
 
-    <!-- RIGHT SIDEBAR -->
-    <div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">Analytics overview</div></div>
-        <div class="analytics-row">
-          <div class="anl-card"><div class="anl-num">3.2k</div><div class="anl-lbl">Total views</div></div>
-          <div class="anl-card"><div class="anl-num">87</div><div class="anl-lbl">Total applies</div></div>
-          <div class="anl-card"><div class="anl-num">2.7%</div><div class="anl-lbl">Apply rate</div></div>
-          <div class="anl-card"><div class="anl-num">8d</div><div class="anl-lbl">Time to hire</div></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-head"><div class="card-title">Auto social posts</div><a class="card-action">View all</a></div>
-        <div class="post-item">
-          <div class="post-platform" style="background:#dbeeff">f</div>
-          <div class="post-info">
-            <div class="post-text">Hiring: Biomedical Engineer at Bir Hospital...</div>
-            <div class="post-stats">👍 142 likes · 38 shares</div>
-          </div>
-          <div class="post-time">2h ago</div>
-        </div>
-        <div class="post-item">
-          <div class="post-platform" style="background:#dbeeff">in</div>
-          <div class="post-info">
-            <div class="post-text">We're looking for a Lab Technician to join...</div>
-            <div class="post-stats">👍 89 likes · 22 shares</div>
-          </div>
-          <div class="post-time">5h ago</div>
-        </div>
-        <div class="post-item">
-          <div class="post-platform" style="background:#ffe8e8">ig</div>
-          <div class="post-info">
-            <div class="post-text">New opening at Bir Hospital! Apply now...</div>
-            <div class="post-stats">❤ 67 likes · 14 shares</div>
-          </div>
-          <div class="post-time">1d ago</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-head"><div class="card-title">Upcoming interviews</div></div>
-        <div class="applicant-row">
-          <div class="app-av" style="background:#fff3d6;color:#7a4e00">MT</div>
-          <div><div class="app-name">Maya Tamang</div><div class="app-role">Tomorrow · 10:00 AM</div></div>
-        </div>
-        <div class="applicant-row">
-          <div class="app-av" style="background:#d6f5eb;color:#064e38">AK</div>
-          <div><div class="app-name">Anish Karki</div><div class="app-role">May 3 · 2:00 PM</div></div>
-        </div>
-        <div style="margin-top:12px;">
-          <button style="width:100%;padding:10px;background:var(--gl);color:var(--gd);border:none;border-radius:10px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;">📅 Schedule interview</button>
-        </div>
-      </div>
+<!-- EMAIL MODAL -->
+<div class="modal-bg" id="emailModal">
+  <div class="modal">
+    <h3>✉️ Send email to applicant</h3>
+    <div class="modal-field"><label>To</label><input type="text" id="emailTo" readonly/></div>
+    <div class="modal-field"><label>Subject</label><input type="text" id="emailSubject"/></div>
+    <div class="modal-field"><label>Message</label><textarea id="emailBody" rows="6"></textarea></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('emailModal')">Cancel</button>
+      <button class="modal-send" onclick="sendEmailViaMailto()">Open in email app →</button>
     </div>
   </div>
 </div>
+
+<!-- VIEW APPLICATION MODAL -->
+<div class="modal-bg" id="viewModal">
+  <div class="modal">
+    <h3 id="viewName">Applicant Details</h3>
+    <div id="viewContent"></div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeModal('viewModal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script type="module" src="navbar.js"></script>
-<div class="mobile-menu" id="mobileMenu">
-  <a href="browse-jobs.html">🔍 Find jobs</a>
-  <a href="interview-prep.html">🎙 AI Interview prep</a>
-  <a href="resume-builder.html">📄 Resume builder</a>
-  <a href="post-job.html">📝 Post a job</a>
-  <a href="employer-dashboard.html">📊 Employer dashboard</a>
-  <a href="profile.html">👤 My profile</a>
-  <a href="auth.html">🔐 Log in</a>
-  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-function toggleMenu(){
-  document.getElementById("mobileMenu").classList.toggle("open");
-  const h=document.getElementById("hamburger");
-  h.classList.toggle("open");
-}
-document.addEventListener("click",function(e){
-  const menu=document.getElementById("mobileMenu");
-  const btn=document.getElementById("hamburger");
-  if(menu && !menu.contains(e.target) && !btn.contains(e.target)){
-    menu.classList.remove("open");
-  }
+const sb = window.supabase.createClient(
+  'https://eteyskwaqjtcybaolnto.supabase.co',
+  'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe'
+);
+
+let currentUser = null;
+let allApplications = [];
+let allJobs = [];
+
+// ── INIT ──────────────────────────────────
+document.addEventListener('DOMContentLoaded', async function() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.href = 'auth.html'; return; }
+  currentUser = session.user;
+
+  // Load profile
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  const name = profile?.company_name || profile?.full_name || 'Employer';
+  document.getElementById('sbName').textContent = name;
+  document.getElementById('sbAv').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('dashTitle').textContent = name + ' — Dashboard';
+
+  await Promise.all([loadApplications(), loadJobs()]);
 });
+
+// ── LOAD APPLICATIONS ─────────────────────
+async function loadApplications() {
+  // Get all jobs by this employer
+  const { data: jobs } = await sb.from('jobs').select('id,title,company').eq('employer_id', currentUser.id);
+  if (!jobs || jobs.length === 0) {
+    document.getElementById('appsList').innerHTML = `
+      <div class="empty">
+        <div class="empty-ico">📭</div>
+        <div class="empty-title">No applications yet</div>
+        <div class="empty-sub">Post a job to start receiving applications from healthcare professionals.</div>
+        <button class="empty-btn" onclick="location.href='post-job.html'">+ Post your first job</button>
+      </div>`;
+    return;
+  }
+
+  const jobIds = jobs.map(j => j.id);
+  const jobMap = {};
+  jobs.forEach(j => jobMap[j.id] = j);
+
+  // Get applications for all employer jobs
+  const { data: apps, error } = await sb
+    .from('applications')
+    .select(`*, profiles!applicant_id(full_name, email, phone, location, job_title, avatar_url)`)
+    .in('job_id', jobIds)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    // Try without join if profiles join fails
+    const { data: apps2 } = await sb
+      .from('applications')
+      .select('*')
+      .in('job_id', jobIds)
+      .order('created_at', { ascending: false });
+    allApplications = apps2 || [];
+  } else {
+    allApplications = apps || [];
+  }
+
+  updateStats(jobs.length, allApplications);
+  renderApplications(allApplications, jobMap);
+}
+
+function updateStats(jobCount, apps) {
+  const today = new Date().toDateString();
+  const newToday = apps.filter(a => new Date(a.created_at).toDateString() === today).length;
+  const hired = apps.filter(a => a.status === 'hired').length;
+  document.getElementById('statJobs').textContent = jobCount;
+  document.getElementById('statApps').textContent = apps.length;
+  document.getElementById('statNew').textContent = newToday;
+  document.getElementById('statHired').textContent = hired;
+}
+
+function renderApplications(apps, jobMap) {
+  if (!apps || apps.length === 0) {
+    document.getElementById('appsList').innerHTML = `
+      <div class="empty">
+        <div class="empty-ico">📭</div>
+        <div class="empty-title">No applications yet</div>
+        <div class="empty-sub">Applications from job seekers will appear here.</div>
+      </div>`;
+    return;
+  }
+
+  const badgeClass = { applied:'badge-new', reviewing:'badge-review', interview:'badge-interview', rejected:'badge-rejected', hired:'badge-hired' };
+  const badgeLabel = { applied:'New', reviewing:'Reviewing', interview:'Interview', rejected:'Rejected', hired:'Hired ✓' };
+
+  let html = '';
+  apps.forEach(app => {
+    const p = app.profiles || {};
+    // Use direct fields first (more reliable), then profile join as fallback
+    const name = app.applicant_name || p.full_name || 'Applicant';
+    const email = app.applicant_email || p.email || '';
+    const phone = app.applicant_phone || p.phone || '';
+    const location = app.applicant_location || p.location || '';
+    const jobTitle = app.applicant_title || p.job_title || '';
+    const education = app.applicant_education || '';
+    const skills = app.applicant_skills || '';
+    const linkedin = app.applicant_linkedin || '';
+    const resumeFile = app.resume_filename || '';
+    const job = jobMap ? jobMap[app.job_id] : null;
+    const jobName = job ? job.title : 'Job application';
+    const status = app.status || 'applied';
+    const badge = badgeClass[status] || 'badge-new';
+    const label = badgeLabel[status] || 'New';
+    const date = new Date(app.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+
+    html += `
+    <div class="app-card" id="app-${app.id}">
+      <div class="app-header">
+        <div class="app-ico">${initials}</div>
+        <div>
+          <div class="app-name">${name}</div>
+          <div class="app-role">Applied for: <strong>${jobName}</strong> · ${date}</div>
+        </div>
+        <span class="app-badge ${badge}">${label}</span>
+      </div>
+      <div class="app-body">
+        ${name !== 'Applicant' ? `<div class="app-field"><div class="app-field-label">Full name</div><div class="app-field-val">${name}</div></div>` : ''}
+        ${email ? `<div class="app-field"><div class="app-field-label">📧 Email</div><div class="app-field-val"><a href="mailto:${email}" style="color:var(--g)">${email}</a></div></div>` : ''}
+        ${phone ? `<div class="app-field"><div class="app-field-label">📱 Phone</div><div class="app-field-val"><a href="tel:${phone}" style="color:var(--g)">${phone}</a></div></div>` : ''}
+        ${location ? `<div class="app-field"><div class="app-field-label">📍 Location</div><div class="app-field-val">${location}</div></div>` : ''}
+        ${jobTitle ? `<div class="app-field"><div class="app-field-label">💼 Current role</div><div class="app-field-val">${jobTitle}</div></div>` : ''}
+        ${education ? `<div class="app-field"><div class="app-field-label">🎓 Education</div><div class="app-field-val">${education}</div></div>` : ''}
+        ${skills ? `<div class="app-field"><div class="app-field-label">⚡ Skills</div><div class="app-field-val">${skills}</div></div>` : ''}
+        ${linkedin ? `<div class="app-field"><div class="app-field-label">🔗 LinkedIn</div><div class="app-field-val"><a href="${linkedin.startsWith('http')?linkedin:'https://'+linkedin}" target="_blank" style="color:var(--g)">${linkedin}</a></div></div>` : ''}
+        ${resumeFile ? `<div class="app-field"><div class="app-field-label">📄 CV file</div><div class="app-field-val">${resumeFile}</div></div>` : ''}
+      </div>
+      ${app.cover_letter ? `
+      <div class="app-cover">
+        <div class="app-cover-label">Cover letter / Note</div>
+        ${app.cover_letter}
+      </div>` : ''}
+      <div class="app-actions">
+        <button class="app-btn btn-review" onclick="updateStatus('${app.id}','reviewing')">👁 Mark reviewing</button>
+        <button class="app-btn btn-interview" onclick="updateStatus('${app.id}','interview')">📅 Move to interview</button>
+        <button class="app-btn btn-hire" onclick="updateStatus('${app.id}','hired')">✅ Hire</button>
+        <button class="app-btn btn-reject" onclick="updateStatus('${app.id}','rejected')">✕ Reject</button>
+        ${email ? `<button class="app-btn btn-email" onclick="openEmail('${email}','${name}','${jobName}')">✉️ Email applicant</button>` : ''}
+        <button class="app-btn" style="background:#f4faf7;color:var(--text);border:1.5px solid var(--border)" onclick="viewFullApp('${app.id}')">👁 View full</button>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('appsList').innerHTML = html;
+}
+
+// ── LOAD JOBS ──────────────────────────────
+async function loadJobs() {
+  const { data: jobs, error } = await sb
+    .from('jobs')
+    .select('*')
+    .eq('employer_id', currentUser.id)
+    .order('created_at', { ascending: false });
+
+  allJobs = jobs || [];
+
+  if (!allJobs.length) {
+    document.getElementById('jobsList').innerHTML = `
+      <div class="empty">
+        <div class="empty-ico">💼</div>
+        <div class="empty-title">No jobs posted yet</div>
+        <div class="empty-sub">Start hiring healthcare professionals in Nepal.</div>
+        <button class="empty-btn" onclick="location.href='post-job.html'">+ Post your first job</button>
+      </div>`;
+    return;
+  }
+
+  let html = `<div class="jobs-table">
+    <div class="jt-head"><div>Job title</div><div>Status</div><div>Applicants</div><div>Posted</div><div>Actions</div></div>`;
+
+  allJobs.forEach(job => {
+    const appCount = allApplications.filter(a => a.job_id === job.id).length;
+    const date = new Date(job.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    const statusClass = job.status === 'active' ? 'st-active' : 'st-closed';
+    const statusLabel = job.status === 'active' ? '● Active' : '○ Closed';
+    html += `
+    <div class="jt-row">
+      <div><div class="jt-title">${job.title}</div><div class="jt-org">${job.company || ''} · ${job.location || ''}</div></div>
+      <div><span class="jt-status ${statusClass}">${statusLabel}</span></div>
+      <div class="jt-apps">${appCount}</div>
+      <div class="jt-stat">${date}</div>
+      <div class="jt-actions">
+        <button class="jt-btn" onclick="toggleJobStatus('${job.id}','${job.status}')">${job.status==='active'?'Close':'Reopen'}</button>
+        <button class="jt-btn danger" onclick="deleteJob('${job.id}')">Delete</button>
+      </div>
+    </div>`;
+  });
+
+  html += '</div>';
+  document.getElementById('jobsList').innerHTML = html;
+}
+
+// ── VIEW FULL APPLICATION ─────────────────
+function viewFullApp(appId) {
+  const app = allApplications.find(a => a.id === appId);
+  if (!app) return;
+  const p = app.profiles || {};
+  const name = app.applicant_name || p.full_name || 'Applicant';
+  const email = app.applicant_email || p.email || '';
+  const phone = app.applicant_phone || p.phone || '';
+  const skills = app.applicant_skills || '';
+  const education = app.applicant_education || '';
+  const cover = app.cover_letter || '';
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:20px;padding:28px;max-width:540px;width:100%;max-height:80vh;overflow-y:auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h3 style="font-family:Fraunces,serif;font-size:20px;">${name}</h3>
+        <button onclick="this.closest('div[style*=fixed]').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#666;">✕</button>
+      </div>
+      ${email ? `<p style="margin-bottom:8px;font-size:14px;">📧 <a href="mailto:${email}" style="color:#0ea271">${email}</a></p>` : ''}
+      ${phone ? `<p style="margin-bottom:8px;font-size:14px;">📱 <a href="tel:${phone}" style="color:#0ea271">${phone}</a></p>` : ''}
+      ${education ? `<p style="margin-bottom:8px;font-size:14px;">🎓 ${education}</p>` : ''}
+      ${skills ? `<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:#4a6b58;margin-bottom:6px;">SKILLS</div><div style="font-size:13px;">${skills}</div></div>` : ''}
+      ${cover ? `<div style="margin-bottom:12px;"><div style="font-size:12px;font-weight:600;color:#4a6b58;margin-bottom:6px;">COVER LETTER</div><div style="font-size:13px;line-height:1.7;background:#f4faf7;padding:14px;border-radius:10px;">${cover}</div></div>` : ''}
+      <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+        ${email ? `<a href="mailto:${email}?subject=Re: Your application" style="background:#0ea271;color:#fff;padding:10px 18px;border-radius:100px;text-decoration:none;font-size:13px;font-weight:600;">✉️ Send email</a>` : ''}
+        ${phone ? `<a href="tel:${phone}" style="background:#f4faf7;color:#0a1a12;border:1.5px solid rgba(14,162,113,.28);padding:10px 18px;border-radius:100px;text-decoration:none;font-size:13px;font-weight:600;">📱 Call</a>` : ''}
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
+}
+
+// ── UPDATE APPLICATION STATUS ──────────────
+async function updateStatus(appId, status) {
+  const { error } = await sb.from('applications').update({ status }).eq('id', appId);
+  if (error) { showToast('❌ Error: ' + error.message); return; }
+  const labels = { reviewing:'👁 Reviewing', interview:'📅 Interview', hired:'✅ Hired!', rejected:'✕ Rejected' };
+  showToast(labels[status] || 'Updated!');
+  // Update badge in UI without full reload
+  const card = document.getElementById('app-' + appId);
+  if (card) {
+    const badge = card.querySelector('.app-badge');
+    const badgeClass = { applied:'badge-new', reviewing:'badge-review', interview:'badge-interview', rejected:'badge-rejected', hired:'badge-hired' };
+    const badgeLabel = { applied:'New', reviewing:'Reviewing', interview:'Interview', rejected:'Rejected', hired:'Hired ✓' };
+    badge.className = 'app-badge ' + (badgeClass[status] || 'badge-new');
+    badge.textContent = badgeLabel[status] || status;
+  }
+}
+
+// ── JOB ACTIONS ────────────────────────────
+async function toggleJobStatus(jobId, currentStatus) {
+  const newStatus = currentStatus === 'active' ? 'closed' : 'active';
+  const { error } = await sb.from('jobs').update({ status: newStatus }).eq('id', jobId);
+  if (error) { showToast('❌ ' + error.message); return; }
+  showToast(newStatus === 'active' ? '✅ Job reopened!' : '🔒 Job closed');
+  loadJobs();
+}
+
+async function deleteJob(jobId) {
+  if (!confirm('Delete this job? All applications will also be removed.')) return;
+  await sb.from('applications').delete().eq('job_id', jobId);
+  const { error } = await sb.from('jobs').delete().eq('id', jobId);
+  if (error) { showToast('❌ ' + error.message); return; }
+  showToast('🗑 Job deleted');
+  loadApplications();
+  loadJobs();
+}
+
+// ── EMAIL ──────────────────────────────────
+function openEmail(email, name, jobTitle) {
+  document.getElementById('emailTo').value = email;
+  document.getElementById('emailSubject').value = `Re: Your application for ${jobTitle} — Talentry`;
+  document.getElementById('emailBody').value = `Dear ${name},\n\nThank you for applying for the ${jobTitle} position through Talentry.\n\n[Write your message here]\n\nBest regards,\n${document.getElementById('sbName').textContent}`;
+  document.getElementById('emailModal').classList.add('show');
+}
+
+function sendEmailViaMailto() {
+  const to = document.getElementById('emailTo').value;
+  const subject = encodeURIComponent(document.getElementById('emailSubject').value);
+  const body = encodeURIComponent(document.getElementById('emailBody').value);
+  window.open(`mailto:${to}?subject=${subject}&body=${body}`);
+  closeModal('emailModal');
+}
+
+// ── UTILS ──────────────────────────────────
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('tab-' + tab).classList.add('on');
+  document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('on');
+  // update sidebar links
+  document.querySelectorAll('.sb-nav a').forEach(a => {
+    a.classList.toggle('on', a.textContent.toLowerCase().includes(tab.toLowerCase().slice(0,4)));
+  });
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  window.location.href = 'auth.html';
+}
 </script>
 </body>
 </html>
