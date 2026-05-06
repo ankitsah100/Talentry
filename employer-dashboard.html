@@ -234,168 +234,41 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 // ── LOAD APPLICATIONS ─────────────────────
 async function loadApplications() {
+  const listEl = document.getElementById('appsList');
   try {
-    // Get all jobs by this employer
-    const { data: jobs, error: jobErr } = await sb.from('jobs')
-      .select('id,title,company')
-      .eq('employer_id', currentUser.id);
-
+    // Step 1: Get employer's job IDs
+    const { data: jobs } = await sb.from('jobs').select('id,title,company').eq('employer_id', currentUser.id);
+    
     if (!jobs || jobs.length === 0) {
-      document.getElementById('appsList').innerHTML = `
-        <div class="empty">
-          <div class="empty-ico">📭</div>
-          <div class="empty-title">No applications yet</div>
-          <div class="empty-sub">Post a job to start receiving applications.</div>
-          <button class="empty-btn" onclick="location.href='post-job.html'">+ Post your first job</button>
-        </div>`;
+      listEl.innerHTML = '<div class="empty"><div class="empty-ico">📭</div><div class="empty-title">No applications yet</div><div class="empty-sub">Post a job to start receiving applications.</div><button class="empty-btn" onclick="location.href=\'post-job.html\'">+ Post your first job</button></div>';
       return;
     }
 
-    const jobIds = jobs.map(j => j.id);
     const jobMap = {};
     jobs.forEach(j => jobMap[j.id] = j);
+    const jobIds = jobs.map(j => j.id);
 
-    // Simple direct query - get applications where job belongs to this employer
-    // Use employer_id directly via jobs join
-    const { data: apps, error: appsError } = await sb
-      .from('applications')
-      .select('*, jobs!inner(employer_id)')
-      .eq('jobs.employer_id', currentUser.id)
-      .order('created_at', { ascending: false });
-
-    if (appsError) {
-      console.error('Applications load error:', appsError);
-      // Fallback: batch query
-      let fallbackApps = [];
-      const batchSize = 10;
-      for (let i = 0; i < jobIds.length; i += batchSize) {
-        const batch = jobIds.slice(i, i + batchSize);
-        const { data: b } = await sb.from('applications').select('*').in('job_id', batch).order('created_at', {ascending:false});
-        if (b) fallbackApps = [...fallbackApps, ...b];
-      }
-      allApplications = fallbackApps;
-    } else {
-      // Remove the jobs join data from results
-      allApplications = (apps || []).map(a => { const {jobs, ...rest} = a; return rest; });
+    // Step 2: Get applications using simple .in() query - split into batches of 10
+    let allApps = [];
+    for (let i = 0; i < jobIds.length; i += 10) {
+      const batch = jobIds.slice(i, i + 10);
+      const { data } = await sb.from('applications').select('*').in('job_id', batch).order('created_at', { ascending: false });
+      if (data) allApps = allApps.concat(data);
     }
 
-    // Enrich with profile data
-    const appsWithProfile = allApplications.filter(a => a.applicant_id);
-    if (appsWithProfile.length > 0) {
-      const userIds = [...new Set(appsWithProfile.map(a => a.applicant_id))];
-      const { data: profiles } = await sb
-        .from('profiles')
-        .select('id, full_name, email, phone, location, job_title')
-        .in('id', userIds);
-      
-      if (profiles) {
-        const profileMap = {};
-        profiles.forEach(p => profileMap[p.id] = p);
-      allApplications = allApplications.map(app => ({
-        ...app,
-        profiles: app.applicant_id ? profileMap[app.applicant_id] : null
-      }));
-    }
-  }
+    allApplications = allApps;
 
-  updateStats(jobs.length, allApplications);
+    // Update stats
+    document.getElementById('statApps').textContent = allApplications.length;
+    document.getElementById('statNew').textContent = allApplications.filter(a => a.status === 'applied').length;
+
     renderApplications(allApplications, jobMap);
   } catch(e) {
     console.error('loadApplications error:', e);
-    document.getElementById('appsList').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading</div><div class="empty-sub">${e.message}</div></div>`;
+    listEl.innerHTML = '<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading applications</div><div class="empty-sub">' + e.message + '</div></div>';
   }
 }
 
-function updateStats(jobCount, apps) {
-  const today = new Date().toDateString();
-  const newToday = apps.filter(a => new Date(a.created_at).toDateString() === today).length;
-  const hired = apps.filter(a => a.status === 'hired').length;
-  document.getElementById('statJobs').textContent = jobCount;
-  document.getElementById('statApps').textContent = apps.length;
-  document.getElementById('statNew').textContent = newToday;
-  document.getElementById('statHired').textContent = hired;
-}
-
-function renderApplications(apps, jobMap) {
-  if (!apps || apps.length === 0) {
-    document.getElementById('appsList').innerHTML = `
-      <div class="empty">
-        <div class="empty-ico">📭</div>
-        <div class="empty-title">No applications yet</div>
-        <div class="empty-sub">Applications from job seekers will appear here.</div>
-      </div>`;
-    return;
-  }
-
-  const badgeClass = { applied:'badge-new', reviewing:'badge-review', interview:'badge-interview', rejected:'badge-rejected', hired:'badge-hired' };
-  const badgeLabel = { applied:'New', reviewing:'Reviewing', interview:'Interview', rejected:'Rejected', hired:'Hired ✓' };
-
-  let html = '';
-  apps.forEach(app => {
-    const p = app.profiles || {};
-    // Use direct fields first (more reliable), then profile join as fallback
-    const name = app.applicant_name || p.full_name || 'Applicant';
-    const email = app.applicant_email || p.email || '';
-    const phone = app.applicant_phone || p.phone || '';
-    const location = app.applicant_location || p.location || '';
-    const jobTitle = app.applicant_title || p.job_title || '';
-    const education = app.applicant_education || '';
-    const skills = app.applicant_skills || '';
-    const linkedin = app.applicant_linkedin || '';
-    const resumeFile = app.resume_filename || '';
-    const job = jobMap ? jobMap[app.job_id] : null;
-    const jobName = job ? job.title : 'Job application';
-    const status = app.status || 'applied';
-    const badge = badgeClass[status] || 'badge-new';
-    const label = badgeLabel[status] || 'New';
-    const date = new Date(app.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-    const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-
-    html += `
-    <div class="app-card" id="app-${app.id}">
-      <div class="app-header">
-        <div class="app-ico">${initials}</div>
-        <div>
-          <div class="app-name">${name}</div>
-          <div class="app-role">Applied for: <strong>${jobName}</strong> · ${date}</div>
-        </div>
-        <span class="app-badge ${badge}">${label}</span>
-      </div>
-      <div class="app-body">
-        ${name !== 'Applicant' ? `<div class="app-field"><div class="app-field-label">Full name</div><div class="app-field-val">${name}</div></div>` : ''}
-        ${email ? `<div class="app-field"><div class="app-field-label">📧 Email</div><div class="app-field-val"><a href="mailto:${email}" style="color:var(--g)">${email}</a></div></div>` : ''}
-        ${phone ? `<div class="app-field"><div class="app-field-label">📱 Phone</div><div class="app-field-val"><a href="tel:${phone}" style="color:var(--g)">${phone}</a></div></div>` : ''}
-        ${location ? `<div class="app-field"><div class="app-field-label">📍 Location</div><div class="app-field-val">${location}</div></div>` : ''}
-        ${jobTitle ? `<div class="app-field"><div class="app-field-label">💼 Current role</div><div class="app-field-val">${jobTitle}</div></div>` : ''}
-        ${education ? `<div class="app-field"><div class="app-field-label">🎓 Education</div><div class="app-field-val">${education}</div></div>` : ''}
-        ${skills ? `<div class="app-field"><div class="app-field-label">⚡ Skills</div><div class="app-field-val">${skills}</div></div>` : ''}
-        ${linkedin ? `<div class="app-field"><div class="app-field-label">🔗 LinkedIn</div><div class="app-field-val"><a href="${linkedin.startsWith('http')?linkedin:'https://'+linkedin}" target="_blank" style="color:var(--g)">${linkedin}</a></div></div>` : ''}
-        ${(resumeFile || app.resume_url) ? `<div class="app-field"><div class="app-field-label">📄 CV / Resume</div><div class="app-field-val">${
-          app.resume_url && app.resume_url.startsWith('data:') 
-            ? `<a href="${app.resume_url}" download="${resumeFile || 'cv.pdf'}" style="color:var(--g);font-weight:600;">⬇ Download CV (${resumeFile || 'file'})</a>`
-            : app.resume_url 
-            ? `<a href="${app.resume_url}" target="_blank" download style="color:var(--g);font-weight:600;">⬇ Download CV (${resumeFile || 'file'})</a>`
-            : `<span style="color:var(--muted)">${resumeFile}</span>`
-        }</div></div>` : ''}
-      </div>
-      ${app.cover_letter ? `
-      <div class="app-cover">
-        <div class="app-cover-label">Cover letter / Note</div>
-        ${app.cover_letter}
-      </div>` : ''}
-      <div class="app-actions">
-        <button class="app-btn btn-review" onclick="updateStatus('${app.id}','reviewing')">👁 Mark reviewing</button>
-        <button class="app-btn btn-interview" onclick="updateStatus('${app.id}','interview')">📅 Move to interview</button>
-        <button class="app-btn btn-hire" onclick="updateStatus('${app.id}','hired')">✅ Hire</button>
-        <button class="app-btn btn-reject" onclick="updateStatus('${app.id}','rejected')">✕ Reject</button>
-        ${email ? `<button class="app-btn btn-email" onclick="openEmail('${email}','${name}','${jobName}')">✉️ Email applicant</button>` : ''}
-        <button class="app-btn" style="background:#f4faf7;color:var(--text);border:1.5px solid var(--border)" onclick="viewFullApp('${app.id}')">👁 View full</button>
-      </div>
-    </div>`;
-  });
-
-  document.getElementById('appsList').innerHTML = html;
-}
 
 // ── LOAD JOBS ──────────────────────────────
 async function loadJobs() {

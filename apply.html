@@ -257,16 +257,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 // Init Supabase with UMD
-window.addEventListener('load', function() {
-  try {
-    const sb = window.supabase.createClient(
-      'https://eteyskwaqjtcybaolnto.supabase.co',
-      'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe'
-    );
-    window._sb = sb;
-    console.log('Supabase ready');
-  } catch(e) { console.error('Supabase init failed:', e); }
-});
+// Init Supabase immediately (not on load event)
+try {
+  const _sbInstance = window.supabase.createClient(
+    'https://eteyskwaqjtcybaolnto.supabase.co',
+    'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe'
+  );
+  window._sb = _sbInstance;
+} catch(e) { console.error('Supabase init failed:', e); }
 
 
 async function handleResumeUpload(input) {
@@ -482,6 +480,7 @@ async function readFileAsText(file) {
   });
 }
 
+// Expose to global scope
 window.handleResumeUpload = handleResumeUpload;
 window.submitApplication = submitApplication;
 
