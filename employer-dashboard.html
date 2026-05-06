@@ -270,6 +270,72 @@ async function loadApplications() {
 }
 
 
+// ── RENDER APPLICATIONS ───────────────────
+function renderApplications(apps, jobMap) {
+  const listEl = document.getElementById('appsList');
+  if (!apps || apps.length === 0) {
+    listEl.innerHTML = '<div class="empty"><div class="empty-ico">📭</div><div class="empty-title">No applications yet</div><div class="empty-sub">Applications from job seekers will appear here.</div></div>';
+    return;
+  }
+
+  const badgeClass = { applied:'badge-new', reviewing:'badge-review', interview:'badge-interview', rejected:'badge-rejected', hired:'badge-hired' };
+  const badgeLabel = { applied:'New', reviewing:'Reviewing', interview:'Interview', rejected:'Rejected', hired:'Hired ✓' };
+
+  let html = '';
+  apps.forEach(app => {
+    const p = app.profiles || {};
+    const name = app.applicant_name || p.full_name || 'Applicant';
+    const email = app.applicant_email || p.email || '';
+    const phone = app.applicant_phone || p.phone || '';
+    const location = app.applicant_location || p.location || '';
+    const jobTitle = app.applicant_title || p.job_title || '';
+    const education = app.applicant_education || '';
+    const skills = app.applicant_skills || '';
+    const linkedin = app.applicant_linkedin || '';
+    const resumeFile = app.resume_filename || '';
+    const job = jobMap ? jobMap[app.job_id] : null;
+    const jobName = job ? job.title : 'Job application';
+    const status = app.status || 'applied';
+    const badge = badgeClass[status] || 'badge-new';
+    const label = badgeLabel[status] || 'New';
+    const date = new Date(app.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const initials = name.split(' ').map(n=>n[0]||'').join('').toUpperCase().slice(0,2) || 'AP';
+
+    html += `
+    <div class="app-card" id="app-${app.id}">
+      <div class="app-header">
+        <div class="app-ico">${initials}</div>
+        <div>
+          <div class="app-name">${name}</div>
+          <div class="app-role">Applied for: <strong>${jobName}</strong> · ${date}</div>
+        </div>
+        <span class="app-badge ${badge}">${label}</span>
+      </div>
+      <div class="app-body">
+        ${email ? `<div class="app-field"><div class="app-field-label">📧 Email</div><div class="app-field-val"><a href="mailto:${email}" style="color:var(--g)">${email}</a></div></div>` : ''}
+        ${phone ? `<div class="app-field"><div class="app-field-label">📱 Phone</div><div class="app-field-val"><a href="tel:${phone}" style="color:var(--g)">${phone}</a></div></div>` : ''}
+        ${location ? `<div class="app-field"><div class="app-field-label">📍 Location</div><div class="app-field-val">${location}</div></div>` : ''}
+        ${jobTitle ? `<div class="app-field"><div class="app-field-label">💼 Current role</div><div class="app-field-val">${jobTitle}</div></div>` : ''}
+        ${education ? `<div class="app-field"><div class="app-field-label">🎓 Education</div><div class="app-field-val">${education}</div></div>` : ''}
+        ${skills ? `<div class="app-field"><div class="app-field-label">⚡ Skills</div><div class="app-field-val">${skills}</div></div>` : ''}
+        ${linkedin ? `<div class="app-field"><div class="app-field-label">🔗 LinkedIn</div><div class="app-field-val"><a href="${linkedin.startsWith('http')?linkedin:'https://'+linkedin}" target="_blank" style="color:var(--g)">${linkedin}</a></div></div>` : ''}
+        ${(resumeFile || app.resume_url) ? `<div class="app-field"><div class="app-field-label">📄 CV</div><div class="app-field-val"><a href="${app.resume_url || '#'}" target="_blank" download="${resumeFile}" style="color:var(--g);font-weight:600;">⬇ Download CV${resumeFile ? ' ('+resumeFile+')' : ''}</a></div></div>` : ''}
+        ${app.cover_letter ? `<div class="app-field" style="grid-column:1/-1"><div class="app-field-label">📝 Cover letter / Note</div><div class="app-field-val" style="white-space:pre-wrap;font-size:13px">${app.cover_letter}</div></div>` : ''}
+      </div>
+      <div class="app-actions">
+        <button class="app-btn btn-review" onclick="updateStatus('${app.id}','reviewing')">📋 Mark reviewing</button>
+        <button class="app-btn btn-interview" onclick="updateStatus('${app.id}','interview')">📅 Move to interview</button>
+        <button class="app-btn btn-hire" onclick="updateStatus('${app.id}','hired')">✅ Hire</button>
+        <button class="app-btn btn-reject" onclick="updateStatus('${app.id}','rejected')">✕ Reject</button>
+        ${email ? `<button class="app-btn btn-email" onclick="openEmail('${email}','${name}','${jobName}')">✉️ Email applicant</button>` : ''}
+        <button class="app-btn" style="background:#f4faf7;color:var(--text);border:1.5px solid var(--border)" onclick="viewFullApp('${app.id}')">👁 View full</button>
+      </div>
+    </div>`;
+  });
+
+  listEl.innerHTML = html;
+}
+
 // ── LOAD JOBS ──────────────────────────────
 async function loadJobs() {
   console.log('Loading jobs for employer:', currentUser.id);
