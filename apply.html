@@ -504,7 +504,12 @@ async function submitApplication() {
   try {
     const sb = window._sb;
     if (sb && jobId) {
-      const { data: { session } } = await sb.auth.getSession();
+      // Get session but don't block on it - anyone can apply
+      let session = null;
+      try {
+        const { data } = await sb.auth.getSession();
+        session = data?.session || null;
+      } catch(e) {}
 
       // Upload CV to Supabase Storage
       let cvUrl = '';
