@@ -596,12 +596,14 @@ function renderJobs(jobs) {
 
 }
 
-// ── JOBS TABLE EVENT DELEGATION (once only) ──
-document.addEventListener('DOMContentLoaded', function() {
+// ── JOBS TABLE EVENT DELEGATION ──
+let _jobsListenerAdded = false;
+function addJobsListListener() {
+  if (_jobsListenerAdded) return;
   const el = document.getElementById('jobsList');
   if (!el) return;
+  _jobsListenerAdded = true;
   el.addEventListener('click', function(e) {
-    // Job row click - toggle applicants
     const jobRow = e.target.closest('.job-row');
     if (jobRow && !e.target.closest('button')) {
       const jobId = jobRow.dataset.jobId;
@@ -609,28 +611,14 @@ document.addEventListener('DOMContentLoaded', function() {
       if (apRow) apRow.style.display = apRow.style.display === 'none' ? 'table-row' : 'none';
       return;
     }
-    // Status action buttons
     const statusBtn = e.target.closest('.status-action-btn');
-    if (statusBtn) {
-      e.stopPropagation();
-      updateStatus(statusBtn.dataset.id, statusBtn.dataset.status);
-      return;
-    }
-    // Toggle job status
+    if (statusBtn) { e.stopPropagation(); updateStatus(statusBtn.dataset.id, statusBtn.dataset.status); return; }
     const toggleBtn = e.target.closest('.toggle-job-btn');
-    if (toggleBtn) {
-      e.stopPropagation();
-      toggleJobStatus(toggleBtn.dataset.jobId, toggleBtn.dataset.status);
-      return;
-    }
-    // Delete job
+    if (toggleBtn) { e.stopPropagation(); toggleJobStatus(toggleBtn.dataset.jobId, toggleBtn.dataset.status); return; }
     const deleteBtn = e.target.closest('.delete-job-btn');
-    if (deleteBtn) {
-      e.stopPropagation();
-      deleteJob(deleteBtn.dataset.jobId);
-    }
+    if (deleteBtn) { e.stopPropagation(); deleteJob(deleteBtn.dataset.jobId); }
   });
-});
+}
 
 
 // ── TOGGLE JOB APPLICANTS ─────────────────
