@@ -490,11 +490,12 @@ function showTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
   document.getElementById('tab-' + tab).classList.add('on');
   document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('on');
-  // update sidebar links
   document.querySelectorAll('.sb-nav a').forEach(a => {
     a.classList.toggle('on', a.textContent.toLowerCase().includes(tab.toLowerCase().slice(0,4)));
   });
-  // Jobs already rendered by loadJobs - no need to re-render
+  if (tab === 'jobs') {
+    renderJobs(allJobs);
+  }
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
@@ -558,14 +559,15 @@ function renderJobs(jobs) {
             + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
             + '<span id="status-badge-' + a.id + '" style="font-size:11px;padding:3px 10px;border-radius:100px;font-weight:600;background:' + sc + ';color:' + stc + ';">' + (a.status||'applied') + '</span>'
             + '<div style="display:flex;gap:4px;flex-wrap:wrap;">'
-            + '<button data-id="' + a.id + '" data-status="reviewing" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #bfdbfe;background:#eff6ff;color:#2563eb;font-size:11px;cursor:pointer;">Review</button>'
-            + '<button data-id="' + a.id + '" data-status="interview" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #fde68a;background:#fef3c7;color:#d97706;font-size:11px;cursor:pointer;">Interview</button>'
-            + '<button data-id="' + a.id + '" data-status="hired" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #6ee7b7;background:#d6f5eb;color:#064e38;font-size:11px;cursor:pointer;">Hire</button>'
-            + '<button data-id="' + a.id + '" data-status="rejected" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;font-size:11px;cursor:pointer;">Reject</button>'
+            + '<button data-id="' + a.id + '" data-status="reviewing" onclick="doStatusAction(this.dataset.id, this.dataset.status)" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #bfdbfe;background:#eff6ff;color:#2563eb;font-size:11px;cursor:pointer;">Review</button>'
+            + '<button data-id="' + a.id + '" data-status="interview" onclick="doStatusAction(this.dataset.id, this.dataset.status)" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #fde68a;background:#fef3c7;color:#d97706;font-size:11px;cursor:pointer;">Interview</button>'
+            + '<button data-id="' + a.id + '" data-status="hired" onclick="doStatusAction(this.dataset.id, this.dataset.status)" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #6ee7b7;background:#d6f5eb;color:#064e38;font-size:11px;cursor:pointer;">Hire</button>'
+            + '<button data-id="' + a.id + '" data-status="rejected" onclick="doStatusAction(this.dataset.id, this.dataset.status)" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;font-size:11px;cursor:pointer;">Reject</button>'
             + '</div></div></div>';
         }).join('');
 
-    return '<tr class="job-row" data-job-id="' + job.id + '" style="border-bottom:1px solid rgba(14,162,113,.1);cursor:pointer;">'
+    const jid = job.id;
+    return '<tr style="border-bottom:1px solid rgba(14,162,113,.1);cursor:pointer;" onclick="toggleRow(this.dataset.jid)" data-jid="' + jid + '">'
       + '<td style="padding:14px 12px;">'
       + '<div style="font-weight:600;font-size:14px;">' + (job.title||'') + '</div>'
       + '<div style="font-size:12px;color:#4a6b58;">' + (job.company||'') + (job.location ? ' · ' + job.location : '') + '</div></td>'
@@ -576,8 +578,8 @@ function renderJobs(jobs) {
       + '</td>'
       + '<td style="padding:14px 12px;font-size:13px;color:#4a6b58;">' + posted + '</td>'
       + '<td style="padding:14px 12px;" onclick="event.stopPropagation()"><div style="display:flex;gap:6px;">'
-      + '<button data-job-id="' + job.id + '" data-status="' + job.status + '" class="toggle-job-btn" style="padding:6px 12px;border-radius:100px;border:1.5px solid rgba(14,162,113,.25);background:#fff;font-size:12px;cursor:pointer;">' + (act?'Close':'Reopen') + '</button>'
-      + '<button data-job-id="' + job.id + '" class="delete-job-btn" style="padding:6px 12px;border-radius:100px;border:1.5px solid #fecaca;background:#fff5f5;color:#dc2626;font-size:12px;cursor:pointer;">Delete</button>'
+      + '<button data-job-id="' + job.id + '" data-status="' + job.status + '" onclick="doToggleJob(this.dataset.jobId, this.dataset.status)" class="toggle-job-btn" style="padding:6px 12px;border-radius:100px;border:1.5px solid rgba(14,162,113,.25);background:#fff;font-size:12px;cursor:pointer;">' + (act?'Close':'Reopen') + '</button>'
+      + '<button data-job-id="' + job.id + '" onclick="doDeleteJob(this.dataset.jobId)" class="delete-job-btn" style="padding:6px 12px;border-radius:100px;border:1.5px solid #fecaca;background:#fff5f5;color:#dc2626;font-size:12px;cursor:pointer;">Delete</button>'
       + '</div></td></tr>'
       + '<tr id="applicants-' + job.id + '" style="display:none;">'
       + '<td colspan="5" style="padding:0;"><div style="background:#f4faf7;border-left:3px solid #0ea271;padding:16px 20px;">'
@@ -596,29 +598,15 @@ function renderJobs(jobs) {
 
 }
 
-// ── JOBS TABLE EVENT DELEGATION ──
-let _jobsListenerAdded = false;
-function addJobsListListener() {
-  if (_jobsListenerAdded) return;
-  const el = document.getElementById('jobsList');
-  if (!el) return;
-  _jobsListenerAdded = true;
-  el.addEventListener('click', function(e) {
-    const jobRow = e.target.closest('.job-row');
-    if (jobRow && !e.target.closest('button')) {
-      const jobId = jobRow.dataset.jobId;
-      const apRow = document.getElementById('applicants-' + jobId);
-      if (apRow) apRow.style.display = apRow.style.display === 'none' ? 'table-row' : 'none';
-      return;
-    }
-    const statusBtn = e.target.closest('.status-action-btn');
-    if (statusBtn) { e.stopPropagation(); updateStatus(statusBtn.dataset.id, statusBtn.dataset.status); return; }
-    const toggleBtn = e.target.closest('.toggle-job-btn');
-    if (toggleBtn) { e.stopPropagation(); toggleJobStatus(toggleBtn.dataset.jobId, toggleBtn.dataset.status); return; }
-    const deleteBtn = e.target.closest('.delete-job-btn');
-    if (deleteBtn) { e.stopPropagation(); deleteJob(deleteBtn.dataset.jobId); }
-  });
+// ── JOBS TABLE CLICK HANDLERS ──
+function toggleRow(jobId) {
+  const apRow = document.getElementById('applicants-' + jobId);
+  if (apRow) apRow.style.display = apRow.style.display === 'none' ? 'table-row' : 'none';
 }
+function doStatusAction(id, status) { updateStatus(id, status); }
+function doToggleJob(jobId, status) { toggleJobStatus(jobId, status); }
+function doDeleteJob(jobId) { deleteJob(jobId); }
+function addJobsListListener() {} // no-op now
 
 
 // ── TOGGLE JOB APPLICANTS ─────────────────
