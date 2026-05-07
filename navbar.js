@@ -111,14 +111,12 @@ async function updateNavbar() {
   } else {
     // Guest — show general nav
     if (navLinks) navLinks.innerHTML = GUEST_NAV;
-    navR.innerHTML = `
-      <button class="btn-ghost" onclick="location.href='auth.html'" style="display:none" id="loginGhost">Log in</button>
-      <button class="btn-solid" onclick="location.href='auth.html'" style="font-size:13px;padding:8px 16px;" id="loginSolid">Log in</button>
-    `;
-    // On desktop show both buttons
-    if(window.innerWidth > 768) {
-      const ghost = document.getElementById('loginGhost');
-      if(ghost) ghost.style.display = '';
+    // Only set buttons if navR doesn't already have them (index.html has hardcoded ones)
+    if (navR && !navR.querySelector('button')) {
+      navR.innerHTML = `
+        <button onclick="location.href='auth.html?tab=login'" style="background:none;border:1.5px solid rgba(14,162,113,.4);color:#0a1a12;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-right:8px;">Log in</button>
+        <button onclick="location.href='auth.html?tab=signup'" style="background:#0ea271;border:none;color:#fff;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Sign up free</button>
+      `;
     }
   }
 }
