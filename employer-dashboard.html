@@ -525,7 +525,7 @@ setInterval(async function() {
 function renderJobs(jobs) {
   const el = document.getElementById('jobsList');
   if (!jobs || jobs.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="empty-ico">💼</div><div class="empty-title">No jobs posted yet</div><div class="empty-sub">Post your first job.</div><button class="empty-btn" onclick="location.href=\'post-job.html\'">+ Post a job</button></div>';
+    el.innerHTML = '<div class="empty"><div class="empty-ico">💼</div><div class="empty-title">No jobs posted yet</div><button class="empty-btn" onclick="location.href=\'post-job.html\'">+ Post a job</button></div>';
     return;
   }
 
@@ -544,7 +544,7 @@ function renderJobs(jobs) {
     const posted = new Date(job.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'});
     const act = job.status === 'active';
 
-    const applicantRows = cnt === 0 
+    const applicantRows = cnt === 0
       ? '<div style="color:#4a6b58;font-size:13px;padding:8px 0;">No applications yet.</div>'
       : jobApps.map(function(a) {
           const ini = (a.applicant_name||'AP').substring(0,2).toUpperCase();
@@ -553,33 +553,34 @@ function renderJobs(jobs) {
           return '<div style="display:flex;align-items:center;gap:12px;padding:10px;background:#fff;border-radius:10px;margin-bottom:8px;border:1px solid rgba(14,162,113,.15);">'
             + '<div style="width:36px;height:36px;border-radius:50%;background:#0ea271;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">' + ini + '</div>'
             + '<div style="flex:1;min-width:0;">'
-            + '<div style="font-size:13px;font-weight:600;">' + (a.applicant_name||'Applicant') + '</div>'
-            + '<div style="font-size:12px;color:#4a6b58;">' + (a.applicant_email||'') + (a.applicant_title ? ' · ' + a.applicant_title : '') + '</div>'
-            + (a.applicant_skills ? '<div style="font-size:11px;color:#4a6b58;margin-top:2px;">⚡ ' + a.applicant_skills.substring(0,80) + '</div>' : '')
+            + '<div style="font-size:14px;font-weight:600;">' + (a.applicant_name||'Applicant') + '</div>'
+            + '<div style="font-size:12px;color:#4a6b58;">' + (a.applicant_email||'No email') + (a.applicant_phone ? ' · ' + a.applicant_phone : '') + '</div>'
+            + '<div style="font-size:12px;color:#4a6b58;">' + (a.applicant_title||'') + (a.applicant_location ? ' · ' + a.applicant_location : '') + '</div>'
+            + (a.applicant_skills ? '<div style="font-size:11px;color:#4a6b58;margin-top:2px;">⚡ ' + a.applicant_skills.substring(0,100) + '</div>' : '')
             + '</div>'
             + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">'
             + '<span id="status-badge-' + a.id + '" style="font-size:11px;padding:3px 10px;border-radius:100px;font-weight:600;background:' + sc + ';color:' + stc + ';">' + (a.status||'applied') + '</span>'
             + '<div style="display:flex;gap:4px;flex-wrap:wrap;">'
-            + '<button onclick="updateStatus(\"' + a.id + '\",\"reviewing\")" style="padding:3px 8px;border-radius:100px;border:1px solid #bfdbfe;background:#eff6ff;color:#2563eb;font-size:11px;cursor:pointer;">Review</button>'
-            + '<button onclick="updateStatus(\"' + a.id + '\",\"interview\")" style="padding:3px 8px;border-radius:100px;border:1px solid #fde68a;background:#fef3c7;color:#d97706;font-size:11px;cursor:pointer;">Interview</button>'
-            + '<button onclick="updateStatus(\"' + a.id + '\",\"hired\")" style="padding:3px 8px;border-radius:100px;border:1px solid #6ee7b7;background:#d6f5eb;color:#064e38;font-size:11px;cursor:pointer;">Hire</button>'
-            + '<button onclick="updateStatus(\"' + a.id + '\",\"rejected\")" style="padding:3px 8px;border-radius:100px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;font-size:11px;cursor:pointer;">Reject</button>'
+            + '<button data-id="' + a.id + '" data-status="reviewing" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #bfdbfe;background:#eff6ff;color:#2563eb;font-size:11px;cursor:pointer;">Review</button>'
+            + '<button data-id="' + a.id + '" data-status="interview" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #fde68a;background:#fef3c7;color:#d97706;font-size:11px;cursor:pointer;">Interview</button>'
+            + '<button data-id="' + a.id + '" data-status="hired" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #6ee7b7;background:#d6f5eb;color:#064e38;font-size:11px;cursor:pointer;">Hire</button>'
+            + '<button data-id="' + a.id + '" data-status="rejected" class="status-action-btn" style="padding:3px 8px;border-radius:100px;border:1px solid #fecaca;background:#fef2f2;color:#dc2626;font-size:11px;cursor:pointer;">Reject</button>'
             + '</div></div></div>';
         }).join('');
 
-    return '<tr style="border-bottom:1px solid rgba(14,162,113,.1);">'
-      + '<td style="padding:14px 12px;cursor:pointer;" onclick="toggleJobApplicants(\"' + job.id + '\")">'
+    return '<tr class="job-row" data-job-id="' + job.id + '" style="border-bottom:1px solid rgba(14,162,113,.1);cursor:pointer;">'
+      + '<td style="padding:14px 12px;">'
       + '<div style="font-weight:600;font-size:14px;">' + (job.title||'') + '</div>'
       + '<div style="font-size:12px;color:#4a6b58;">' + (job.company||'') + (job.location ? ' · ' + job.location : '') + '</div></td>'
       + '<td style="padding:14px 12px;"><span style="background:' + (act?'#d6f5eb':'#f1f5f9') + ';color:' + (act?'#064e38':'#64748b') + ';padding:4px 10px;border-radius:100px;font-size:12px;font-weight:600;">● ' + (job.status||'active') + '</span></td>'
-      + '<td style="padding:14px 12px;text-align:center;cursor:pointer;" onclick="toggleJobApplicants(\"' + job.id + '\")">'
+      + '<td style="padding:14px 12px;text-align:center;">'
       + '<span style="font-size:18px;font-weight:700;color:' + (cnt>0?'#0ea271':'#4a6b58') + ';">' + cnt + '</span>'
       + (cnt > 0 ? '<div style="font-size:10px;color:#4a6b58;">click to view</div>' : '')
       + '</td>'
       + '<td style="padding:14px 12px;font-size:13px;color:#4a6b58;">' + posted + '</td>'
-      + '<td style="padding:14px 12px;"><div style="display:flex;gap:6px;">'
-      + '<button onclick="toggleJobStatus(\"' + job.id + '\",\"' + job.status + '\")" style="padding:6px 12px;border-radius:100px;border:1.5px solid rgba(14,162,113,.25);background:#fff;font-size:12px;cursor:pointer;">' + (act?'Close':'Reopen') + '</button>'
-      + '<button onclick="deleteJob(\"' + job.id + '\")" style="padding:6px 12px;border-radius:100px;border:1.5px solid #fecaca;background:#fff5f5;color:#dc2626;font-size:12px;cursor:pointer;">Delete</button>'
+      + '<td style="padding:14px 12px;" onclick="event.stopPropagation()"><div style="display:flex;gap:6px;">'
+      + '<button data-job-id="' + job.id + '" data-status="' + job.status + '" class="toggle-job-btn" style="padding:6px 12px;border-radius:100px;border:1.5px solid rgba(14,162,113,.25);background:#fff;font-size:12px;cursor:pointer;">' + (act?'Close':'Reopen') + '</button>'
+      + '<button data-job-id="' + job.id + '" class="delete-job-btn" style="padding:6px 12px;border-radius:100px;border:1.5px solid #fecaca;background:#fff5f5;color:#dc2626;font-size:12px;cursor:pointer;">Delete</button>'
       + '</div></td></tr>'
       + '<tr id="applicants-' + job.id + '" style="display:none;">'
       + '<td colspan="5" style="padding:0;"><div style="background:#f4faf7;border-left:3px solid #0ea271;padding:16px 20px;">'
@@ -595,6 +596,35 @@ function renderJobs(jobs) {
     + '<th style="padding:10px 12px;text-align:left;">POSTED</th>'
     + '<th style="padding:10px 12px;text-align:left;">ACTIONS</th>'
     + '</tr></thead><tbody>' + rows + '</tbody></table>';
+
+  // Add event listeners using data attributes (avoids all quote escaping issues)
+  el.addEventListener('click', function(e) {
+    // Job row click - toggle applicants
+    const jobRow = e.target.closest('.job-row');
+    if (jobRow && !e.target.closest('button')) {
+      const jobId = jobRow.dataset.jobId;
+      const apRow = document.getElementById('applicants-' + jobId);
+      if (apRow) apRow.style.display = apRow.style.display === 'none' ? 'table-row' : 'none';
+    }
+    // Status action buttons
+    const statusBtn = e.target.closest('.status-action-btn');
+    if (statusBtn) {
+      e.stopPropagation();
+      updateStatus(statusBtn.dataset.id, statusBtn.dataset.status);
+    }
+    // Toggle job status
+    const toggleBtn = e.target.closest('.toggle-job-btn');
+    if (toggleBtn) {
+      e.stopPropagation();
+      toggleJobStatus(toggleBtn.dataset.jobId, toggleBtn.dataset.status);
+    }
+    // Delete job
+    const deleteBtn = e.target.closest('.delete-job-btn');
+    if (deleteBtn) {
+      e.stopPropagation();
+      deleteJob(deleteBtn.dataset.jobId);
+    }
+  });
 }
 
 
