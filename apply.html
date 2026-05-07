@@ -273,6 +273,7 @@ async function handleResumeUpload(input) {
   const maxSize = 5 * 1024 * 1024;
   if (file.size > maxSize) { alert('File too large. Please upload a file under 5MB.'); return; }
   window._cvFileName = file.name; // Store filename for application
+  window._cvFile = file; // Store actual file object for upload at submit time
 
   // Show upload success on the drop zone
   document.getElementById('uploadWrap').innerHTML = `
@@ -504,8 +505,7 @@ async function submitApplication() {
     // Upload CV to storage first
     let cvUrl = '';
     let cvFilename = window._cvFileName || '';
-    const cvFileEl = document.getElementById('cvFile');
-    const cvFile = cvFileEl?.files?.[0];
+    const cvFile = window._cvFile || document.getElementById('cvFile')?.files?.[0];
     if (cvFile) {
       cvFilename = cvFile.name;
       try {
