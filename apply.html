@@ -501,6 +501,30 @@ async function submitApplication() {
   const jobId = new URLSearchParams(window.location.search).get('job');
 
   try {
+    // Upload CV to storage first
+    let cvUrl = '';
+    let cvFilename = window._cvFileName || '';
+    const cvFileEl = document.getElementById('cvFile');
+    const cvFile = cvFileEl?.files?.[0];
+    if (cvFile) {
+      cvFilename = cvFile.name;
+      try {
+        const cvPath = `cvs/${Date.now()}_${cvFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+        const cvResp = await fetch(`https://eteyskwaqjtcybaolnto.supabase.co/storage/v1/object/${cvPath}`, {
+          method: 'POST',
+          headers: {
+            'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
+            'Authorization': 'Bearer sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
+            'Content-Type': cvFile.type || 'application/octet-stream'
+          },
+          body: cvFile
+        });
+        if (cvResp.ok) {
+          cvUrl = `https://eteyskwaqjtcybaolnto.supabase.co/storage/v1/object/public/${cvPath}`;
+        }
+      } catch(e) { console.log('CV upload error:', e.message); }
+    }
+
     const appData = {
       job_id: jobId,
       applicant_id: null,
@@ -514,8 +538,8 @@ async function submitApplication() {
       applicant_skills: document.getElementById('appSkills').value || '',
       applicant_linkedin: document.getElementById('appLinkedin')?.value || '',
       cover_letter: document.getElementById('appCover').value || '',
-      resume_filename: window._cvFileName || '',
-      resume_url: '',
+      resume_filename: cvFilename,
+      resume_url: cvUrl,
       created_at: new Date().toISOString()
     };
 
