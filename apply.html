@@ -495,200 +495,56 @@ async function submitApplication() {
   }
 
   const btn = document.getElementById('submitBtn');
-  btn.innerHTML = '⏳ Submitting your application...';
+  btn.innerHTML = '⏳ Submitting...';
   btn.disabled = true;
 
-  const params = new URLSearchParams(window.location.search);
-  const jobId = params.get('job');
+  const jobId = new URLSearchParams(window.location.search).get('job');
 
   try {
-    const sb = window._sb;
-    if (sb && jobId) {
-      // Get session but don't block on it - anyone can apply
-      let session = null;
-      try {
-        const { data } = await sb.auth.getSession();
-        session = data?.session || null;
-      } catch(e) {}
+    const appData = {
+      job_id: jobId,
+      applicant_id: null,
+      status: 'applied',
+      applicant_name: name,
+      applicant_email: email,
+      applicant_phone: phone,
+      applicant_location: document.getElementById('appLocation').value || '',
+      applicant_title: document.getElementById('appTitle').value || '',
+      applicant_education: document.getElementById('appEducation').value || '',
+      applicant_skills: document.getElementById('appSkills').value || '',
+      applicant_linkedin: document.getElementById('appLinkedin')?.value || '',
+      cover_letter: document.getElementById('appCover').value || '',
+      resume_filename: window._cvFileName || '',
+      resume_url: '',
+      created_at: new Date().toISOString()
+    };
 
-      // Upload CV to Supabase Storage
-      let cvUrl = '';
-      let cvFilename = window._cvFileName || '';
-      const cvFile = document.getElementById('cvFile').files[0];
-      if (cvFile) {
-        cvFilename = cvFile.name;
-        try {
-          const ext = cvFile.name.split('.').pop().toLowerCase();
-          const timestamp = Date.now();
-          const userId = session?.user?.id || 'guest';
-          const path = `${userId}/${timestamp}_${cvFile.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-          
-          const { data: uploadData, error: uploadError } = await sb.storage
-            .from('cvs')
-            .upload(path, cvFile, { upsert: true, contentType: cvFile.type });
-          
-          if (!uploadError && uploadData) {
-            // Get public URL
-            const { data: urlData } = sb.storage.from('cvs').getPublicUrl(path);
-            cvUrl = urlData?.publicUrl || '';
-            console.log('✅ CV uploaded:', cvUrl);
-          } else {
-            console.log('CV upload error:', uploadError?.message);
-            // Fallback: store as base64 data URL (works without storage bucket)
-            cvUrl = await new Promise(resolve => {
-              const reader = new FileReader();
-              reader.onload = e => resolve(e.target.result);
-              reader.onerror = () => resolve('');
-              reader.readAsDataURL(cvFile);
-            });
-            if (cvUrl) console.log('✅ CV saved as base64 fallback');
-          }
-        } catch(uploadErr) {
-          console.log('CV upload exception:', uploadErr);
-        }
-      }
+    // Direct REST API insert - no session needed
+    const resp = await fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/applications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
+        'Authorization': 'Bearer sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(appData)
+    });
 
-      // Collect all form fields
-      const appData = {
-        job_id: jobId,
-        applicant_id: null,  // Don't save to avoid unique constraint blocking re-applications
-        status: 'applied',
-        cover_letter: document.getElementById('appCover').value || '',
-        applicant_name: document.getElementById('appName').value || '',
-        applicant_email: document.getElementById('appEmail').value || '',
-        applicant_phone: document.getElementById('appPhone').value || '',
-        applicant_location: document.getElementById('appLocation').value || '',
-        applicant_title: document.getElementById('appTitle').value || '',
-        applicant_education: document.getElementById('appEducation').value || '',
-        applicant_skills: document.getElementById('appSkills').value || '',
-        applicant_linkedin: document.getElementById('appLinkedin') ? document.getElementById('appLinkedin').value || '' : '',
-        resume_filename: cvFilename,
-        resume_url: cvUrl,
-        created_at: new Date().toISOString()
-      };
-
-      console.log('Submitting application:', appData);
-      // Direct REST API - bypasses session/RLS issues completely
-      let inserted = null, insertError = null;
-      try {
-        const resp = await fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/applications', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
-            'Authorization': 'Bearer sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
-            'Prefer': 'return=representation'
-          },
-          body: JSON.stringify(appData)
-        });
-        const result = await resp.json();
-        if (resp.ok) { inserted = Array.isArray(result) ? result[0] : result; }
-        else { insertError = { message: result.message || result.hint || JSON.stringify(result) }; }
-      } catch(e) { insertError = { message: e.message }; }
-      if (insertError) {
-        console.error('❌ Application save error:', insertError.message, insertError);
-        alert('Error saving application: ' + insertError.message);
-      } else if (inserted) {
-        console.log('✅ Application saved:', inserted);
-        // Notify employer via email using our API
-        try {
-          await fetch('/api/notify-employer', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              applicationId: inserted.id,
-              jobId: jobId,
-              applicantName: appData.applicant_name,
-              applicantEmail: appData.applicant_email,
-              applicantPhone: appData.applicant_phone,
-              skills: appData.applicant_skills,
-              coverLetter: appData.cover_letter,
-              cvUrl: cvUrl
-            })
-          });
-        } catch(e) { /* email notification is non-critical */ }
-      }
+    if (resp.ok || resp.status === 201) {
+      // Success - show success screen
+      document.getElementById('applyForm').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+      document.getElementById('successScreen').scrollIntoView({behavior:'smooth'});
+    } else {
+      const err = await resp.json().catch(()=>({}));
+      alert('Error: ' + (err.message || err.hint || resp.status));
+      btn.innerHTML = '🚀 Submit application';
+      btn.disabled = false;
     }
-  } catch(e) { console.log('DB save error:', e); }
-
-  document.getElementById('applyForm').style.display = 'none';
-  document.getElementById('aiSuccess').style.display = 'none';
-  document.getElementById('aiParsing').style.display = 'none';
-  document.getElementById('successScreen').classList.add('show');
-}
-
-function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('open');
-  document.getElementById('hamburger').classList.toggle('open');
-}
-
-// Drag and drop support
-const wrap = document.getElementById('uploadWrap');
-if (wrap) {
-  wrap.addEventListener('dragover', (e) => { e.preventDefault(); wrap.classList.add('dragover'); });
-  wrap.addEventListener('dragleave', () => wrap.classList.remove('dragover'));
-  wrap.addEventListener('drop', (e) => {
-    e.preventDefault();
-    wrap.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      document.getElementById('cvFile').files = dt.files;
-      handleResumeUpload(document.getElementById('cvFile'));
-    }
-  });
-}
-
-// ── JOB LOADER ──────────────────────────────
-(async function initPage() {
-const sb = window._sb; // Use the initialized Supabase client
-if(!sb){ console.error('Supabase not ready'); return; }
-// Load job from URL param
-const params = new URLSearchParams(window.location.search);
-const jobId = params.get('job');
-if(jobId){
-  const { data: job } = await sb.from('jobs').select('*').eq('id', jobId).single();
-  if(job){
-    document.getElementById('jobTitle').textContent = job.title;
-    document.getElementById('jobOrg').textContent = job.company + (job.location ? ' · '+job.location : '');
-    const tags = document.getElementById('jobTags');
-    if(job.job_type) tags.innerHTML += `<span class="jt jtg">${job.job_type}</span>`;
-    if(job.salary_min) tags.innerHTML += `<span class="jt jtb">Rs. ${Number(job.salary_min).toLocaleString()}${job.salary_max?'–'+Number(job.salary_max).toLocaleString():'+'}/mo</span>`;
-    if(job.category) tags.innerHTML += `<span class="jt jta">${job.category}</span>`;
-    document.title = `Apply — ${job.title} at ${job.company} | Talentry`;
+  } catch(e) {
+    alert('Network error: ' + e.message);
+    btn.innerHTML = '🚀 Submit application';
+    btn.disabled = false;
   }
 }
-
-// Auto-fill if logged in
-const { data: { session } } = await sb.auth.getSession();
-if(session){
-  // Logged in — auto-fill from profile
-  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-  if(profile){
-    if(profile.full_name) setField('appName', profile.full_name);
-    if(session.user.email) setField('appEmail', session.user.email);
-    if(profile.phone) setField('appPhone', profile.phone);
-    if(profile.location) setField('appLocation', profile.location);
-    if(profile.job_title) setField('appTitle', profile.job_title);
-  }
-} else {
-  // Guest — show a soft nudge (not a block)
-  const nudge = document.createElement('div');
-  nudge.style.cssText = 'background:linear-gradient(135deg,#d6f5eb,#e8f8f2);border:1.5px solid rgba(14,162,113,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;';
-  nudge.innerHTML = '<div><div style="font-size:13.5px;font-weight:600;color:#064e38;">💡 Log in to apply faster</div>'
-    + '<div style="font-size:12.5px;color:#4a6b58;margin-top:2px;">Your details auto-fill and you can track your application status.</div></div>'
-    + '<a href="auth.html" style="background:#0ea271;color:#fff;padding:8px 18px;border-radius:100px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;">Log in</a>';
-  const formCard = document.querySelector('.form-card');
-  if(formCard) formCard.insertBefore(nudge, formCard.firstChild);
-}
-
-function setField(id, val){
-  const el = document.getElementById(id);
-  if(el && val) { el.value = val; }
-}
-})(); // end initPage
-
-</script>
-</body>
-</html>
