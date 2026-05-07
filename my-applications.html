@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>My Applications — Talentry</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{--g:#0ea271;--gd:#064e38;--bg:#f4faf7;--text:#0a1a12;--muted:#4a6b58;--border:rgba(14,162,113,.18);--white:#fff;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  .header{background:var(--gd);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .logo{font-family:Fraunces,serif;font-size:22px;color:#fff;}
+  .logo span{color:#4ecda4;}
+  .back-btn{color:rgba(255,255,255,.7);font-size:14px;text-decoration:none;display:flex;align-items:center;gap:6px;}
+  .container{max-width:700px;margin:0 auto;padding:24px 16px;}
+  .page-title{font-family:Fraunces,serif;font-size:28px;margin-bottom:8px;}
+  .page-sub{color:var(--muted);font-size:14px;margin-bottom:24px;}
+  .app-card{background:#fff;border-radius:16px;border:1.5px solid var(--border);padding:20px;margin-bottom:14px;transition:box-shadow .2s;}
+  .app-card:hover{box-shadow:0 4px 20px rgba(14,162,113,.1);}
+  .app-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+  .company-ico{width:44px;height:44px;border-radius:12px;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .job-title{font-size:16px;font-weight:700;color:var(--text);}
+  .job-company{font-size:13px;color:var(--muted);margin-top:2px;}
+  .status-badge{margin-left:auto;padding:6px 14px;border-radius:100px;font-size:12px;font-weight:700;flex-shrink:0;}
+  .s-applied{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;}
+  .s-reviewing{background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;}
+  .s-interview{background:#fef3c7;color:#d97706;border:1px solid #fde68a;}
+  .s-hired{background:#d6f5eb;color:#064e38;border:1px solid #6ee7b7;}
+  .s-rejected{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;}
+  .app-details{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--muted);}
+  .app-detail{display:flex;align-items:center;gap:6px;}
+  .status-timeline{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);}
+  .timeline-title{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin-bottom:10px;}
+  .timeline{display:flex;gap:0;}
+  .t-step{flex:1;text-align:center;position:relative;}
+  .t-step::after{content:'';position:absolute;top:12px;left:50%;width:100%;height:2px;background:#e2e8f0;z-index:0;}
+  .t-step:last-child::after{display:none;}
+  .t-dot{width:24px;height:24px;border-radius:50%;margin:0 auto 4px;position:relative;z-index:1;display:flex;align-items:center;justify-content:center;font-size:11px;}
+  .t-dot.done{background:var(--g);color:#fff;}
+  .t-dot.active{background:#fff;border:2px solid var(--g);color:var(--g);}
+  .t-dot.pending{background:#e2e8f0;color:#94a3b8;}
+  .t-label{font-size:10px;color:var(--muted);font-weight:500;}
+  .empty{text-align:center;padding:60px 20px;}
+  .empty-ico{font-size:48px;margin-bottom:12px;}
+  .empty-title{font-family:Fraunces,serif;font-size:22px;margin-bottom:8px;}
+  .empty-sub{color:var(--muted);font-size:14px;margin-bottom:20px;}
+  .empty-btn{background:var(--g);color:#fff;border:none;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .loading{text-align:center;padding:40px;color:var(--muted);}
+  .notif-banner{background:#d6f5eb;border:1.5px solid #6ee7b7;border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+  .notif-ico{font-size:20px;flex-shrink:0;}
+  .notif-text{font-size:13px;font-weight:500;color:var(--gd);}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+  .stat-card{background:#fff;border-radius:12px;border:1.5px solid var(--border);padding:14px;text-align:center;}
+  .stat-n{font-size:24px;font-weight:700;color:var(--text);}
+  .stat-l{font-size:11px;color:var(--muted);margin-top:2px;}
+</style>
+</head>
+<body>
+<script>
+// Auth guard
+(function(){
+  try {
+    const key = 'sb-eteyskwaqjtcybaolnto-auth-token';
+    const raw = localStorage.getItem(key);
+    if (!raw) { window.location.replace('auth.html'); return; }
+    const d = JSON.parse(raw);
+    if (!d.access_token && !d.user) { window.location.replace('auth.html'); }
+  } catch(e) { window.location.replace('auth.html'); }
+})();
+</script>
+
+<div class="header">
+  <a class="logo" href="index.html">Tal<span>entry</span></a>
+  <a class="back-btn" href="browse-jobs.html">← Browse jobs</a>
+</div>
+
+<div class="container">
+  <h1 class="page-title">My Applications</h1>
+  <p class="page-sub">Track the status of all your job applications</p>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-n" id="statTotal">0</div><div class="stat-l">Total applied</div></div>
+    <div class="stat-card"><div class="stat-n" id="statReviewing">0</div><div class="stat-l">Under review</div></div>
+    <div class="stat-card"><div class="stat-n" id="statInterview">0</div><div class="stat-l">Interview</div></div>
+    <div class="stat-card"><div class="stat-n" id="statHired">0</div><div class="stat-l">Hired 🎉</div></div>
+  </div>
+
+  <div id="notifArea"></div>
+  <div id="appsList"><div class="loading">⏳ Loading your applications...</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const sb = window.supabase.createClient(
+  'https://eteyskwaqjtcybaolnto.supabase.co',
+  'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe'
+);
+
+const STATUS_STEPS = ['applied','reviewing','interview','hired'];
+const STATUS_LABELS = {applied:'Applied',reviewing:'Reviewing',interview:'Interview',hired:'Hired'};
+const STATUS_ICONS = {applied:'📝',reviewing:'👀',interview:'🤝',hired:'🎉',rejected:'❌'};
+
+(async function init() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { window.location.replace('auth.html'); return; }
+
+  const userId = session.user.id;
+  const userEmail = session.user.email;
+
+  // Get applications by email (since applicant_id is null)
+  const { data: apps, error } = await sb
+    .from('applications')
+    .select('*, jobs(id, title, company, location, job_type, category)')
+    .eq('applicant_email', userEmail)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    document.getElementById('appsList').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading</div><div class="empty-sub">${error.message}</div></div>`;
+    return;
+  }
+
+  if (!apps || apps.length === 0) {
+    document.getElementById('appsList').innerHTML = `
+      <div class="empty">
+        <div class="empty-ico">📭</div>
+        <div class="empty-title">No applications yet</div>
+        <div class="empty-sub">Start applying to healthcare jobs in Nepal!</div>
+        <button class="empty-btn" onclick="location.href='browse-jobs.html'">Browse jobs →</button>
+      </div>`;
+    return;
+  }
+
+  // Update stats
+  document.getElementById('statTotal').textContent = apps.length;
+  document.getElementById('statReviewing').textContent = apps.filter(a=>a.status==='reviewing').length;
+  document.getElementById('statInterview').textContent = apps.filter(a=>a.status==='interview').length;
+  document.getElementById('statHired').textContent = apps.filter(a=>a.status==='hired').length;
+
+  // Show notifications for status changes
+  const notifArea = document.getElementById('notifArea');
+  const updates = apps.filter(a => a.status !== 'applied');
+  if (updates.length > 0) {
+    updates.forEach(a => {
+      const job = a.jobs;
+      if (!job) return;
+      const notif = document.createElement('div');
+      notif.className = 'notif-banner';
+      notif.innerHTML = `
+        <div class="notif-ico">${STATUS_ICONS[a.status] || '📢'}</div>
+        <div class="notif-text"><strong>${job.company}</strong> has updated your application for <strong>${job.title}</strong>: <strong>${STATUS_LABELS[a.status] || a.status}</strong></div>`;
+      notifArea.appendChild(notif);
+    });
+  }
+
+  // Render application cards
+  let html = '';
+  apps.forEach(app => {
+    const job = app.jobs || {};
+    const status = app.status || 'applied';
+    const badgeClass = {applied:'s-applied',reviewing:'s-reviewing',interview:'s-interview',hired:'s-hired',rejected:'s-rejected'}[status] || 's-applied';
+    const statusLabel = {applied:'✅ Applied',reviewing:'👀 Under Review',interview:'🤝 Interview',hired:'🎉 Hired!',rejected:'❌ Not selected'}[status] || status;
+    const date = new Date(app.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const companyInitial = (job.company||'?').charAt(0).toUpperCase();
+
+    // Timeline
+    const stepIdx = STATUS_STEPS.indexOf(status);
+    const timelineHtml = status === 'rejected' ? 
+      `<div style="font-size:13px;color:#dc2626;padding:8px 0;">❌ Application was not selected. Keep applying!</div>` :
+      `<div class="timeline">
+        ${STATUS_STEPS.map((s,i) => `
+          <div class="t-step">
+            <div class="t-dot ${i < stepIdx ? 'done' : i === stepIdx ? 'active' : 'pending'}">${i < stepIdx ? '✓' : i+1}</div>
+            <div class="t-label">${STATUS_LABELS[s]}</div>
+          </div>`).join('')}
+      </div>`;
+
+    html += `
+    <div class="app-card">
+      <div class="app-header">
+        <div class="company-ico">${companyInitial}</div>
+        <div>
+          <div class="job-title">${job.title || 'Job Application'}</div>
+          <div class="job-company">${job.company || ''}${job.location ? ' · '+job.location : ''}</div>
+        </div>
+        <span class="status-badge ${badgeClass}">${statusLabel}</span>
+      </div>
+      <div class="app-details">
+        <div class="app-detail">📅 Applied ${date}</div>
+        ${job.job_type ? `<div class="app-detail">💼 ${job.job_type}</div>` : ''}
+        ${job.category ? `<div class="app-detail">🏥 ${job.category}</div>` : ''}
+        ${app.resume_filename ? `<div class="app-detail">📄 ${app.resume_filename}</div>` : ''}
+      </div>
+      <div class="status-timeline">
+        <div class="timeline-title">APPLICATION PROGRESS</div>
+        ${timelineHtml}
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('appsList').innerHTML = html;
+})();
+</script>
+</body>
+</html>

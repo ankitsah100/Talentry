@@ -266,6 +266,38 @@ try {
   window._sb = _sbInstance;
 } catch(e) { console.error('Supabase init failed:', e); }
 
+// Load job details immediately
+(async function loadJob() {
+  try {
+    const jobId = new URLSearchParams(window.location.search).get('job');
+    if (!jobId || !window._sb) return;
+    const { data: job } = await window._sb.from('jobs').select('*').eq('id', jobId).single();
+    if (job) {
+      const titleEl = document.getElementById('jobTitle');
+      const orgEl = document.getElementById('jobOrg');
+      const tagsEl = document.getElementById('jobTags');
+      if (titleEl) titleEl.textContent = job.title;
+      if (orgEl) orgEl.textContent = job.company + (job.location ? ' · ' + job.location : '');
+      if (tagsEl) {
+        tagsEl.innerHTML = '';
+        if (job.job_type) tagsEl.innerHTML += `<span class="jt jtg">${job.job_type}</span>`;
+        if (job.salary_min) tagsEl.innerHTML += `<span class="jt jtb">Rs. ${Number(job.salary_min).toLocaleString()}+/mo</span>`;
+        if (job.category) tagsEl.innerHTML += `<span class="jt jta">${job.category}</span>`;
+      }
+      // Show deadline nudge
+      if (job.deadline) {
+        const days = Math.ceil((new Date(job.deadline) - new Date()) / 86400000);
+        if (days <= 7 && days > 0) {
+          const nudge = document.createElement('div');
+          nudge.style.cssText = 'background:#fef3c7;color:#92400e;padding:10px 16px;border-radius:10px;font-size:13px;margin-bottom:12px;font-weight:500;';
+          nudge.textContent = `⏰ Deadline in ${days} day${days>1?'s':''}!`;
+          const formCard = document.querySelector('.form-card');
+          if (formCard) formCard.insertBefore(nudge, formCard.firstChild);
+        }
+      }
+    }
+  } catch(e) { console.log('Job load error:', e.message); }
+})();
 
 async function handleResumeUpload(input) {
   if (!input.files || !input.files[0]) return;
