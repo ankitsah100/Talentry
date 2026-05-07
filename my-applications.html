@@ -110,12 +110,28 @@ const STATUS_ICONS = {applied:'📝',reviewing:'👀',interview:'🤝',hired:'�
   const userId = session.user.id;
   const userEmail = session.user.email;
 
-  // Get applications by email (since applicant_id is null)
-  const { data: apps, error } = await sb
+  // Get applications by email OR user ID
+  const { data: appsByEmail } = await sb
     .from('applications')
     .select('*, jobs(id, title, company, location, job_type, category)')
     .eq('applicant_email', userEmail)
     .order('created_at', { ascending: false });
+
+  const { data: appsById } = await sb
+    .from('applications')
+    .select('*, jobs(id, title, company, location, job_type, category)')
+    .eq('applicant_id', userId)
+    .order('created_at', { ascending: false });
+
+  // Merge and deduplicate
+  const seen = new Set();
+  const apps = [...(appsByEmail||[]), ...(appsById||[])].filter(a => {
+    if (seen.has(a.id)) return false;
+    seen.add(a.id);
+    return true;
+  }).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  
+  const error = null;
 
   if (error) {
     document.getElementById('appsList').innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-title">Error loading</div><div class="empty-sub">${error.message}</div></div>`;
