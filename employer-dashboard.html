@@ -570,7 +570,9 @@ function renderJobs(jobs) {
     return '<tr style="border-bottom:1px solid rgba(14,162,113,.1);cursor:pointer;" onclick="toggleRow(this.dataset.jid)" data-jid="' + jid + '">'
       + '<td style="padding:14px 12px;">'
       + '<div style="font-weight:600;font-size:14px;">' + (job.title||'') + '</div>'
-      + '<div style="font-size:12px;color:#4a6b58;">' + (job.company||'') + (job.location ? ' · ' + job.location : '') + '</div></td>'
+      + '<div style="font-size:12px;color:#4a6b58;">' + (job.company||'') + (job.location ? ' · ' + job.location : '') + '</div>'
+      + (job.job_type ? '<span style="font-size:11px;background:#d6f5eb;color:#064e38;padding:2px 8px;border-radius:100px;margin-top:4px;display:inline-block;">' + job.job_type + '</span>' : '')
+      + '</td>'
       + '<td style="padding:14px 12px;"><span style="background:' + (act?'#d6f5eb':'#f1f5f9') + ';color:' + (act?'#064e38':'#64748b') + ';padding:4px 10px;border-radius:100px;font-size:12px;font-weight:600;">● ' + (job.status||'active') + '</span></td>'
       + '<td style="padding:14px 12px;text-align:center;">'
       + '<span style="font-size:18px;font-weight:700;color:' + (cnt>0?'#0ea271':'#4a6b58') + ';">' + cnt + '</span>'
@@ -582,8 +584,23 @@ function renderJobs(jobs) {
       + '<button data-job-id="' + job.id + '" onclick="doDeleteJob(this.dataset.jobId)" class="delete-job-btn" style="padding:6px 12px;border-radius:100px;border:1.5px solid #fecaca;background:#fff5f5;color:#dc2626;font-size:12px;cursor:pointer;">Delete</button>'
       + '</div></td></tr>'
       + '<tr id="applicants-' + job.id + '" style="display:none;">'
-      + '<td colspan="5" style="padding:0;"><div style="background:#f4faf7;border-left:3px solid #0ea271;padding:16px 20px;">'
-      + applicantRows
+      + '<td colspan="5" style="padding:0;">'
+      + '<div style="background:#f4faf7;border-left:3px solid #0ea271;padding:20px 24px;">'
+      // Job details banner
+      + '<div style="background:#064e38;color:#fff;border-radius:12px;padding:14px 18px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;">'
+      + '<div style="flex:1;min-width:200px;">'
+      + '<div style="font-size:16px;font-weight:700;font-family:Fraunces,serif;">' + (job.title||'') + '</div>'
+      + '<div style="font-size:13px;color:rgba(255,255,255,.75);margin-top:2px;">' + (job.company||'') + (job.location ? ' · ' + job.location : '') + '</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+      + (job.job_type ? '<span style="background:rgba(255,255,255,.15);color:#fff;padding:4px 10px;border-radius:100px;font-size:12px;">' + job.job_type + '</span>' : '')
+      + (job.category ? '<span style="background:rgba(255,255,255,.15);color:#fff;padding:4px 10px;border-radius:100px;font-size:12px;">' + job.category + '</span>' : '')
+      + (job.salary_min ? '<span style="background:#4ecda4;color:#064e38;padding:4px 10px;border-radius:100px;font-size:12px;font-weight:600;">Rs. ' + Number(job.salary_min).toLocaleString() + (job.salary_max ? '–' + Number(job.salary_max).toLocaleString() : '+') + '/mo</span>' : '')
+      + '</div>'
+      + '<div style="font-size:12px;color:rgba(255,255,255,.6);">' + cnt + ' applicant' + (cnt!==1?'s':'') + '</div>'
+      + '</div>'
+      // Applicants
+      + (cnt === 0 ? '<div style="color:#4a6b58;font-size:13px;padding:8px 0;text-align:center;">No applications yet for this job.</div>' : applicantRows)
       + '</div></td></tr>';
   }).join('');
 
