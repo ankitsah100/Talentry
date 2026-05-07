@@ -229,7 +229,8 @@ document.addEventListener('DOMContentLoaded', async function() {
   document.getElementById('sbAv').textContent = name.charAt(0).toUpperCase();
   document.getElementById('dashTitle').textContent = name + ' — Dashboard';
 
-  await Promise.all([loadApplications(), loadJobs()]);
+  await loadApplications();  // Load apps first
+  await loadJobs();           // Then jobs (so renderJobs has allApplications ready)
 });
 
 // ── LOAD APPLICATIONS ─────────────────────
@@ -356,6 +357,9 @@ async function loadJobs() {
   const activeCount = allJobs.filter(j => j.status === 'active').length;
   const statJobsEl = document.getElementById('statJobs');
   if(statJobsEl) statJobsEl.textContent = activeCount;
+  
+  // Render jobs tab (allApplications must be loaded first)
+  renderJobs(allJobs);
 
   if (!allJobs.length) {
     document.getElementById('jobsList').innerHTML = `
@@ -462,8 +466,6 @@ async function deleteJob(jobId) {
   const { error } = await sb.from('jobs').delete().eq('id', jobId);
   if (error) { showToast('❌ ' + error.message); return; }
   showToast('🗑 Job deleted');
-  loadApplications();
-  loadJobs();
 }
 
 // ── EMAIL ──────────────────────────────────
