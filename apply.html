@@ -546,7 +546,7 @@ async function submitApplication() {
       // Collect all form fields
       const appData = {
         job_id: jobId,
-        applicant_id: session?.user?.id || null,
+        applicant_id: null,  // Don't save to avoid unique constraint blocking re-applications
         status: 'applied',
         cover_letter: document.getElementById('appCover').value || '',
         applicant_name: document.getElementById('appName').value || '',
