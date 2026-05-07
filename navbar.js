@@ -98,6 +98,7 @@ async function updateNavbar() {
           </div>
           ${dashboardLink}
           ${postJobLink}
+          ${role !== 'employer' ? `<a href="my-applications.html" style="display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:10px;font-size:13px;color:#0a1a12;text-decoration:none;" onmouseover="this.style.background='#f4faf7'" onmouseout="this.style.background='none'">📋 My applications</a>` : ''}
           <a href="interview-prep.html" style="display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:10px;font-size:13px;color:#0a1a12;text-decoration:none;" onmouseover="this.style.background='#f4faf7'" onmouseout="this.style.background='none'">🎙 Interview prep</a>
           <a href="resume-builder.html" style="display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:10px;font-size:13px;color:#0a1a12;text-decoration:none;" onmouseover="this.style.background='#f4faf7'" onmouseout="this.style.background='none'">📄 Resume builder</a>
           <a href="salary-insights.html" style="display:flex;align-items:center;gap:9px;padding:10px 14px;border-radius:10px;font-size:13px;color:#0a1a12;text-decoration:none;" onmouseover="this.style.background='#f4faf7'" onmouseout="this.style.background='none'">💰 Salary insights</a>
