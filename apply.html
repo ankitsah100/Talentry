@@ -190,8 +190,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
     <div id="applyForm">
       <div class="sec-title">👤 Personal information</div>
       <div class="field-row">
-        <div class="field"><label>Full name <span>*</span></label><input type="text" id="appName" placeholder="Ram Bahadur Shrestha"/></div>
-        <div class="field"><label>Email address <span>*</span></label><input type="email" id="appEmail" placeholder="you@example.com"/></div>
+        <div class="field">
+          <label>Full name <span>*</span> <span style="font-size:11px;background:#d6f5eb;color:#064e38;padding:2px 8px;border-radius:100px;font-weight:600;">🔒 From your account</span></label>
+          <input type="text" id="appName" readonly style="background:#f4faf7;color:#0a1a12;cursor:not-allowed;border-color:rgba(14,162,113,.3);" placeholder="Loading..."/>
+        </div>
+        <div class="field">
+          <label>Email address <span>*</span> <span style="font-size:11px;background:#d6f5eb;color:#064e38;padding:2px 8px;border-radius:100px;font-weight:600;">🔒 From your account</span></label>
+          <input type="email" id="appEmail" readonly style="background:#f4faf7;color:#0a1a12;cursor:not-allowed;border-color:rgba(14,162,113,.3);" placeholder="Loading..."/>
+        </div>
       </div>
       <div class="field-row">
         <div class="field"><label>Phone number <span>*</span></label><input type="tel" id="appPhone" placeholder="+977 98XXXXXXXX"/></div>
@@ -297,6 +303,32 @@ try {
       }
     }
   } catch(e) { console.log('Job load error:', e.message); }
+  
+  // Pre-fill name and email from user profile (locked fields)
+  try {
+    const { data: { session } } = await window._sb.auth.getSession();
+    if (session) {
+      const nameEl = document.getElementById('appName');
+      const emailEl = document.getElementById('appEmail');
+      // Set email from session immediately
+      if (emailEl) emailEl.value = session.user.email || '';
+      // Get full name from profile
+      const { data: profile } = await window._sb.from('profiles')
+        .select('full_name, phone, location, job_title')
+        .eq('id', session.user.id)
+        .single();
+      if (profile) {
+        if (nameEl && profile.full_name) nameEl.value = profile.full_name;
+        else if (nameEl) nameEl.value = session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || '';
+        // Pre-fill other fields too if profile has them
+        if (profile.phone) { const el = document.getElementById('appPhone'); if(el && !el.value) el.value = profile.phone; }
+        if (profile.location) { const el = document.getElementById('appLocation'); if(el && !el.value) el.value = profile.location; }
+        if (profile.job_title) { const el = document.getElementById('appTitle'); if(el && !el.value) el.value = profile.job_title; }
+      } else if (nameEl) {
+        nameEl.value = session.user.user_metadata?.full_name || session.user.user_metadata?.name || session.user.email?.split('@')[0] || '';
+      }
+    }
+  } catch(e) { console.log('Profile prefill error:', e.message); }
 })();
 
 async function handleResumeUpload(input) {
@@ -365,8 +397,9 @@ async function handleResumeUpload(input) {
     // Fill fields — with animated delay per field
     let filled = 0;
     const fieldMap = [
-      { id:'appName',      val:parsed.full_name,               label:'Full name' },
-      { id:'appEmail',     val:parsed.email,                   label:'Email' },
+      // Name and email are locked from profile - skip AI override
+      // { id:'appName',   val:parsed.full_name,               label:'Full name' },
+      // { id:'appEmail',  val:parsed.email,                   label:'Email' },
       { id:'appPhone',     val:parsed.phone,                   label:'Phone' },
       { id:'appLocation',  val:parsed.location,                label:'Location' },
       { id:'appTitle',     val:parsed.job_title,               label:'Job title' },
