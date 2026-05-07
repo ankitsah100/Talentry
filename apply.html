@@ -568,7 +568,23 @@ async function submitApplication() {
       };
 
       console.log('Submitting application:', appData);
-      const { data: inserted, error: insertError } = await sb.from('applications').insert([appData]).select().single();
+      // Direct REST API - bypasses session/RLS issues completely
+      let inserted = null, insertError = null;
+      try {
+        const resp = await fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/applications', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
+            'Authorization': 'Bearer sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify(appData)
+        });
+        const result = await resp.json();
+        if (resp.ok) { inserted = Array.isArray(result) ? result[0] : result; }
+        else { insertError = { message: result.message || result.hint || JSON.stringify(result) }; }
+      } catch(e) { insertError = { message: e.message }; }
       if (insertError) {
         console.error('❌ Application save error:', insertError.message, insertError);
         alert('Error saving application: ' + insertError.message);
