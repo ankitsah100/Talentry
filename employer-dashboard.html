@@ -494,6 +494,10 @@ function showTab(tab) {
   document.querySelectorAll('.sb-nav a').forEach(a => {
     a.classList.toggle('on', a.textContent.toLowerCase().includes(tab.toLowerCase().slice(0,4)));
   });
+  // Re-render jobs tab with latest data every time it's opened
+  if (tab === 'jobs') {
+    renderJobs(allJobs);
+  }
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
