@@ -510,6 +510,13 @@ async function doLogout() {
   await sb.auth.signOut();
   window.location.href = 'auth.html';
 }
+// Auto-refresh applications every 30 seconds
+setInterval(async function() {
+  if(document.visibilityState === 'visible') {
+    await loadApplications();
+    console.log('Auto-refreshed applications');
+  }
+}, 30000);
 </script>
 </body>
 </html>
