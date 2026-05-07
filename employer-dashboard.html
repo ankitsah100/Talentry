@@ -494,10 +494,7 @@ function showTab(tab) {
   document.querySelectorAll('.sb-nav a').forEach(a => {
     a.classList.toggle('on', a.textContent.toLowerCase().includes(tab.toLowerCase().slice(0,4)));
   });
-  // Re-render jobs tab with latest data every time it's opened
-  if (tab === 'jobs') {
-    renderJobs(allJobs);
-  }
+  // Jobs already rendered by loadJobs - no need to re-render
 }
 
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
@@ -597,7 +594,12 @@ function renderJobs(jobs) {
     + '<th style="padding:10px 12px;text-align:left;">ACTIONS</th>'
     + '</tr></thead><tbody>' + rows + '</tbody></table>';
 
-  // Add event listeners using data attributes (avoids all quote escaping issues)
+}
+
+// ── JOBS TABLE EVENT DELEGATION (once only) ──
+document.addEventListener('DOMContentLoaded', function() {
+  const el = document.getElementById('jobsList');
+  if (!el) return;
   el.addEventListener('click', function(e) {
     // Job row click - toggle applicants
     const jobRow = e.target.closest('.job-row');
@@ -605,18 +607,21 @@ function renderJobs(jobs) {
       const jobId = jobRow.dataset.jobId;
       const apRow = document.getElementById('applicants-' + jobId);
       if (apRow) apRow.style.display = apRow.style.display === 'none' ? 'table-row' : 'none';
+      return;
     }
     // Status action buttons
     const statusBtn = e.target.closest('.status-action-btn');
     if (statusBtn) {
       e.stopPropagation();
       updateStatus(statusBtn.dataset.id, statusBtn.dataset.status);
+      return;
     }
     // Toggle job status
     const toggleBtn = e.target.closest('.toggle-job-btn');
     if (toggleBtn) {
       e.stopPropagation();
       toggleJobStatus(toggleBtn.dataset.jobId, toggleBtn.dataset.status);
+      return;
     }
     // Delete job
     const deleteBtn = e.target.closest('.delete-job-btn');
@@ -625,7 +630,7 @@ function renderJobs(jobs) {
       deleteJob(deleteBtn.dataset.jobId);
     }
   });
-}
+});
 
 
 // ── TOGGLE JOB APPLICANTS ─────────────────
