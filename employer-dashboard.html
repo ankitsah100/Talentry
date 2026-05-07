@@ -350,6 +350,11 @@ async function loadJobs() {
 
   console.log('Jobs loaded:', jobs?.length, 'Error:', error?.message);
   allJobs = jobs || [];
+  
+  // Update active jobs stat
+  const activeCount = allJobs.filter(j => j.status === 'active').length;
+  const statJobsEl = document.getElementById('statJobs');
+  if(statJobsEl) statJobsEl.textContent = activeCount;
 
   if (!allJobs.length) {
     document.getElementById('jobsList').innerHTML = `
