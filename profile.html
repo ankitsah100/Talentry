@@ -1,326 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<style id="authGuardStyle">body{visibility:hidden!important;}</style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>My Profile — Talentry</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--g:#0ea271;--gd:#064e38;--bg:#f4faf7;--text:#0a1a12;--muted:#4a6b58;--border:rgba(14,162,113,.18);--white:#fff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.container{max-width:680px;margin:0 auto;padding:24px 16px 60px;}
+.page-title{font-family:Fraunces,serif;font-size:28px;margin-bottom:4px;}
+.page-sub{color:var(--muted);font-size:14px;margin-bottom:24px;}
+.card{background:#fff;border-radius:16px;border:1.5px solid var(--border);padding:24px;margin-bottom:16px;}
+.card-title{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.06em;margin-bottom:16px;text-transform:uppercase;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.field input,.field textarea,.field select{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;outline:none;transition:border .2s;}
+.field input:focus,.field textarea:focus{border-color:var(--g);}
+.field textarea{resize:vertical;min-height:100px;line-height:1.6;}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.save-btn{width:100%;padding:14px;background:var(--g);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s;margin-top:8px;}
+.save-btn:hover{background:var(--gd);transform:translateY(-1px);}
+.save-btn:disabled{background:var(--muted);cursor:not-allowed;transform:none;}
+.avatar{width:72px;height:72px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin-bottom:12px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--gd);color:#fff;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:600;z-index:9999;display:none;}
+.toast.show{display:block;}
+.locked-field{background:#f4faf7;color:var(--text);cursor:not-allowed;border-color:rgba(14,162,113,.25) !important;}
+.locked-label{display:inline-flex;align-items:center;gap:6px;}
+.locked-badge{font-size:11px;background:#d6f5eb;color:#064e38;padding:2px 8px;border-radius:100px;font-weight:600;}
+</style>
+</head>
+<body>
 <script>
 (function(){
-  try {
-    // Supabase v2 stores session under: sb-{project-ref}-auth-token
-    var key = 'sb-eteyskwaqjtcybaolnto-auth-token';
-    var raw = localStorage.getItem(key);
-    if(raw){
-      var data = JSON.parse(raw);
-      // Check access_token exists and not expired
-      if(data && data.access_token){
-        var exp = data.expires_at || 0;
-        if(exp === 0 || (Date.now() / 1000) < exp){
-          // Valid session — show page
-          document.getElementById('authGuardStyle').textContent = '';
-          return;
-        }
-      }
-    }
-  } catch(e){}
-  // No valid session — redirect to login
-  var current = window.location.href;
-  // Never save auth.html as redirect target (prevents loop)
-  if(current.indexOf('auth.html') === -1){
-    sessionStorage.setItem('redirectAfterLogin', current);
-  }
-  window.location.replace('auth.html');
+  try{
+    const k='sb-eteyskwaqjtcybaolnto-auth-token';
+    const d=JSON.parse(localStorage.getItem(k)||'{}');
+    if(!d.access_token&&!d.user){window.location.replace('auth.html');}
+  }catch(e){window.location.replace('auth.html');}
 })();
 </script>
 
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>My Profile — Talentry</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<style>
-:root{--g:#0ea271;--gd:#064e38;--gl:#d6f5eb;--gm:#4ecda4;--text:#0a1a12;--muted:#4a6b58;--bg:#fff;--bg2:#f4faf7;--border:rgba(14,162,113,0.14);--border2:rgba(14,162,113,0.28);}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var(--bg2);}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
-.logo{font-family:'Fraunces',serif;font-size:24px;color:var(--text);text-decoration:none;}.logo em{color:var(--g);font-style:italic;}
-.nav-links{display:flex;gap:24px;}.nav-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s;}.nav-links a:hover{color:var(--g);}
-.nav-r{display:flex;gap:10px;}
-.btn-ghost{background:none;border:1.5px solid var(--border2);color:var(--text);padding:8px 18px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;}
-.btn-solid{background:var(--g);color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
-
-.cover{height:200px;background:linear-gradient(135deg,var(--gd),var(--g));margin-top:64px;position:relative;}
-.cover-edit{position:absolute;bottom:14px;right:14px;background:rgba(0,0,0,0.4);color:#fff;border:none;padding:7px 16px;border-radius:100px;font-size:12px;cursor:pointer;font-family:inherit;}
-.page{max-width:1000px;margin:0 auto;padding:0 6% 60px;}
-
-.profile-header{background:#fff;border:1.5px solid var(--border);border-radius:20px;padding:28px;margin-top:-60px;position:relative;display:flex;gap:22px;align-items:flex-start;margin-bottom:20px;}
-.avatar-wrap{position:relative;flex-shrink:0;}
-.avatar{width:90px;height:90px;border-radius:50%;background:var(--gl);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:28px;color:var(--gd);border:4px solid #fff;}
-.avatar-edit{position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--g);border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;}
-.profile-info{flex:1;}
-.profile-name{font-family:'Fraunces',serif;font-size:24px;color:var(--text);letter-spacing:-0.5px;margin-bottom:4px;}
-.profile-role{font-size:14px;color:var(--muted);margin-bottom:8px;}
-.profile-url{font-size:13px;color:var(--g);margin-bottom:12px;}
-.profile-badges{display:flex;gap:8px;flex-wrap:wrap;}
-.pb{font-size:11.5px;padding:4px 13px;border-radius:100px;}
-.pbg{background:var(--gl);color:var(--gd);border:1px solid var(--gm);}
-.pbb{background:#dbeeff;color:#1a5fa8;}
-.profile-actions{display:flex;gap:10px;flex-shrink:0;}
-.btn-edit{background:var(--g);color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:500;}
-.btn-share{background:none;border:1.5px solid var(--border2);color:var(--text);padding:9px 18px;border-radius:100px;font-size:13px;font-family:inherit;cursor:pointer;}
-
-.profile-grid{display:grid;grid-template-columns:1fr 320px;gap:20px;}
-
-.card{background:#fff;border:1.5px solid var(--border);border-radius:18px;padding:24px;margin-bottom:16px;}
-.card-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;}
-.card-edit{font-size:12px;color:var(--g);cursor:pointer;}
-
-.completion-bar{background:var(--bg2);border-radius:6px;height:8px;overflow:hidden;margin-bottom:6px;}
-.completion-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--gm));border-radius:6px;width:72%;}
-.completion-text{font-size:12px;color:var(--muted);}
-.completion-text strong{color:var(--g);}
-
-.exp-item{display:flex;gap:14px;margin-bottom:18px;padding-bottom:18px;border-bottom:1.5px solid var(--border);}
-.exp-item:last-child{border:none;margin:0;padding:0;}
-.exp-ico{width:42px;height:42px;border-radius:11px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.exp-role{font-size:14px;font-weight:600;color:var(--text);}
-.exp-org{font-size:13px;color:var(--muted);}
-.exp-date{font-size:12px;color:var(--muted);margin-top:2px;}
-.exp-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-top:6px;}
-
-.skills-wrap{display:flex;gap:8px;flex-wrap:wrap;}
-.skill-tag{background:var(--gl);color:var(--gd);font-size:12.5px;padding:5px 14px;border-radius:100px;border:1px solid var(--gm);}
-.skill-tag.verified{background:#dbeeff;color:#1a5fa8;border-color:#85B7EB;}
-
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.stat-card{background:var(--bg2);border-radius:12px;padding:14px;text-align:center;}
-.stat-num{font-family:'Fraunces',serif;font-size:24px;color:var(--g);font-weight:500;}
-.stat-lbl{font-size:11.5px;color:var(--muted);margin-top:2px;}
-
-.kanban-mini{display:flex;flex-direction:column;gap:8px;}
-.km-item{display:flex;align-items:center;gap:10px;padding:10px 13px;background:var(--bg2);border-radius:10px;border:1.5px solid var(--border);}
-.km-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.km-role{font-size:13px;font-weight:500;color:var(--text);}
-.km-org{font-size:11.5px;color:var(--muted);}
-.km-status{font-size:11px;padding:2px 9px;border-radius:100px;margin-left:auto;white-space:nowrap;}
-
-.wa-card{background:var(--gd);border-radius:14px;padding:18px;text-align:center;}
-.wa-card h4{font-size:14px;font-weight:600;color:#fff;margin-bottom:6px;}
-.wa-card p{font-size:12.5px;color:rgba(255,255,255,0.65);margin-bottom:14px;line-height:1.6;}
-.wa-btn{background:#25D366;color:#fff;border:none;padding:9px 20px;border-radius:100px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;width:100%;}
-</style>
-<link rel="stylesheet" href="mobile.css"/>
-</head>
-<body>
-<nav>
-  <a class="logo" href="index.html">Tal<em>entry</em></a>
-  <div class="nav-links">
-    <a href="browse-jobs.html">Find jobs</a>
-    <a href="interview-prep.html">Interview prep</a>
-    <a href="employer-dashboard.html">Dashboard</a>
-  </div>
-  <button class="hamburger" onclick="toggleMenu()" id="hamburger"><span></span><span></span><span></span></button>
-  <div class="nav-r" id="navR">
-    <button class="btn-ghost">Log out</button>
-    <button class="btn-solid" onclick="location.href='profile.html'">My profile</button>
-  </div>
-</nav>
-
-<div class="cover"><button class="cover-edit">✏ Edit cover</button></div>
-
-<div class="page">
-  <div class="profile-header">
-    <div class="avatar-wrap">
-      <div class="avatar">RB</div>
-      <div class="avatar-edit">📷</div>
-    </div>
-    <div class="profile-info">
-      <div class="profile-name">Ram Bahadur Shrestha</div>
-      <div class="profile-role">Biomedical Engineer · Kathmandu, Nepal</div>
-      <div class="profile-url">talentry.com/rambahadur</div>
-      <div class="profile-badges">
-        <span class="pb pbg">Medical devices</span>
-        <span class="pb pbg">Ventilator servicing</span>
-        <span class="pb pbg">ICU equipment</span>
-        <span class="pb pbb">✓ Identity verified</span>
-        <span class="pb pbb">✓ Degree verified</span>
-      </div>
-    </div>
-    <div class="profile-actions">
-      <button class="btn-share">🔗 Share profile</button>
-      <button class="btn-edit">✏ Edit profile</button>
-    </div>
-  </div>
-
-  <div class="profile-grid">
-    <div>
-      <!-- COMPLETION -->
-      <div class="card">
-        <div class="card-title">Profile strength <span class="card-edit">Improve →</span></div>
-        <div class="completion-bar"><div class="completion-fill"></div></div>
-        <p class="completion-text"><strong>72% complete</strong> — Add a video intro to reach 90%</p>
-      </div>
-
-      <!-- ABOUT -->
-      <div class="card">
-        <div class="card-title">About <span class="card-edit">Edit</span></div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.8;">Biomedical Engineer with 4 years of experience in medical device maintenance and calibration. Specialized in ICU equipment, ventilators, imaging systems, and patient monitoring devices across Kathmandu hospitals. Passionate about ensuring optimal equipment performance to support quality patient care.</p>
-      </div>
-
-      <!-- EXPERIENCE -->
-      <div class="card">
-        <div class="card-title">Experience <span class="card-edit">+ Add</span></div>
-        <div class="exp-item">
-          <div class="exp-ico">🏥</div>
-          <div>
-            <div class="exp-role">Biomedical Engineer</div>
-            <div class="exp-org">Bir Hospital</div>
-            <div class="exp-date">Jan 2022 – Present · 2 yrs 4 mos</div>
-            <div class="exp-desc">Maintenance and calibration of ICU equipment including ventilators, patient monitors, and infusion pumps. Reduced equipment downtime by 30%.</div>
-          </div>
-        </div>
-        <div class="exp-item">
-          <div class="exp-ico">🔬</div>
-          <div>
-            <div class="exp-role">Junior Biomedical Technician</div>
-            <div class="exp-org">Grande Hospital</div>
-            <div class="exp-date">Jun 2020 – Dec 2021 · 1 yr 6 mos</div>
-            <div class="exp-desc">Assisted senior engineers in preventive maintenance schedules and equipment repair for imaging and laboratory departments.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- EDUCATION -->
-      <div class="card">
-        <div class="card-title">Education <span class="card-edit">+ Add</span></div>
-        <div class="exp-item">
-          <div class="exp-ico">🎓</div>
-          <div>
-            <div class="exp-role">B.E. Biomedical Engineering</div>
-            <div class="exp-org">Kathmandu University</div>
-            <div class="exp-date">2016 – 2020</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- SKILLS -->
-      <div class="card">
-        <div class="card-title">Skills <span class="card-edit">+ Add</span></div>
-        <div class="skills-wrap">
-          <span class="skill-tag verified">✓ Medical devices</span>
-          <span class="skill-tag verified">✓ Ventilator servicing</span>
-          <span class="skill-tag verified">✓ ICU equipment</span>
-          <span class="skill-tag">Imaging systems</span>
-          <span class="skill-tag">Preventive maintenance</span>
-          <span class="skill-tag">Equipment calibration</span>
-          <span class="skill-tag">Patient monitoring</span>
-          <span class="skill-tag">Infusion pumps</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- SIDEBAR -->
-    <div>
-      <div class="card">
-        <div class="card-title">Profile stats</div>
-        <div class="stat-grid">
-          <div class="stat-card"><div class="stat-num">142</div><div class="stat-lbl">Profile views</div></div>
-          <div class="stat-card"><div class="stat-num">8</div><div class="stat-lbl">Applications</div></div>
-          <div class="stat-card"><div class="stat-num">3</div><div class="stat-lbl">Interviews</div></div>
-          <div class="stat-card"><div class="stat-num">94%</div><div class="stat-lbl">AI match score</div></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">Applications tracker</div>
-        <div class="kanban-mini">
-          <div class="km-item"><div class="km-dot" style="background:#0ea271"></div><div><div class="km-role">Biomedical Engineer</div><div class="km-org">Bir Hospital</div></div><span class="km-status" style="background:#d6f5eb;color:#064e38;">Offer 🎉</span></div>
-          <div class="km-item"><div class="km-dot" style="background:#f0a500"></div><div><div class="km-role">Radiographer</div><div class="km-org">Norvic Hospital</div></div><span class="km-status" style="background:#fff3d6;color:#7a4e00;">Interview</span></div>
-          <div class="km-item"><div class="km-dot" style="background:#378ADD"></div><div><div class="km-role">Lab Technician</div><div class="km-org">Grande Hospital</div></div><span class="km-status" style="background:#dbeeff;color:#1a5fa8;">Screening</span></div>
-          <div class="km-item"><div class="km-dot" style="background:#888"></div><div><div class="km-role">Pharmacist</div><div class="km-org">Patan Hospital</div></div><span class="km-status" style="background:#f0f0f0;color:#666;">Applied</span></div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title">WhatsApp alerts</div>
-        <div class="wa-card">
-          <h4>Enable job alerts</h4>
-          <p>Get new job matches, interview reminders, and updates on WhatsApp instantly.</p>
-          <button class="wa-btn">💬 Enable WhatsApp alerts</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 <script type="module" src="navbar.js"></script>
-<div class="mobile-menu" id="mobileMenu">
-  <a href="browse-jobs.html">🔍 Find jobs</a>
-  <a href="interview-prep.html">🎙 AI Interview prep</a>
-  <a href="resume-builder.html">📄 Resume builder</a>
-  <a href="post-job.html">📝 Post a job</a>
-  <a href="employer-dashboard.html">📊 Employer dashboard</a>
-  <a href="profile.html">👤 My profile</a>
-  <a href="auth.html">🔐 Log in</a>
-  <button class="m-btn-solid" onclick="location.href='auth.html'">Get started free</button>
+
+<div class="container" style="margin-top:80px;">
+  <h1 class="page-title">My Profile</h1>
+  <p class="page-sub">Your info is used across Talentry — keep it updated!</p>
+
+  <div id="profileContent"><div style="text-align:center;padding:40px;color:var(--muted);">⏳ Loading profile...</div></div>
 </div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-function toggleMenu(){
-  document.getElementById("mobileMenu").classList.toggle("open");
-  const h=document.getElementById("hamburger");
-  h.classList.toggle("open");
+const sb = window.supabase.createClient(
+  'https://eteyskwaqjtcybaolnto.supabase.co',
+  'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe'
+);
+window._sb = sb;
+
+function toast(msg, ok=true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = ok ? '#064e38' : '#dc2626';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
 }
-document.addEventListener("click",function(e){
-  const menu=document.getElementById("mobileMenu");
-  const btn=document.getElementById("hamburger");
-  if(menu && !menu.contains(e.target) && !btn.contains(e.target)){
-    menu.classList.remove("open");
+
+(async function init() {
+  const {data:{session}} = await sb.auth.getSession();
+  if (!session) { window.location.replace('auth.html'); return; }
+
+  const userId = session.user.id;
+  const userEmail = session.user.email;
+
+  // Load profile
+  const {data:p} = await sb.from('profiles').select('*').eq('id', userId).single();
+
+  const initials = (p?.full_name || userEmail).substring(0,2).toUpperCase();
+  const isEmployer = p?.role === 'employer';
+
+  document.getElementById('profileContent').innerHTML = `
+    <div class="card">
+      <div class="avatar">${initials}</div>
+      <div class="card-title">Account Info</div>
+      <div class="field">
+        <label class="locked-label">Email <span class="locked-badge">🔒 Cannot change</span></label>
+        <input class="locked-field" readonly value="${userEmail}"/>
+      </div>
+      <div class="field">
+        <label class="locked-label">Role <span class="locked-badge">🔒 Fixed</span></label>
+        <input class="locked-field" readonly value="${isEmployer ? '🏥 Employer' : '👤 Job Seeker'}"/>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Personal Information</div>
+      <div class="field">
+        <label>Full name *</label>
+        <input id="fullName" type="text" value="${p?.full_name||''}" placeholder="Ram Bahadur Shrestha"/>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Phone number</label>
+          <input id="phone" type="tel" value="${p?.phone||''}" placeholder="+977 98XXXXXXXX"/>
+        </div>
+        <div class="field">
+          <label>Location</label>
+          <input id="location" type="text" value="${p?.location||''}" placeholder="Kathmandu, Nepal"/>
+        </div>
+      </div>
+      ${isEmployer ? `
+      <div class="field">
+        <label>Company / Hospital name</label>
+        <input id="companyName" type="text" value="${p?.company_name||''}" placeholder="Bir Hospital"/>
+      </div>` : `
+      <div class="field">
+        <label>Current job title</label>
+        <input id="jobTitle" type="text" value="${p?.job_title||''}" placeholder="Biomedical Engineer"/>
+      </div>
+      <div class="field">
+        <label>Years of experience</label>
+        <select id="yearsExp">
+          <option value="">Select...</option>
+          ${['Fresh graduate','Less than 1 year','1-2 years','3-5 years','5-10 years','10+ years'].map(y=>`<option value="${y}" ${p?.years_experience===y?'selected':''}>${y}</option>`).join('')}
+        </select>
+      </div>`}
+    </div>
+
+    ${!isEmployer ? `
+    <div class="card">
+      <div class="card-title">Professional Summary</div>
+      <div class="field">
+        <label>Bio / About me</label>
+        <textarea id="bio" placeholder="Write a short summary about your experience, skills and goals...">${p?.bio||''}</textarea>
+      </div>
+      <div class="field">
+        <label>Key skills (comma separated)</label>
+        <input id="skills" type="text" value="${p?.skills||''}" placeholder="Medical devices, ICU equipment, Ventilator servicing"/>
+      </div>
+      <div class="field">
+        <label>LinkedIn profile URL</label>
+        <input id="linkedin" type="url" value="${p?.linkedin||''}" placeholder="https://linkedin.com/in/yourname"/>
+      </div>
+    </div>` : ''}
+
+    <button class="save-btn" id="saveBtn" onclick="saveProfile('${userId}')">💾 Save profile</button>
+  `;
+})();
+
+async function saveProfile(userId) {
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '⏳ Saving...';
+  btn.disabled = true;
+
+  const updates = {
+    full_name: document.getElementById('fullName')?.value?.trim() || '',
+    phone: document.getElementById('phone')?.value?.trim() || '',
+    location: document.getElementById('location')?.value?.trim() || '',
+    company_name: document.getElementById('companyName')?.value?.trim() || null,
+    job_title: document.getElementById('jobTitle')?.value?.trim() || null,
+    years_experience: document.getElementById('yearsExp')?.value || null,
+    bio: document.getElementById('bio')?.value?.trim() || null,
+    skills: document.getElementById('skills')?.value?.trim() || null,
+    linkedin: document.getElementById('linkedin')?.value?.trim() || null,
+  };
+
+  const {error} = await sb.from('profiles').update(updates).eq('id', userId);
+
+  if (error) {
+    toast('❌ Error saving: ' + error.message, false);
+  } else {
+    toast('✅ Profile saved successfully!');
   }
-});
+
+  btn.textContent = '💾 Save profile';
+  btn.disabled = false;
+}
+window.saveProfile = saveProfile;
 </script>
 </body>
 </html>
-
-<script src="ai-match.js"></script>
-<script type="module">
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
-
-async function loadProfile(){
-  const { data: { session } } = await sb.auth.getSession();
-  if(!session){
-    // Show guest prompt instead of blank page
-    const main = document.querySelector('.profile-main') || document.querySelector('.page') || document.body;
-    const guestDiv = document.createElement('div');
-    guestDiv.style.cssText = 'max-width:520px;margin:100px auto;text-align:center;padding:40px;background:#fff;border-radius:24px;border:1.5px solid rgba(14,162,113,0.14);';
-    guestDiv.innerHTML = '<div style="font-size:56px;margin-bottom:16px">👤</div>'
-      + '<h2 style="font-family:Fraunces,serif;font-size:26px;color:#0a1a12;letter-spacing:-0.5px;margin-bottom:10px">Your profile</h2>'
-      + '<p style="font-size:15px;color:#4a6b58;margin-bottom:28px;font-weight:300">Create your profile to save applications, track interviews, and get personalized job matches.</p>'
-      + '<a href="auth.html" style="background:#0ea271;color:#fff;padding:13px 32px;border-radius:100px;font-size:15px;font-weight:600;text-decoration:none;display:inline-block;margin-right:10px;">Create free account</a>'
-      + '<a href="auth.html" style="background:none;border:1.5px solid rgba(14,162,113,0.28);color:#0a1a12;padding:13px 24px;border-radius:100px;font-size:14px;text-decoration:none;display:inline-block;">Log in</a>';
-    // Insert after nav
-    const nav = document.querySelector('nav');
-    if(nav) nav.insertAdjacentElement('afterend', guestDiv);
-    return;
-  }
-
-  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-  if(!profile) return;
-
-  // Update profile display
-  if(profile.full_name){
-    document.querySelector('.profile-name').textContent = profile.full_name;
-    document.querySelector('.avatar').textContent = profile.full_name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-  }
-  if(profile.job_title) document.querySelector('.profile-role').textContent = profile.job_title + ' · ' + (profile.location || 'Nepal');
-  if(profile.profile_url) document.querySelector('.profile-url').textContent = 'talentry.com/' + profile.profile_url;
-
-  // Show skills
-  if(profile.skills && profile.skills.length > 0){
-    const wrap = document.querySelector('.skills-wrap');
-    if(wrap){
-      wrap.innerHTML = profile.skills.map(s =>
-        '<span class="skill-tag">'+s+'</span>'
-      ).join('');
-    }
-  }
-}
-
-loadProfile();
-</script>
