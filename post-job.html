@@ -347,6 +347,22 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const sb = createClient('https://eteyskwaqjtcybaolnto.supabase.co', 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe');
 window._sb = sb;
+
+// Pre-fill contact email/phone from profile immediately after sb is ready
+(async()=>{
+  try {
+    const {data:{session}} = await sb.auth.getSession();
+    if(!session) return;
+    const emailEl = document.getElementById('contactEmail');
+    const phoneEl = document.getElementById('contactPhone');
+    if(emailEl) emailEl.value = session.user.email || '';
+    const {data:p} = await sb.from('profiles').select('phone,company_name').eq('id',session.user.id).single();
+    if(phoneEl) phoneEl.value = p?.phone || '';
+    if(!p?.phone && phoneEl) phoneEl.placeholder = 'Add phone in My Profile';
+    const companyEl = document.getElementById('company');
+    if(companyEl && p?.company_name && !companyEl.value) companyEl.value = p.company_name;
+  } catch(e){}
+})();
 </script>
 
 <script>
