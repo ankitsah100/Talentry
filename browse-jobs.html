@@ -276,7 +276,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
         <div class="j-right"><div class="ring"><span class="ring-n">65%</span><span class="ring-t">match</span></div><button class="save-btn">Save</button></div>
       </div>
     </div>
-    <button class="load-more">Load more jobs</button>
+    <button class="load-more" onclick="loadMoreJobs()">Load more jobs</button>
   </div>
 </div>
 
@@ -325,7 +325,7 @@ function renderJobs(jobs) {
       </div>
       <div class="j-right">
         <div class="ring"><span class="ring-n">${Math.floor(65+Math.random()*25)}%</span><span class="ring-t">match</span></div>
-        <button class="save-btn" style="margin-top:6px">Save</button>
+        <button class="save-btn" style="margin-top:6px" onclick="toggleSave(this,'" + job.id + "')">🔖 Save</button>
       </div>
     </div>`;
   });
@@ -417,6 +417,40 @@ function updateFilterChips(keyword, location, types, cats) {
   chipsEl.innerHTML = chips.map((c,i) => 
     `<span style="background:#d6f5eb;color:#064e38;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer;" onclick="removeChip(${i})">${c.label} ✕</span>`
   ).join('');
+}
+
+// ── SAVE JOB ────────────────────────────
+async function toggleSave(btn, jobId) {
+  const isSaved = btn.textContent.includes('Saved');
+  if (isSaved) {
+    btn.textContent = '🔖 Save';
+    btn.style.color = '';
+    btn.style.borderColor = '';
+    // Remove from saved_jobs if logged in
+    if (window._sb) {
+      const {data:{session}} = await window._sb.auth.getSession();
+      if (session) await window._sb.from('saved_jobs').delete().eq('user_id', session.user.id).eq('job_id', jobId);
+    }
+  } else {
+    btn.textContent = '✅ Saved';
+    btn.style.color = '#0ea271';
+    btn.style.borderColor = '#0ea271';
+    // Save to saved_jobs if logged in
+    if (window._sb) {
+      const {data:{session}} = await window._sb.auth.getSession();
+      if (session) await window._sb.from('saved_jobs').upsert({user_id: session.user.id, job_id: jobId}).onConflict('user_id,job_id');
+    }
+  }
+}
+
+// ── LOAD MORE ────────────────────────────
+let _displayCount = 13;
+function loadMoreJobs() {
+  _displayCount += 10;
+  renderJobs(window._allJobs.slice(0, _displayCount));
+  if (_displayCount >= window._allJobs.length) {
+    document.querySelector('.load-more').style.display = 'none';
+  }
 }
 
 function clearFilters() {
@@ -561,7 +595,7 @@ async function loadJobs() {
         </div>
         <div class="j-right">
           ${matchBadgeHtml}
-          <button class="save-btn" style="margin-top:6px">Save</button>
+          <button class="save-btn" style="margin-top:6px" onclick="toggleSave(this,'" + job.id + "')">🔖 Save</button>
         </div>
       </div>`;
     });

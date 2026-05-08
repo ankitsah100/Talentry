@@ -486,7 +486,7 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
           <div class="sc-role">Biomedical Engineer</div>
           <div class="sc-sal">Rs. 45,000 / month</div>
           <div style="display:flex;gap:6px;margin-bottom:14px;"><span style="font-size:11px;padding:3px 11px;border-radius:100px;background:var(--gl);color:var(--gd);">Full time</span><span style="font-size:11px;padding:3px 11px;border-radius:100px;background:#dbeeff;color:#1a5fa8;">Medical devices</span></div>
-          <div class="sc-btns"><button class="sc-skip">✕ Skip</button><button class="sc-go" id="applyBtn">✓ Apply</button></div>
+          <div class="sc-btns"><button class="sc-skip" onclick="location.href='browse-jobs.html'">✕ Skip</button><button class="sc-go" id="applyBtn" onclick="location.href='browse-jobs.html'">✓ Apply</button></div>
         </div>
       </div>
     </div>
@@ -527,12 +527,12 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
     <a href="browse-jobs.html">View all jobs →</a>
   </div>
   <div class="filters">
-    <button class="f on">All</button>
-    <button class="f">Biomedical</button>
-    <button class="f">Nursing</button>
-    <button class="f">Laboratory</button>
-    <button class="f">Pharmacy</button>
-    <button class="f">INGO / NGO</button>
+    <button class="f on" onclick="filterIndexJobs(this,'')">All</button>
+    <button class="f" onclick="filterIndexJobs(this,'biomedical')">Biomedical</button>
+    <button class="f" onclick="filterIndexJobs(this,'nursing')">Nursing</button>
+    <button class="f" onclick="filterIndexJobs(this,'laboratory')">Laboratory</button>
+    <button class="f" onclick="filterIndexJobs(this,'pharmacy')">Pharmacy</button>
+    <button class="f" onclick="filterIndexJobs(this,'ingo')">INGO / NGO</button>
   </div>
   <div class="jcard"><div class="j-ico">🏥</div><div class="j-body"><div class="j-title">Biomedical Engineer <span class="jnew">New</span></div><div class="j-org">Bir Hospital · Kathmandu · 2 hours ago</div><div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 45,000/mo</span><span class="jt jta">Medical devices</span><span class="jt jtp">Urgent</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn" onclick="location.href='apply.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">94%</span><span class="ring-t">match</span></div></div></div>
   <div class="jcard"><div class="j-ico">🧬</div><div class="j-body"><div class="j-title">Clinical Lab Technician</div><div class="j-org">Grande Hospital · Kathmandu · 5 hours ago</div><div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 38,000/mo</span><span class="jt jta">Laboratory</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn" onclick="location.href='apply.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">88%</span><span class="ring-t">match</span></div></div></div>

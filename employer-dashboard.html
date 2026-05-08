@@ -440,15 +440,26 @@ async function updateStatus(appId, status) {
   if (error) { showToast('❌ Error: ' + error.message); return; }
   const labels = { reviewing:'👁 Reviewing', interview:'📅 Interview', hired:'✅ Hired!', rejected:'✕ Rejected' };
   showToast(labels[status] || 'Updated!');
-  // Update badge in UI without full reload
+  // Update badge in Applications tab
   const card = document.getElementById('app-' + appId);
   if (card) {
     const badge = card.querySelector('.app-badge');
     const badgeClass = { applied:'badge-new', reviewing:'badge-review', interview:'badge-interview', rejected:'badge-rejected', hired:'badge-hired' };
     const badgeLabel = { applied:'New', reviewing:'Reviewing', interview:'Interview', rejected:'Rejected', hired:'Hired ✓' };
-    badge.className = 'app-badge ' + (badgeClass[status] || 'badge-new');
-    badge.textContent = badgeLabel[status] || status;
+    if (badge) { badge.className = 'app-badge ' + (badgeClass[status] || 'badge-new'); badge.textContent = badgeLabel[status] || status; }
   }
+  // Update badge in My Jobs expanded view
+  const jobsBadge = document.getElementById('status-badge-' + appId);
+  if (jobsBadge) {
+    const statusBgs = {hired:'#d6f5eb',rejected:'#fef2f2',interview:'#fef3c7',reviewing:'#eff6ff',applied:'#f0fdf4'};
+    const statusFgs = {hired:'#064e38',rejected:'#dc2626',interview:'#d97706',reviewing:'#2563eb',applied:'#16a34a'};
+    jobsBadge.style.background = statusBgs[status] || '#f0fdf4';
+    jobsBadge.style.color = statusFgs[status] || '#16a34a';
+    jobsBadge.textContent = status;
+  }
+  // Update allApplications array
+  const appIdx = allApplications.findIndex(a => a.id === appId);
+  if (appIdx > -1) allApplications[appIdx].status = status;
 }
 
 // ── JOB ACTIONS ────────────────────────────
