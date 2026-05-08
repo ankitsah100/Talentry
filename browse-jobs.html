@@ -183,7 +183,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
     <div class="filter-group">
       <div class="fg-title">Salary range (Rs./mo)</div>
       <div class="salary-range">
-        <input type="range" min="10000" max="150000" value="150000" step="5000" id="salaryRange" oninput="updateSalaryLabel(this.value)"/>
+        <input type="range" min="10000" max="150000" value="150000" step="5000" id="salaryRange" oninput="updateSalaryLabel(this.value); filterJobs()"/>
         <div class="salary-labels"><span>Rs. 10k</span><span id="salaryLabel">Up to Rs. 150k</span></div>
       </div>
     </div>
@@ -357,6 +357,14 @@ function filterJobs() {
       if (!jobLocation.includes(location)) return false;
     }
     
+    // Salary filter
+    const salaryEl = document.getElementById('salaryRange');
+    const maxSalary = salaryEl ? Number(salaryEl.value) : 150000;
+    if (maxSalary < 150000) {
+      // Show jobs with salary_min <= maxSalary OR no salary specified
+      if (job.salary_min && Number(job.salary_min) > maxSalary) return false;
+    }
+
     // Job type filter
     if (checkedTypes.length > 0) {
       const jobType = (job.job_type || '').toLowerCase().trim();
@@ -423,7 +431,11 @@ function clearFilters() {
   const chipsEl = document.getElementById('activeFilters');
   if (chipsEl) chipsEl.innerHTML = '';
 }
-function updateSalaryLabel(v){ document.getElementById('salaryLabel').textContent = 'Up to Rs. '+Number(v).toLocaleString(); }
+function updateSalaryLabel(v) {
+  const val = Number(v);
+  const label = val >= 150000 ? 'Any salary' : 'Up to Rs. ' + val.toLocaleString();
+  document.getElementById('salaryLabel').textContent = label;
+}
 </script>
 <script type="module" src="navbar.js"></script>
 <div class="mobile-menu" id="mobileMenu">
