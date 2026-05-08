@@ -133,8 +133,8 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var
     <div class="sb-role">Employer Account</div>
   </div>
   <div class="sb-nav">
-    <a href="#" class="on" onclick="showTab('applications')">📋 Applications</a>
-    <a href="#" onclick="showTab('jobs')">💼 My Jobs</a>
+    <a href="javascript:void(0)" class="on" onclick="showTab('applications')">📋 Applications</a>
+    <a href="javascript:void(0)" onclick="showTab('jobs')">💼 My Jobs</a>
     <a href="post-job.html" class="sb-post">+ Post a Job</a>
     <div class="section">Tools</div>
     <a href="browse-jobs.html">🔍 Browse jobs</a>
@@ -224,6 +224,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   // Load profile
   const { data: profile } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  // Redirect jobseekers away from employer dashboard
+  if (profile?.role === 'jobseeker') {
+    window.location.replace('browse-jobs.html');
+    return;
+  }
   const name = profile?.company_name || profile?.full_name || 'Employer';
   document.getElementById('sbName').textContent = name;
   document.getElementById('sbAv').textContent = name.charAt(0).toUpperCase();
