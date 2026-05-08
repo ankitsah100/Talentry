@@ -158,27 +158,27 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
     <div class="fs-title">Filters <span class="fs-clear" onclick="clearFilters()">Clear all</span></div>
     <div class="filter-group">
       <div class="fg-title">Job type</div>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Full time <span class="filter-count">142</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Part time <span class="filter-count">38</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Contract <span class="filter-count">67</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Internship <span class="filter-count">24</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-type" value="Full time" onchange="filterJobs()"/> Full time <span class="filter-count">142</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-type" value="Part time" onchange="filterJobs()"/> Part time <span class="filter-count">38</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-type" value="Contract" onchange="filterJobs()"/> Contract <span class="filter-count">67</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-type" value="Internship" onchange="filterJobs()"/> Internship <span class="filter-count">24</span></label>
     </div>
     <div class="filter-group">
       <div class="fg-title">Category</div>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Biomedical Engineering <span class="filter-count">45</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Nursing <span class="filter-count">89</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Laboratory <span class="filter-count">52</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Pharmacy <span class="filter-count">34</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Imaging / Radiology <span class="filter-count">28</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Public Health <span class="filter-count">41</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> INGO / NGO <span class="filter-count">19</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-cat" value="Biomedical Engineering" onchange="filterJobs()"/> Biomedical Engineering <span class="filter-count">45</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-cat" value="Nursing" onchange="filterJobs()"/> Nursing <span class="filter-count">89</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-cat" value="Laboratory" onchange="filterJobs()"/> Laboratory <span class="filter-count">52</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-cat" value="Pharmacy" onchange="filterJobs()"/> Pharmacy <span class="filter-count">34</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-cat" value="Imaging / Radiology" onchange="filterJobs()"/> Imaging / Radiology <span class="filter-count">28</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-cat" value="Public Health" onchange="filterJobs()"/> Public Health <span class="filter-count">41</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-cat" value="INGO / NGO" onchange="filterJobs()"/> INGO / NGO <span class="filter-count">19</span></label>
     </div>
     <div class="filter-group">
       <div class="fg-title">Experience level</div>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Entry level (0–1 yr) <span class="filter-count">56</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Junior (1–3 yrs) <span class="filter-count">98</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Mid level (3–5 yrs) <span class="filter-count">72</span></label>
-      <label class="filter-option"><input type="checkbox" onchange="filterJobs()"/> Senior (5+ yrs) <span class="filter-count">44</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-exp" value="Entry level (0–1 yr)" onchange="filterJobs()"/> Entry level (0–1 yr) <span class="filter-count">56</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-exp" value="Junior (1–3 yrs)" onchange="filterJobs()"/> Junior (1–3 yrs) <span class="filter-count">98</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-exp" value="Mid level (3–5 yrs)" onchange="filterJobs()"/> Mid level (3–5 yrs) <span class="filter-count">72</span></label>
+      <label class="filter-option"><input type="checkbox" class="filter-exp" value="Senior (5+ yrs)" onchange="filterJobs()"/> Senior (5+ yrs) <span class="filter-count">44</span></label>
     </div>
     <div class="filter-group">
       <div class="fg-title">Salary range (Rs./mo)</div>
@@ -359,20 +359,29 @@ function filterJobs() {
     
     // Job type filter
     if (checkedTypes.length > 0) {
-      const jobType = (job.job_type || '').toLowerCase().replace(' ', '');
-      if (!checkedTypes.some(t => jobType.includes(t.replace(' ','')))) return false;
+      const jobType = (job.job_type || '').toLowerCase().trim();
+      if (!checkedTypes.some(t => {
+        const tv = t.toLowerCase().trim();
+        return jobType === tv || jobType.includes(tv) || tv.includes(jobType);
+      })) return false;
     }
     
     // Category filter
     if (checkedCats.length > 0) {
-      const jobCat = (job.category || '').toLowerCase();
-      if (!checkedCats.some(c => jobCat.includes(c.split(' ')[0]))) return false;
+      const jobCat = (job.category || '').toLowerCase().trim();
+      if (!checkedCats.some(c => {
+        const cv = c.toLowerCase().split(' ')[0];
+        return jobCat.includes(cv) || cv.includes(jobCat.split(' ')[0]);
+      })) return false;
     }
     
-    // Experience filter
+    // Experience filter - match against job description/requirements
     if (checkedExp.length > 0) {
-      const jobExp = (job.exp_level || job.department || '').toLowerCase();
-      if (!checkedExp.some(e => jobExp.includes(e.split(' ')[0]))) return false;
+      const jobText = [job.exp_level, job.requirements, job.description, job.department].filter(Boolean).join(' ').toLowerCase();
+      if (!checkedExp.some(e => {
+        const ev = e.toLowerCase().split(' ')[0];
+        return jobText.includes(ev);
+      })) return false;
     }
     
     return true;
