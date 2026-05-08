@@ -284,6 +284,56 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 // Store all loaded jobs for filtering
 let _allJobs = [];
 
+function renderJobs(jobs) {
+  const list = document.getElementById('jobsList');
+  if (!list) return;
+  
+  if (!jobs || jobs.length === 0) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#4a6b58;">No jobs found matching your search.</div>';
+    const countEl = document.querySelector('.results-count strong');
+    if (countEl) countEl.textContent = 0;
+    return;
+  }
+
+  list.innerHTML = '';
+  jobs.forEach(job => {
+    const sal = job.salary_min && job.salary_max
+      ? 'Rs. '+Number(job.salary_min).toLocaleString()+'–'+Number(job.salary_max).toLocaleString()+'/mo'
+      : job.salary_min ? 'Rs. '+Number(job.salary_min).toLocaleString()+'+' : '';
+    const posted = job.created_at
+      ? new Date(job.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})
+      : 'Recently';
+    const applyBtn = _userRole !== 'employer'
+      ? `<button class="apply-btn" onclick="location.href='apply.html?job=${job.id}'">Apply now →</button>`
+      : '';
+    list.innerHTML += `
+    <div class="jcard">
+      <div class="j-ico">🏥</div>
+      <div class="j-body">
+        <div class="j-title">${job.title||'Untitled'}</div>
+        <div class="j-org">${job.company||''} · ${job.location||'Nepal'}</div>
+        <div class="j-desc">${(job.description||'').substring(0,140)}${(job.description||'').length>140?'...':''}</div>
+        <div class="j-tags">
+          ${job.job_type?'<span class="jt jtg">'+job.job_type+'</span>':''}
+          ${sal?'<span class="jt jtb">'+sal+'</span>':''}
+          ${job.category?'<span class="jt jta">'+job.category+'</span>':''}
+        </div>
+        <div class="j-footer">
+          <span class="j-time">Posted ${posted}</span>
+          ${applyBtn}
+        </div>
+      </div>
+      <div class="j-right">
+        <div class="ring"><span class="ring-n">${Math.floor(65+Math.random()*25)}%</span><span class="ring-t">match</span></div>
+        <button class="save-btn" style="margin-top:6px">Save</button>
+      </div>
+    </div>`;
+  });
+
+  const countEl = document.querySelector('.results-count strong');
+  if (countEl) countEl.textContent = jobs.length;
+}
+
 function filterJobs() {
   const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
   const location = (document.getElementById('locationFilter')?.value || '').toLowerCase();
