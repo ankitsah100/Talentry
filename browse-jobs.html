@@ -281,8 +281,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 </div>
 
 <script>
-// Store all loaded jobs for filtering
-let _allJobs = [];
+// Use global window._allJobs accessible from module script
+
 
 function renderJobs(jobs) {
   const list = document.getElementById('jobsList');
@@ -343,7 +343,7 @@ function filterJobs() {
   const checkedCats = Array.from(document.querySelectorAll('.filter-cat:checked')).map(c => c.value.toLowerCase());
   const checkedExp = Array.from(document.querySelectorAll('.filter-exp:checked')).map(c => c.value.toLowerCase());
   
-  let filtered = _allJobs.filter(job => {
+  let filtered = window._allJobs.filter(job => {
     // Keyword search - title, company, description, skills
     if (keyword) {
       const haystack = [job.title, job.company, job.description, job.category, job.department, job.skills?.join(' ')]
@@ -408,9 +408,9 @@ function clearFilters() {
   if (searchInput) searchInput.value = '';
   const locFilter = document.getElementById('locationFilter');
   if (locFilter) locFilter.value = '';
-  renderJobs(_allJobs);
+  renderJobs(window._allJobs);
   const countEl = document.querySelector('.results-header strong, .results-count strong');
-  if (countEl) countEl.textContent = _allJobs.length;
+  if (countEl) countEl.textContent = window._allJobs.length;
   const chipsEl = document.getElementById('activeFilters');
   if (chipsEl) chipsEl.innerHTML = '';
 }
@@ -491,7 +491,7 @@ async function loadJobs() {
     };
     const profile = candidateProfile || defaultProfile;
 
-    _allJobs = jobs; // store all for search/filter
+    window.window._allJobs = jobs; // store all (global) for search/filter (global)
     list.innerHTML = '';
     jobs.forEach(job => {
       // Calculate match score
@@ -548,6 +548,25 @@ async function loadJobs() {
     // Update count in header
     const countEl = document.querySelector('.results-count strong');
     if (countEl) countEl.textContent = jobs.length;
+
+    // Auto-apply URL params (from index.html search)
+    const urlParams = new URLSearchParams(window.location.search);
+    const qParam = urlParams.get('q');
+    const locParam = urlParams.get('loc');
+    if (qParam) {
+      const si = document.getElementById('searchInput');
+      if(si) si.value = qParam;
+    }
+    if (locParam && locParam !== 'All Nepal') {
+      const lf = document.getElementById('locationFilter');
+      if(lf) {
+        // Find matching option
+        Array.from(lf.options).forEach(o => {
+          if(o.value.toLowerCase().includes(locParam.toLowerCase())) lf.value = o.value;
+        });
+      }
+    }
+    if (qParam || locParam) filterJobs();
 
   } catch(err) {
     console.error('loadJobs error:', err);

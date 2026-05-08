@@ -334,7 +334,7 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
     <p class="hero-sub">Smart matching, AI interview coaching, resume builder & WhatsApp alerts — everything to get hired in Nepal's healthcare sector, 100% free.</p>
 
     <div class="hero-search">
-      <input type="text" placeholder="Job title, skill, or hospital name..."/>
+      <input type="text" id="heroSearch" placeholder="Job title, skill, or hospital name..." onkeydown="if(event.key==='Enter'){const q=this.value||'';const loc=document.getElementById('heroLocation')?.value||'';location.href='browse-jobs.html?q='+encodeURIComponent(q)+'&loc='+encodeURIComponent(loc);}"/>
       <select>
         <option>All Nepal</option>
         <option>Kathmandu</option>
@@ -342,7 +342,7 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
         <option>Lalitpur</option>
         <option>Bharatpur</option>
       </select>
-      <button onclick="location.href='browse-jobs.html'">Search jobs</button>
+      <button onclick="const q=document.getElementById('heroSearch')?.value||''; const loc=document.getElementById('heroLocation')?.value||''; location.href='browse-jobs.html?q='+encodeURIComponent(q)+'&loc='+encodeURIComponent(loc);">Search jobs</button>
     </div>
 
     <div class="hero-chips">
