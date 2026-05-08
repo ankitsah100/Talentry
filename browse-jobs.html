@@ -303,7 +303,7 @@ function renderJobs(jobs) {
     const posted = job.created_at
       ? new Date(job.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})
       : 'Recently';
-    const applyBtn = _userRole !== 'employer'
+    const applyBtn = window._userRole !== 'employer'
       ? `<button class="apply-btn" onclick="location.href='apply.html?job=${job.id}'">Apply now →</button>`
       : '';
     list.innerHTML += `
@@ -456,7 +456,7 @@ let _userRole = '';
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       const { data: p } = await sb.from('profiles').select('role').eq('id', session.user.id).single();
-      _userRole = p?.role || '';
+      _userRole = p?.role || ''; window._userRole = _userRole || '';
     }
   } catch(e) {}
   await loadJobs();
@@ -516,7 +516,7 @@ async function loadJobs() {
         ? new Date(job.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric'})
         : 'Recently';
 
-      const applyBtn = _userRole !== 'employer' 
+      const applyBtn = window._userRole !== 'employer' 
         ? `<button class="apply-btn" onclick="location.href='apply.html?job=${job.id}'">Apply now →</button>`
         : '';
 
