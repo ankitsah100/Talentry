@@ -281,8 +281,89 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;ali
 </div>
 
 <script>
-function filterJobs(){ }
-function clearFilters(){ document.querySelectorAll('.filters-sidebar input[type=checkbox]').forEach(c=>c.checked=false); }
+// Store all loaded jobs for filtering
+let _allJobs = [];
+
+function filterJobs() {
+  const keyword = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+  const location = (document.getElementById('locationFilter')?.value || '').toLowerCase();
+  
+  // Get checked filters
+  const checkedTypes = Array.from(document.querySelectorAll('.filter-type:checked')).map(c => c.value.toLowerCase());
+  const checkedCats = Array.from(document.querySelectorAll('.filter-cat:checked')).map(c => c.value.toLowerCase());
+  const checkedExp = Array.from(document.querySelectorAll('.filter-exp:checked')).map(c => c.value.toLowerCase());
+  
+  let filtered = _allJobs.filter(job => {
+    // Keyword search - title, company, description, skills
+    if (keyword) {
+      const haystack = [job.title, job.company, job.description, job.category, job.department, job.skills?.join(' ')]
+        .filter(Boolean).join(' ').toLowerCase();
+      if (!haystack.includes(keyword)) return false;
+    }
+    
+    // Location filter
+    if (location && location !== 'all nepal') {
+      const jobLocation = (job.location || '').toLowerCase();
+      if (!jobLocation.includes(location)) return false;
+    }
+    
+    // Job type filter
+    if (checkedTypes.length > 0) {
+      const jobType = (job.job_type || '').toLowerCase().replace(' ', '');
+      if (!checkedTypes.some(t => jobType.includes(t.replace(' ','')))) return false;
+    }
+    
+    // Category filter
+    if (checkedCats.length > 0) {
+      const jobCat = (job.category || '').toLowerCase();
+      if (!checkedCats.some(c => jobCat.includes(c.split(' ')[0]))) return false;
+    }
+    
+    // Experience filter
+    if (checkedExp.length > 0) {
+      const jobExp = (job.exp_level || job.department || '').toLowerCase();
+      if (!checkedExp.some(e => jobExp.includes(e.split(' ')[0]))) return false;
+    }
+    
+    return true;
+  });
+  
+  renderJobs(filtered);
+  
+  // Update count
+  const countEl = document.querySelector('.results-header strong, .results-count strong');
+  if (countEl) countEl.textContent = filtered.length;
+  
+  // Show active filter chips
+  updateFilterChips(keyword, location, checkedTypes, checkedCats);
+}
+
+function updateFilterChips(keyword, location, types, cats) {
+  const chipsEl = document.getElementById('activeFilters');
+  if (!chipsEl) return;
+  const chips = [];
+  if (keyword) chips.push({label: '🔍 ' + keyword, clear: ()=>{document.getElementById('searchInput').value='';filterJobs();}});
+  if (location && location !== 'all nepal') chips.push({label: '📍 ' + location, clear: ()=>{document.getElementById('locationFilter').value='';filterJobs();}});
+  types.forEach(t => chips.push({label: '💼 ' + t}));
+  cats.forEach(c => chips.push({label: '🏥 ' + c}));
+  
+  chipsEl.innerHTML = chips.map((c,i) => 
+    `<span style="background:#d6f5eb;color:#064e38;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;cursor:pointer;" onclick="removeChip(${i})">${c.label} ✕</span>`
+  ).join('');
+}
+
+function clearFilters() {
+  document.querySelectorAll('.filters-sidebar input[type=checkbox]').forEach(c=>c.checked=false);
+  const searchInput = document.getElementById('searchInput');
+  if (searchInput) searchInput.value = '';
+  const locFilter = document.getElementById('locationFilter');
+  if (locFilter) locFilter.value = '';
+  renderJobs(_allJobs);
+  const countEl = document.querySelector('.results-header strong, .results-count strong');
+  if (countEl) countEl.textContent = _allJobs.length;
+  const chipsEl = document.getElementById('activeFilters');
+  if (chipsEl) chipsEl.innerHTML = '';
+}
 function updateSalaryLabel(v){ document.getElementById('salaryLabel').textContent = 'Up to Rs. '+Number(v).toLocaleString(); }
 </script>
 <script type="module" src="navbar.js"></script>
@@ -360,6 +441,7 @@ async function loadJobs() {
     };
     const profile = candidateProfile || defaultProfile;
 
+    _allJobs = jobs; // store all for search/filter
     list.innerHTML = '';
     jobs.forEach(job => {
       // Calculate match score
