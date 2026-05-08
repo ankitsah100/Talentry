@@ -386,7 +386,7 @@ async function loadJobs() {
 
       const applyBtn = _userRole !== 'employer' 
         ? `<button class="apply-btn" onclick="location.href='apply.html?job=${job.id}'">Apply now →</button>`
-        : `<span style="font-size:12px;color:#0ea271;font-weight:600;">Your platform</span>`;
+        : '';
 
       list.innerHTML += `
       <div class="jcard" style="cursor:pointer">
