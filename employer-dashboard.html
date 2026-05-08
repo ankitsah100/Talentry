@@ -270,6 +270,8 @@ async function loadApplications() {
     const statNew = document.getElementById('statNew');
     if(statApps) statApps.textContent = allApplications.length;
     if(statNew) statNew.textContent = allApplications.filter(a => a.status === 'applied').length;
+    const statHiredEl = document.getElementById('statHired');
+    if(statHiredEl) statHiredEl.textContent = allApplications.filter(a => a.status === 'hired').length;
 
     renderApplications(allApplications, jobMap);
   } catch(e) {

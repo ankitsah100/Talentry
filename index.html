@@ -323,7 +323,8 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
 </nav>
 
 <!-- ── HERO ── -->
-<section class="hero">
+<section id="interviewPrepSection">
+ class="hero">
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
   <div class="particles" id="particles"></div>
@@ -363,6 +364,18 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
     </div>
   </div>
 </section>
+<script>
+(function() {
+  try {
+    const key = 'sb-eteyskwaqjtcybaolnto-auth-token';
+    const d = JSON.parse(localStorage.getItem(key) || '{}');
+    const role = localStorage.getItem('talentry_role') || '';
+    if (role === 'employer') {
+      document.getElementById('interviewPrepSection').style.display = 'none';
+    }
+  } catch(e) {}
+})();
+</script>
 
 <!-- ── LIVE STRIP ── -->
 <div class="live-strip">
@@ -534,10 +547,10 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
     <button class="f" onclick="filterIndexJobs(this,'pharmacy')">Pharmacy</button>
     <button class="f" onclick="filterIndexJobs(this,'ingo')">INGO / NGO</button>
   </div>
-  <div class="jcard"><div class="j-ico">🏥</div><div class="j-body"><div class="j-title">Biomedical Engineer <span class="jnew">New</span></div><div class="j-org">Bir Hospital · Kathmandu · 2 hours ago</div><div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 45,000/mo</span><span class="jt jta">Medical devices</span><span class="jt jtp">Urgent</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn" onclick="location.href='apply.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">94%</span><span class="ring-t">match</span></div></div></div>
-  <div class="jcard"><div class="j-ico">🧬</div><div class="j-body"><div class="j-title">Clinical Lab Technician</div><div class="j-org">Grande Hospital · Kathmandu · 5 hours ago</div><div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 38,000/mo</span><span class="jt jta">Laboratory</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn" onclick="location.href='apply.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">88%</span><span class="ring-t">match</span></div></div></div>
-  <div class="jcard"><div class="j-ico">🔬</div><div class="j-body"><div class="j-title">Radiographer</div><div class="j-org">Norvic Hospital · Kathmandu · 1 day ago</div><div class="j-tags"><span class="jt jtg">Part time</span><span class="jt jtb">Rs. 30,000/mo</span><span class="jt jta">Imaging</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn" onclick="location.href='apply.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">81%</span><span class="ring-t">match</span></div></div></div>
-  <div class="jcard"><div class="j-ico">🌍</div><div class="j-body"><div class="j-title">Health Program Officer <span class="jnew">INGO</span></div><div class="j-org">WHO Nepal · Kathmandu · 3 days ago</div><div class="j-tags"><span class="jt jtg">Contract</span><span class="jt jtb">Rs. 80,000/mo</span><span class="jt jtp">Public health</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn" onclick="location.href='apply.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">77%</span><span class="ring-t">match</span></div></div></div>
+  <div class="jcard" data-category="biomedical"><div class="j-ico">🏥</div><div class="j-body"><div class="j-title">Biomedical Engineer <span class="jnew">New</span></div><div class="j-org">Bir Hospital · Kathmandu · 2 hours ago</div><div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 45,000/mo</span><span class="jt jta">Medical devices</span><span class="jt jtp">Urgent</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn employer-hidden" onclick="location.href='browse-jobs.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">94%</span><span class="ring-t">match</span></div></div></div>
+  <div class="jcard" data-category="laboratory"><div class="j-ico">🧬</div><div class="j-body"><div class="j-title">Clinical Lab Technician</div><div class="j-org">Grande Hospital · Kathmandu · 5 hours ago</div><div class="j-tags"><span class="jt jtg">Full time</span><span class="jt jtb">Rs. 38,000/mo</span><span class="jt jta">Laboratory</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn employer-hidden" onclick="location.href='browse-jobs.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">88%</span><span class="ring-t">match</span></div></div></div>
+  <div class="jcard" data-category="imaging"><div class="j-ico">🔬</div><div class="j-body"><div class="j-title">Radiographer</div><div class="j-org">Norvic Hospital · Kathmandu · 1 day ago</div><div class="j-tags"><span class="jt jtg">Part time</span><span class="jt jtb">Rs. 30,000/mo</span><span class="jt jta">Imaging</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn employer-hidden" onclick="location.href='browse-jobs.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">81%</span><span class="ring-t">match</span></div></div></div>
+  <div class="jcard" data-category="ingo"><div class="j-ico">🌍</div><div class="j-body"><div class="j-title">Health Program Officer <span class="jnew">INGO</span></div><div class="j-org">WHO Nepal · Kathmandu · 3 days ago</div><div class="j-tags"><span class="jt jtg">Contract</span><span class="jt jtb">Rs. 80,000/mo</span><span class="jt jtp">Public health</span></div><div class="j-footer"><span class="j-time"></span><button class="apply-btn employer-hidden" onclick="location.href='browse-jobs.html'">Apply now</button></div></div><div class="j-right"><div class="ring"><span class="ring-n">77%</span><span class="ring-t">match</span></div></div></div>
   </div>
 </section>
 
@@ -669,7 +682,7 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
     <div class="foot-col"><h4>Job seekers</h4><a href="browse-jobs.html">Find jobs</a>
     <a href="swipe-jobs.html">💼 Swipe jobs</a><a href="resume-builder.html">Resume builder</a><a href="interview-prep.html">AI interview prep</a><a href="salary-insights.html">Salary insights</a></div>
     <div class="foot-col"><h4>Employers</h4><a href="post-job.html">Post a job</a><a href="employer-dashboard.html">Dashboard</a><a href="post-job.html">AI screening</a><a href="employer-dashboard.html">Analytics</a></div>
-    <div class="foot-col"><h4>Company</h4><a href="javascript:void(0)" href="index.html">About</a><a href="javascript:void(0)" href="index.html">Blog</a><a href="javascript:void(0)" href="privacy.html">Privacy</a><a href="javascript:void(0)" href="terms.html">Terms</a></div>
+    <div class="foot-col"><h4>Company</h4><a href="index.html" href="about.html">About</a><a href="index.html" href="blog.html">Blog</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
   </div>
   <div class="foot-bot">
     <div class="foot-copy">© 2026 Talentry · Kathmandu, Nepal · Built for Nepal's healthcare sector</div>
@@ -773,6 +786,33 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 // ── HAMBURGER ──────────────────────────────
 function toggleMenu(){ document.getElementById('mobileMenu').classList.toggle('open'); document.getElementById('hamburger').classList.toggle('open'); }
 document.addEventListener('click', e => { const m = document.getElementById('mobileMenu'); const h = document.getElementById('hamburger'); if(m&&h&&!m.contains(e.target)&&!h.contains(e.target)) m.classList.remove('open'); });
+
+// Hide apply buttons for employers
+(function() {
+  try {
+    const role = localStorage.getItem('talentry_role') || '';
+    if (role === 'employer') {
+      document.querySelectorAll('.employer-hidden').forEach(el => el.style.display = 'none');
+    }
+  } catch(e) {}
+})();
+
+// ── CATEGORY FILTER (Latest Openings section) ──
+function filterIndexJobs(btn, cat) {
+  document.querySelectorAll('.f').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  const cards = document.querySelectorAll('.jcard, .job-card-home, [data-category]');
+  if (cards.length > 0) {
+    cards.forEach(card => {
+      const text = card.textContent.toLowerCase();
+      card.style.display = (!cat || text.includes(cat.toLowerCase())) ? '' : 'none';
+    });
+  } else {
+    // Jobs loaded dynamically - filter via fetch
+    window._indexCatFilter = cat;
+    if (window._indexJobs) renderIndexJobs(window._indexJobs.filter(j => !cat || (j.category||'').toLowerCase().includes(cat)));
+  }
+}
 </script>
 
 <div class="mobile-menu" id="mobileMenu">
