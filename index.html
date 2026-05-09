@@ -45,7 +45,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;height:64px;display:flex;ali
 .particle{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--gm);opacity:0;animation:float linear infinite;}
 @keyframes float{0%{opacity:0;transform:translateY(0) scale(0)}20%{opacity:0.8}80%{opacity:0.8}100%{opacity:0;transform:translateY(-100vh) scale(1.5)}}
 
-.hero-content{position:relative;z-index:2;max-width:900px;}
+.hero-content{position:relative;z-index:2;max-width:900px;margin:0 auto;width:100%;}
 
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(14,162,113,0.12);border:1px solid rgba(14,162,113,0.3);color:var(--gm);font-size:12px;font-weight:600;padding:6px 16px;border-radius:100px;margin-bottom:28px;letter-spacing:.04em;}
 .hero-badge-dot{width:7px;height:7px;border-radius:50%;background:var(--g);animation:blink 1.5s infinite;}
@@ -531,14 +531,30 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
   </div>
   </div>
 <script>
-(function() {
+(async function() {
   try {
-    const role = localStorage.getItem('talentry_role') || '';
+    // Check all possible role storage keys
+    const keys = Object.keys(localStorage);
+    const authKey = keys.find(k => k.includes('auth-token') || k.includes('supabase'));
+    if (!authKey) return;
+    const session = JSON.parse(localStorage.getItem(authKey) || '{}');
+    const userId = session?.user?.id || session?.user?.sub;
+    if (!userId) return;
+
+    // Fetch profile to get role
+    const resp = await fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/profiles?id=eq.' + userId + '&select=role', {
+      headers: {
+        'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
+        'Authorization': 'Bearer ' + (session?.access_token || '')
+      }
+    });
+    const data = await resp.json();
+    const role = data?.[0]?.role;
+    
     if (role === 'employer') {
       document.querySelectorAll('.feat.jobseeker-only').forEach(el => el.style.display = 'none');
-      // Update section title
-      const title = document.querySelector('.feat-grid')?.closest('section')?.querySelector('.sec-title');
-      if (title) title.innerHTML = title.innerHTML.replace(/\d+/, '4');
+      document.querySelectorAll('.employer-hidden').forEach(el => el.style.display = 'none');
+      document.getElementById('interviewPrepSection') && (document.getElementById('interviewPrepSection').style.display = 'none');
     }
   } catch(e) {}
 })();
