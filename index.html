@@ -311,6 +311,12 @@ body.is-employer .feat.jobseeker-only { display: none !important; }
 body.is-employer .employer-hidden { display: none !important; }
 body.is-employer a.jobseeker-only { display: none !important; }
 body.is-employer .jobseeker-only { display: none !important; }
+body.is-employer li.jobseeker-only { display: none !important; }
+/* Hide entire jobseeker sections */
+body.is-employer #swipeSection { display: none !important; }
+body.is-employer #aiCoachSection { display: none !important; }
+body.is-employer #salaryJobseekerSection { display: none !important; }
+body.is-employer #socialSection { display: none !important; }
 /* employer-only items hidden by default, shown for employers */
 a.employer-only { display: none; }
 body.is-employer a.employer-only { display: inline !important; }
@@ -491,7 +497,7 @@ body.is-employer a.employer-only { display: inline !important; }
 </div>
 
 <!-- ── SWIPE ── -->
-<section class="light-section reveal">
+<section id="swipeSection" class="jobseeker-section jobseeker-section light-section reveal">
   <div style="max-width:1100px;margin:0 auto;">
   <div class="split">
     <div class="split-text">
@@ -631,7 +637,7 @@ body.is-employer a.employer-only { display: inline !important; }
 </section>
 
 <!-- ── JOBS ── -->
-<section class="light-section reveal">
+<section class="jobseeker-section light-section reveal">
   <div style="max-width:1100px;margin:0 auto;">
   <div class="jobs-hdr">
     <div><div class="sec-label">Latest openings</div><h2 class="sec-title">Healthcare jobs in <em>Nepal</em></h2></div>
@@ -653,7 +659,7 @@ body.is-employer a.employer-only { display: inline !important; }
 </section>
 
 <!-- ── AI INTERVIEW ── -->
-<section class="light-section-alt reveal">
+<section id="aiCoachSection" class="jobseeker-section jobseeker-section light-section-alt reveal">
   <div style="max-width:1100px;margin:0 auto;">
   <div class="ai-layout">
     <div>
@@ -684,7 +690,7 @@ body.is-employer a.employer-only { display: inline !important; }
 </section>
 
 <!-- ── SALARY ── -->
-<section class="light-section reveal">
+<section id="salaryJobseekerSection" class="jobseeker-section light-section reveal">
   <div style="max-width:1100px;margin:0 auto;">
   <div class="salary-layout">
     <div>
@@ -705,7 +711,7 @@ body.is-employer a.employer-only { display: inline !important; }
 </section>
 
 <!-- ── SOCIAL POSTING ── -->
-<section class="light-section-alt reveal">
+<section id="socialSection" class="jobseeker-section jobseeker-section light-section-alt reveal">
   <div style="max-width:1100px;margin:0 auto;text-align:center;">
   <div class="sec-label">Auto social posting</div>
   <h2 class="sec-title" style="margin-bottom:14px;">Every job posted to social media<br><em>automatically — free</em></h2>
