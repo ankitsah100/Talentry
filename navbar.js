@@ -47,6 +47,7 @@ async function updateNavbar() {
 
     const initials = name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
     const role = profile?.role || 'jobseeker';
+    localStorage.setItem('talentry_role', role); // Cache for instant role detection on index page
 
     // Update nav links based on role
     if (navLinks) {

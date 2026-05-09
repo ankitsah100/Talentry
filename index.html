@@ -301,14 +301,19 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
 .reveal.in{opacity:1;transform:translateY(0);}
 
-/* Role-based visibility */
+/* Role-based visibility - default shows all (not logged in) */
 #employerFeatures { display: none !important; }
-#jobseekerFeatures { display: block; }
-.jobseeker-section { display: block; }
-body.is-employer #employerFeatures, html.is-employer #employerFeatures { display: block !important; }
-body.is-employer #jobseekerFeatures, html.is-employer #jobseekerFeatures { display: none !important; }
-body.is-employer .jobseeker-section, html.is-employer .jobseeker-section { display: none !important; }
-body.is-employer .employer-hidden, html.is-employer .employer-hidden { display: none !important; }
+/* When employer detected */
+body.is-employer #employerFeatures { display: block !important; }
+body.is-employer #jobseekerFeatures { display: none !important; }
+body.is-employer .jobseeker-section { display: none !important; }
+body.is-employer .feat.jobseeker-only { display: none !important; }
+body.is-employer .employer-hidden { display: none !important; }
+body.is-employer a.jobseeker-only { display: none !important; }
+body.is-employer .jobseeker-only { display: none !important; }
+/* employer-only items hidden by default, shown for employers */
+a.employer-only { display: none; }
+body.is-employer a.employer-only { display: inline !important; }
 </style>
 </head>
 <body><script>
@@ -543,33 +548,34 @@ body.is-employer .employer-hidden, html.is-employer .employer-hidden { display: 
   </div>
   </div>
 <script>
-// SYNC role check - runs immediately before render
+// Role detection - runs on page load
 (function() {
   try {
-    const keys = Object.keys(localStorage);
-    const authKey = keys.find(k => k.includes('supabase') && k.includes('auth'));
+    // 1. Check cached role first (fastest)
+    const cached = localStorage.getItem('talentry_role');
+    if (cached === 'employer') { document.body.classList.add('is-employer'); return; }
+    if (cached === 'jobseeker') return; // confirmed jobseeker, show all
+    
+    // 2. Check Supabase session
+    const authKey = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth'));
     if (!authKey) return;
     const session = JSON.parse(localStorage.getItem(authKey) || '{}');
-    const role = session?.user?.user_metadata?.role || '';
-    // Also check our stored role
-    const storedRole = localStorage.getItem('talentry_role') || '';
+    if (!session?.access_token) return;
     
-    if (role === 'employer' || storedRole === 'employer') {
-      document.body.classList.add('is-employer');
-      return;
-    }
-    
-    // Async fallback - fetch from DB
     const userId = session?.user?.id;
     const token = session?.access_token;
-    if (!userId || !token) return;
     
+    // 3. Fetch role from DB and cache it
     fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/profiles?id=eq.' + userId + '&select=role', {
-      headers: { 'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe', 'Authorization': 'Bearer ' + token }
+      headers: {
+        'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
+        'Authorization': 'Bearer ' + token
+      }
     }).then(r => r.json()).then(data => {
-      if (data?.[0]?.role === 'employer') {
+      const role = data?.[0]?.role || 'jobseeker';
+      localStorage.setItem('talentry_role', role); // cache for next visit
+      if (role === 'employer') {
         document.body.classList.add('is-employer');
-        localStorage.setItem('talentry_role', 'employer');
       }
     }).catch(()=>{});
   } catch(e) {}
@@ -772,8 +778,8 @@ body.is-employer .employer-hidden, html.is-employer .employer-hidden { display: 
       <p>Nepal's first AI-powered healthcare job portal. Built for biomedical engineers, nurses, lab technicians, and all healthcare professionals across Nepal.</p>
     </div>
     <div class="foot-col"><h4>Job seekers</h4><a href="browse-jobs.html">Find jobs</a>
-    <a href="swipe-jobs.html">💼 Swipe jobs</a><a href="resume-builder.html">Resume builder</a><a href="interview-prep.html">AI interview prep</a><a href="salary-insights.html">Salary insights</a></div>
-    <div class="foot-col"><h4>Employers</h4><a href="post-job.html">Post a job</a><a href="employer-dashboard.html">Dashboard</a><a href="post-job.html">AI screening</a><a href="employer-dashboard.html">Analytics</a></div>
+    <a href="swipe-jobs.html" class="jobseeker-only">💼 Swipe jobs</a><a href="resume-builder.html" class="jobseeker-only">Resume builder</a><a href="interview-prep.html" class="jobseeker-only">AI interview prep</a><a href="salary-insights.html">Salary insights</a></div>
+    <div class="foot-col"><h4>Employers</h4><a href="post-job.html" class="employer-only">Post a job</a><a href="employer-dashboard.html" class="employer-only">Dashboard</a><a href="post-job.html" class="employer-only">AI screening</a><a href="employer-dashboard.html" class="employer-only">Analytics</a></div>
     <div class="foot-col"><h4>Company</h4><a href="index.html" href="about.html">About</a><a href="index.html" href="blog.html">Blog</a><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a></div>
   </div>
   <div class="foot-bot">
