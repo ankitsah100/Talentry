@@ -300,9 +300,21 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
 /* REVEAL */
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease;}
 .reveal.in{opacity:1;transform:translateY(0);}
+
+/* Role-based visibility */
+#employerFeatures { display: none !important; }
+#jobseekerFeatures { display: block; }
+.jobseeker-section { display: block; }
+body.is-employer #employerFeatures, html.is-employer #employerFeatures { display: block !important; }
+body.is-employer #jobseekerFeatures, html.is-employer #jobseekerFeatures { display: none !important; }
+body.is-employer .jobseeker-section, html.is-employer .jobseeker-section { display: none !important; }
+body.is-employer .employer-hidden, html.is-employer .employer-hidden { display: none !important; }
 </style>
 </head>
-<body>
+<body><script>
+// Early employer detection - prevents flash
+(function(){try{const k=Object.keys(localStorage).find(k=>k.includes('supabase')&&k.includes('auth'));if(!k)return;const s=JSON.parse(localStorage.getItem(k)||'{}');const r=s?.user?.user_metadata?.role||localStorage.getItem('talentry_role')||'';if(r==='employer')document.documentElement.classList.add('is-employer');}catch(e){}})();
+</script>
 
 <!-- NAV -->
 <nav>
@@ -323,7 +335,7 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
 </nav>
 
 <!-- ── HERO ── -->
-<section id="interviewPrepSection">
+<section id="interviewPrepSection" class="jobseeker-section">
  class="hero">
   <div class="hero-grid"></div>
   <div class="hero-glow"></div>
@@ -508,7 +520,7 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
 </section>
 
 <!-- ── AI TOOLS ── -->
-<section class="light-section-alt reveal">
+<section class="light-section-alt reveal" id="jobseekerFeatures">
   <div style="max-width:1100px;margin:0 auto;">
   <div class="sec-center">
     <div class="sec-label">All-in-one platform</div>
@@ -531,34 +543,85 @@ footer{padding:52px 5% 28px;background:#050d0a;border-top:1px solid rgba(14,162,
   </div>
   </div>
 <script>
-(async function() {
+// SYNC role check - runs immediately before render
+(function() {
   try {
-    // Check all possible role storage keys
     const keys = Object.keys(localStorage);
-    const authKey = keys.find(k => k.includes('auth-token') || k.includes('supabase'));
+    const authKey = keys.find(k => k.includes('supabase') && k.includes('auth'));
     if (!authKey) return;
     const session = JSON.parse(localStorage.getItem(authKey) || '{}');
-    const userId = session?.user?.id || session?.user?.sub;
-    if (!userId) return;
-
-    // Fetch profile to get role
-    const resp = await fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/profiles?id=eq.' + userId + '&select=role', {
-      headers: {
-        'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe',
-        'Authorization': 'Bearer ' + (session?.access_token || '')
-      }
-    });
-    const data = await resp.json();
-    const role = data?.[0]?.role;
+    const role = session?.user?.user_metadata?.role || '';
+    // Also check our stored role
+    const storedRole = localStorage.getItem('talentry_role') || '';
     
-    if (role === 'employer') {
-      document.querySelectorAll('.feat.jobseeker-only').forEach(el => el.style.display = 'none');
-      document.querySelectorAll('.employer-hidden').forEach(el => el.style.display = 'none');
-      document.getElementById('interviewPrepSection') && (document.getElementById('interviewPrepSection').style.display = 'none');
+    if (role === 'employer' || storedRole === 'employer') {
+      document.body.classList.add('is-employer');
+      return;
     }
+    
+    // Async fallback - fetch from DB
+    const userId = session?.user?.id;
+    const token = session?.access_token;
+    if (!userId || !token) return;
+    
+    fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/profiles?id=eq.' + userId + '&select=role', {
+      headers: { 'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe', 'Authorization': 'Bearer ' + token }
+    }).then(r => r.json()).then(data => {
+      if (data?.[0]?.role === 'employer') {
+        document.body.classList.add('is-employer');
+        localStorage.setItem('talentry_role', 'employer');
+      }
+    }).catch(()=>{});
   } catch(e) {}
 })();
 </script>
+</section>
+<section class="light-section-alt reveal" id="employerFeatures" style="display:none;">
+  <div style="max-width:1100px;margin:0 auto;">
+  <div class="sec-center">
+    <div class="sec-label">Built for employers</div>
+    <h2 class="sec-title">Everything you need to <em>hire faster</em></h2>
+    <p class="sec-sub">Post jobs, screen applicants with AI, and find the right healthcare professional for your team.</p>
+  </div>
+  <div class="feat-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:40px;">
+    <div class="feat">
+      <div class="feat-ico">🤖</div>
+      <h3>AI applicant screening</h3>
+      <p>Instantly rank applicants by skills, experience and role fit. Never miss the right candidate.</p>
+      <span class="feat-tag" style="background:#d6f5eb;color:#064e38;">Smart</span>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📊</div>
+      <h3>Applicant dashboard</h3>
+      <p>Track all applications in one place. Move candidates through Review → Interview → Hire.</p>
+      <span class="feat-tag" style="background:#fef3c7;color:#92400e;">New</span>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">💰</div>
+      <h3>Salary insights</h3>
+      <p>Know the market rate before posting. Set competitive salaries and attract top talent.</p>
+      <span class="feat-tag" style="background:#fef3c7;color:#92400e;">New</span>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📋</div>
+      <h3>CV downloads</h3>
+      <p>Download applicant CVs instantly. View full profiles with education, skills and experience.</p>
+      <span class="feat-tag" style="background:#d6f5eb;color:#064e38;">Free</span>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">✉️</div>
+      <h3>Direct email contact</h3>
+      <p>Email shortlisted candidates directly from the dashboard with one click.</p>
+      <span class="feat-tag" style="background:#d6f5eb;color:#064e38;">Built-in</span>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🌐</div>
+      <h3>Nepali language support</h3>
+      <p>Full platform support in Nepali and English. Reach candidates across all provinces.</p>
+      <span class="feat-tag" style="background:#ede9fe;color:#5b21b6;">नेपाली</span>
+    </div>
+  </div>
+  </div>
 </section>
 
 <!-- ── JOBS ── -->
