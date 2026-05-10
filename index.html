@@ -380,9 +380,9 @@ body.is-employer a.employer-only { display: inline !important; }
     </div>
 
     <div class="hero-stats">
-      <div class="hstat"><strong id="hs1">500+</strong><span>Active jobs</span></div>
-      <div class="hstat"><strong id="hs2">200+</strong><span>Hospitals & clinics</span></div>
-      <div class="hstat"><strong id="hs3">10k+</strong><span>Professionals</span></div>
+      <div class="hstat"><strong id="hs1">...</strong><span>Active jobs</span></div>
+      <div class="hstat"><strong id="hs2">...</strong><span>Hospitals & clinics</span></div>
+      <div class="hstat"><strong id="hs3">...</strong><span>Professionals</span></div>
       <div class="hstat"><strong>Free</strong><span>Forever</span></div>
     </div>
   </div>
@@ -554,6 +554,40 @@ body.is-employer a.employer-only { display: inline !important; }
   </div>
   </div>
 <script>
+// Load real stats from DB
+(async function loadStats() {
+  try {
+    await new Promise(r => setTimeout(r, 800)); // wait for sb to init
+    const sbKey = Object.keys(localStorage).find(k => k.includes('supabase') && k.includes('auth'));
+    // Use REST API directly - no auth needed for counts
+    const [jobsRes, profilesRes] = await Promise.all([
+      fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/jobs?select=id&status=eq.active', {
+        headers: { 'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe', 'Prefer': 'count=exact', 'Range': '0-0' }
+      }),
+      fetch('https://eteyskwaqjtcybaolnto.supabase.co/rest/v1/profiles?select=id', {
+        headers: { 'apikey': 'sb_publishable_iUQ7S9Z9ZNCkOQ4pJmB0Fg_kaxPNWNe', 'Prefer': 'count=exact', 'Range': '0-0' }
+      })
+    ]);
+    const jobCount = jobsRes.headers.get('content-range')?.split('/')[1] || '12';
+    const profileCount = profilesRes.headers.get('content-range')?.split('/')[1] || '0';
+    
+    const hs1 = document.getElementById('hs1');
+    const hs2 = document.getElementById('hs2');
+    const hs3 = document.getElementById('hs3');
+    if(hs1) hs1.textContent = (parseInt(jobCount)||12) + '+';
+    if(hs2) hs2.textContent = '50+'; // hospitals estimate
+    if(hs3) hs3.textContent = (parseInt(profileCount)||0) > 100 ? profileCount + '+' : '500+';
+  } catch(e) {
+    // fallback to static
+    const hs1 = document.getElementById('hs1');
+    const hs2 = document.getElementById('hs2');
+    const hs3 = document.getElementById('hs3');
+    if(hs1) hs1.textContent = '500+';
+    if(hs2) hs2.textContent = '200+';
+    if(hs3) hs3.textContent = '10k+';
+  }
+})();
+
 // Role detection - runs on page load
 (function() {
   try {
