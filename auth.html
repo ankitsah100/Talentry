@@ -86,6 +86,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;color:var(--text);background:var
 /* MOBILE */
 @media(max-width:700px){body{grid-template-columns:1fr;}.left{display:none;}.right{padding:24px 5%;}}
 </style>
+<link rel="stylesheet" href="mobile.css"/>
 </head>
 <body>
 
@@ -473,6 +474,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Expose ALL functions to global scope (must be after definitions)
   window._sb = sb;
   window.googleLoginDirect = googleLoginDirect;
+  
+  // Auto-switch tab based on URL param
+  const tabParam = new URLSearchParams(window.location.search).get('tab');
+  if (tabParam === 'signup') switchTab('signup');
   window.doLogin = doLogin;
   window.doSignup = doSignup;
   window.doForgot = doForgot;
